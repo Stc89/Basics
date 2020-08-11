@@ -1,0 +1,16 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+D:\my-zimeiti\少儿编程开发板\51单片机 小系统板 STC89C52 STC51 STC89核心 开发板 学习板\贴片STC最小系统资料包v3.4\5.例程\1.LCD1602例程\main.uvproj
+Project File Date:  04/14/2013
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling main.c...
+compiling LCD1602.c...
+linking...
+Program Size: data=12.0 xdata=0 code=291
+creating hex file from "main"...
+"main" - 0 Error(s), 0 Warning(s).

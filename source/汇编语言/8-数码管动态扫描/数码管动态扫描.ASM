@@ -1,0 +1,42 @@
+;动态扫描数码显示程序
+;P0口接J3，数据端口
+;P2.2接 J2 B端子，表示段码锁存
+;P2.3接 J2 A端子，标志位码锁存
+ORG 00H
+MOV 20H,#3FH   ;0
+MOV 21H,#06H   ;1
+MOV 22H,#5BH   ;2
+MOV 23H,#4FH   ;3
+MOV 24H,#66H   ;4
+MOV 25H,#6DH   ;5
+
+  LATCH1 BIT P2.2
+  LATCH2 BIT P2.3
+
+START:CALL SCAN
+      JMP START
+SCAN:MOV A,#0FEH    ;扫描子程序
+      MOV R0,#20H
+      SETB C
+      MOV R2,#06H
+LOOP:RLC A
+
+     MOV P0,A
+     SETB LATCH2
+     CLR LATCH2
+     MOV P0,@R0
+     SETB LATCH1
+     CLR LATCH1
+     INC R0
+     CALL DELAY
+     DJNZ R2,LOOP
+     MOV R2,#07H
+     RET
+DELAY:MOV R3,#1  ;扫描延时
+D1:MOV R4,#2
+D2:MOV R5,#248
+   DJNZ R5,$
+   DJNZ R4,D2
+   DJNZ R3,D1
+   RET
+   END

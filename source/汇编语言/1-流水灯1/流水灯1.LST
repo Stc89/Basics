@@ -1,0 +1,236 @@
+                                                                    页     1
+                                                                    07-31-20
+                                                                    21:13:46
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            ;流水灯程序
+            ;使用杜邦线连接P1与LED端口J9
+            
+            ORG 00H
+            
+0000 74FF   START:MOV A,#0FFH    ;赋初值
+0002 C3           CLR C
+0003 7A08         MOV R2,#8
+                  
+0005 13     LOOP1:RRC A           ; 带进位右移
+0006 F590        MOV P1,A
+0008 120019      CALL DELAY
+000B DAF8        DJNZ R2,LOOP1
+000D 7A07        MOV R2,#7
+                 
+000F 33     LOOP2:RLC A          ;  带进位左移
+0010 F590         MOV P1,A
+0012 120019       CALL DELAY
+0015 DAF8         DJNZ R2,LOOP2
+0017 80E7         JMP START
+                  
+0019 7B14   DELAY:MOV R3,#20     ;   延时0.2秒
+001B 7C14   D1:   MOV R4,#20
+001D 7DF8   D2:   MOV R5,#248
+001F DDFE         DJNZ R5,$
+0021 DCFA         DJNZ R4,D2
+0023 DBF6         DJNZ R3,D1
+0025 22           RET
+                  
+            END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+ 
+                                                                    页     2
+                                                                    07-31-20
+                                                                    21:13:46
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+
+
+            符号                       值     类型
+
+            AC                       = 00D6H CONST 常量 
+            ACC                      = 00E0H CONST 常量 
+            B                        = 00F0H CONST 常量 
+            CCF0                     = 00DFH CONST 常量 
+            CCF1                     = 00DEH CONST 常量 
+            CCF2                     = 00DDH CONST 常量 
+            CCF3                     = 00DCH CONST 常量 
+            CCF4                     = 00DBH CONST 常量 
+            CF                       = 00D8H CONST 常量 
+            CP_RL2                   = 00C8H CONST 常量 
+            CP_RL2                   = 00C8H CONST 常量 
+            CR                       = 00D9H CONST 常量 
+            CY                       = 00D7H CONST 常量 
+            C_T2                     = 00C9H CONST 常量 
+            C_T2                     = 00C9H CONST 常量 
+            D1                       = 001BH CODE  标号 
+            D2                       = 001DH CODE  标号 
+            DELAY                    = 0019H CODE  标号 
+            DPH                      = 0083H CONST 常量 
+            DPL                      = 0082H CONST 常量 
+            EA                       = 00AFH CONST 常量 
+            ES                       = 00ACH CONST 常量 
+            ET0                      = 00A9H CONST 常量 
+            ET1                      = 00ABH CONST 常量 
+            ET2                      = 00ADH CONST 常量 
+            EX0                      = 00A8H CONST 常量 
+            EX1                      = 00AAH CONST 常量 
+            EXEN2                    = 00CBH CONST 常量 
+            EXEN2                    = 00CBH CONST 常量 
+            EXF2                     = 00CEH CONST 常量 
+            EXF2                     = 00CEH CONST 常量 
+            F0                       = 00D5H CONST 常量 
+            IE                       = 00A8H CONST 常量 
+            IE0                      = 0089H CONST 常量 
+            IE1                      = 008BH CONST 常量 
+            INT0                     = 00B2H CONST 常量 
+            INT1                     = 00B3H CONST 常量 
+            IP                       = 00B8H CONST 常量 
+            IT0                      = 0088H CONST 常量 
+            IT1                      = 008AH CONST 常量 
+            LOOP1                    = 0005H CODE  标号 
+            LOOP2                    = 000FH CODE  标号 
+            OV                       = 00D2H CONST 常量 
+            P                        = 00D0H CONST 常量 
+
+
+D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+ 
+                                                                    页     3
+                                                                    07-31-20
+                                                                    21:13:46
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            P0                       = 0080H CONST 常量 
+            P1                       = 0090H CONST 常量 
+            P2                       = 00A0H CONST 常量 
+            P3                       = 00B0H CONST 常量 
+            PCON                     = 0087H CONST 常量 
+            PS                       = 00BCH CONST 常量 
+            PSW                      = 00D0H CONST 常量 
+            PT0                      = 00B9H CONST 常量 
+            PT1                      = 00BBH CONST 常量 
+            PX0                      = 00B8H CONST 常量 
+            PX1                      = 00BAH CONST 常量 
+            RB8                      = 009AH CONST 常量 
+            RCAP2H                   = 00CBH CONST 常量 
+            RCAP2L                   = 00CAH CONST 常量 
+            RCLK                     = 00CDH CONST 常量 
+            RCLK                     = 00CDH CONST 常量 
+            RD                       = 00B7H CONST 常量 
+            REN                      = 009CH CONST 常量 
+            RI                       = 0098H CONST 常量 
+            RS0                      = 00D3H CONST 常量 
+            RS1                      = 00D4H CONST 常量 
+            RXD                      = 00B0H CONST 常量 
+            SBUF                     = 0099H CONST 常量 
+            SCON                     = 0098H CONST 常量 
+            SM0                      = 009FH CONST 常量 
+            SM1                      = 009EH CONST 常量 
+            SM2                      = 009DH CONST 常量 
+            SP                       = 0081H CONST 常量 
+            START                    = 0000H CODE  标号 
+            T0                       = 00B4H CONST 常量 
+            T1                       = 00B5H CONST 常量 
+            T2CON                    = 00C8H CONST 常量 
+            TB8                      = 009BH CONST 常量 
+            TCLK                     = 00CCH CONST 常量 
+            TCLK                     = 00CCH CONST 常量 
+            TCON                     = 0088H CONST 常量 
+            TF0                      = 008DH CONST 常量 
+            TF1                      = 008FH CONST 常量 
+            TF2                      = 00CFH CONST 常量 
+            TF2                      = 00CFH CONST 常量 
+            TH0                      = 008CH CONST 常量 
+            TH1                      = 008DH CONST 常量 
+            TH2                      = 00CDH CONST 常量 
+            TI                       = 0099H CONST 常量 
+            TL0                      = 008AH CONST 常量 
+            TL1                      = 008BH CONST 常量 
+            TL2                      = 00CCH CONST 常量 
+            TMOD                     = 0089H CONST 常量 
+
+
+D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+ 
+                                                                    页     4
+                                                                    07-31-20
+                                                                    21:13:46
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            TR0                      = 008CH CONST 常量 
+            TR1                      = 008EH CONST 常量 
+            TR2                      = 00CAH CONST 常量 
+            TR2                      = 00CAH CONST 常量 
+            TXD                      = 00B1H CONST 常量 
+            WR                       = 00B6H CONST 常量 
+
+
+            公有符号:   98
+            私有符号:    0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+ 
