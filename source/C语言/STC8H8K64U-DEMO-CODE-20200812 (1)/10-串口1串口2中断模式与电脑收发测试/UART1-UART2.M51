@@ -1,0 +1,311 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    08/10/2020  17:40:07  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE UART1-UART2.obj TO UART1-UART2 RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  UART1-UART2.obj (UART1_UART2)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+
+
+LINK MAP OF MODULE:  UART1-UART2 (UART1_UART2)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0004H     UNIT         ?DT?UART1_UART2
+                    000CH     0014H                  *** GAP ***
+            BIT     0020H.0   0000H.2   UNIT         ?BI?UART1_UART2
+                    0020H.2   0000H.6                *** GAP ***
+            IDATA   0021H     0040H     UNIT         ?ID?UART1_UART2
+            IDATA   0061H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     001AH     UNIT         ?PR?_SETTIMER2BAUDRAYE?UART1_UART2
+                    001DH     0006H                  *** GAP ***
+            CODE    0023H     0003H     ABSOLUTE     
+            CODE    0026H     0019H     UNIT         ?C?LIB_CODE
+                    003FH     0004H                  *** GAP ***
+            CODE    0043H     0003H     ABSOLUTE     
+            CODE    0046H     0087H     UNIT         ?PR?MAIN?UART1_UART2
+            CODE    00CDH     0046H     UNIT         ?CO?UART1_UART2
+            CODE    0113H     0043H     UNIT         ?PR?_UART1_CONFIG?UART1_UART2
+            CODE    0156H     003BH     UNIT         ?PR?UART2_INT?UART1_UART2
+            CODE    0191H     0033H     UNIT         ?PR?UART1_INT?UART1_UART2
+            CODE    01C4H     0022H     UNIT         ?PR?_UART2_CONFIG?UART1_UART2
+            CODE    01E6H     0016H     UNIT         ?PR?_PRINTSTRING1?UART1_UART2
+            CODE    01FCH     0016H     UNIT         ?PR?_PRINTSTRING2?UART1_UART2
+            CODE    0212H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   UART1-UART2 (UART1_UART2)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?UART1_UART2
+
+?PR?MAIN?UART1_UART2
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  08/10/2020  17:40:07  PAGE 2
+
+
+  +--> ?PR?_UART1_CONFIG?UART1_UART2
+  +--> ?PR?_UART2_CONFIG?UART1_UART2
+  +--> ?CO?UART1_UART2
+  +--> ?PR?_PRINTSTRING1?UART1_UART2
+  +--> ?PR?_PRINTSTRING2?UART1_UART2
+
+?PR?_UART1_CONFIG?UART1_UART2
+  +--> ?PR?_SETTIMER2BAUDRAYE?UART1_UART2
+
+?PR?_UART2_CONFIG?UART1_UART2
+  +--> ?PR?_SETTIMER2BAUDRAYE?UART1_UART2
+
+
+
+SYMBOL TABLE OF MODULE:  UART1-UART2 (UART1_UART2)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        UART1_UART2
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  B:0020H.0       PUBLIC        B_TX1_Busy
+  D:00E1H         PUBLIC        P7M1
+  B:00A8H.7       PUBLIC        EA
+  B:0020H.1       PUBLIC        B_TX2_Busy
+  D:00A2H         PUBLIC        P_SW1
+  D:00BAH         PUBLIC        P_SW2
+  C:0003H         PUBLIC        _SetTimer2Baudraye
+  B:00A8H.4       PUBLIC        ES
+  I:0021H         PUBLIC        RX1_Buffer
+  I:0041H         PUBLIC        RX2_Buffer
+  B:0098H.0       PUBLIC        RI
+  C:0191H         PUBLIC        UART1_int
+  C:0156H         PUBLIC        UART2_int
+  B:0098H.1       PUBLIC        TI
+  C:0046H         PUBLIC        main
+  D:0099H         PUBLIC        SBUF
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  08/10/2020  17:40:07  PAGE 3
+
+
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  C:01E6H         PUBLIC        _PrintString1
+  C:01FCH         PUBLIC        _PrintString2
+  D:00AFH         PUBLIC        IE2
+  D:008EH         PUBLIC        AUXR
+  C:0113H         PUBLIC        _UART1_config
+  C:01C4H         PUBLIC        _UART2_config
+  B:00A8H.3       PUBLIC        ET1
+  D:008DH         PUBLIC        TH1
+  D:00D6H         PUBLIC        TH2
+  D:008BH         PUBLIC        TL1
+  D:00D7H         PUBLIC        TL2
+  B:0088H.6       PUBLIC        TR1
+  D:0008H         PUBLIC        RX1_Cnt
+  D:0009H         PUBLIC        RX2_Cnt
+  D:009BH         PUBLIC        S2BUF
+  D:000AH         PUBLIC        TX1_Cnt
+  D:000BH         PUBLIC        TX2_Cnt
+  B:0098H.4       PUBLIC        REN
+  D:009AH         PUBLIC        S2CON
+  D:008FH         PUBLIC        INT_CLKO
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  C:0046H         LINE#         143
+  C:0046H         LINE#         144
+  C:0046H         LINE#         145
+  C:004BH         LINE#         146
+  C:004FH         LINE#         147
+  C:0053H         LINE#         148
+  C:0057H         LINE#         149
+  C:005BH         LINE#         150
+  C:005FH         LINE#         151
+  C:0063H         LINE#         152
+  C:0067H         LINE#         154
+  C:006CH         LINE#         155
+  C:0071H         LINE#         156
+  C:0073H         LINE#         158
+  C:007CH         LINE#         159
+  C:0085H         LINE#         161
+  C:0085H         LINE#         162
+  C:0085H         LINE#         163
+  C:008EH         LINE#         164
+  C:008EH         LINE#         165
+  C:0096H         LINE#         166
+  C:0098H         LINE#         167
+  C:00A8H         LINE#         168
+  C:00A8H         LINE#         170
+  C:00B1H         LINE#         171
+  C:00B1H         LINE#         172
+  C:00B9H         LINE#         173
+  C:00BBH         LINE#         174
+  C:00CBH         LINE#         175
+  C:00CBH         LINE#         176
+  -------         ENDPROC       MAIN
+  -------         PROC          _PRINTSTRING1
+  D:0001H         SYMBOL        puts
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  08/10/2020  17:40:07  PAGE 4
+
+
+  C:01E6H         LINE#         189
+  C:01E6H         LINE#         190
+  C:01E6H         LINE#         191
+  C:01EBH         LINE#         192
+  C:01EBH         LINE#         193
+  C:01EDH         LINE#         194
+  C:01EFH         LINE#         195
+  C:01F2H         LINE#         196
+  C:01FBH         LINE#         197
+  -------         ENDPROC       _PRINTSTRING1
+  -------         PROC          _PRINTSTRING2
+  D:0001H         SYMBOL        puts
+  C:01FCH         LINE#         208
+  C:01FCH         LINE#         209
+  C:01FCH         LINE#         210
+  C:0201H         LINE#         211
+  C:0201H         LINE#         212
+  C:0203H         LINE#         213
+  C:0205H         LINE#         214
+  C:0208H         LINE#         215
+  C:0211H         LINE#         216
+  -------         ENDPROC       _PRINTSTRING2
+  -------         PROC          _SETTIMER2BAUDRAYE
+  D:0004H         SYMBOL        dat
+  C:0003H         LINE#         227
+  C:0007H         LINE#         228
+  C:0007H         LINE#         229
+  C:000AH         LINE#         230
+  C:000DH         LINE#         231
+  C:0010H         LINE#         232
+  C:0012H         LINE#         233
+  C:0016H         LINE#         234
+  C:0019H         LINE#         235
+  C:001CH         LINE#         236
+  -------         ENDPROC       _SETTIMER2BAUDRAYE
+  -------         PROC          _UART1_CONFIG
+  D:0007H         SYMBOL        brt
+  C:0113H         LINE#         247
+  C:0113H         LINE#         248
+  C:0113H         LINE#         250
+  C:0118H         LINE#         251
+  C:0118H         LINE#         252
+  C:011BH         LINE#         253
+  C:0122H         LINE#         254
+  C:0124H         LINE#         258
+  C:0124H         LINE#         259
+  C:0126H         LINE#         260
+  C:0129H         LINE#         261
+  C:012CH         LINE#         262
+  C:012FH         LINE#         263
+  C:0132H         LINE#         264
+  C:0135H         LINE#         265
+  C:0138H         LINE#         266
+  C:013AH         LINE#         267
+  C:013DH         LINE#         268
+  C:013FH         LINE#         269
+  C:013FH         LINE#         272
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  08/10/2020  17:40:07  PAGE 5
+
+
+  C:0147H         LINE#         274
+  C:0149H         LINE#         275
+  C:014BH         LINE#         276
+  C:014EH         LINE#         280
+  C:0150H         LINE#         281
+  C:0153H         LINE#         282
+  C:0155H         LINE#         283
+  -------         ENDPROC       _UART1_CONFIG
+  -------         PROC          _UART2_CONFIG
+  D:0007H         SYMBOL        brt
+  C:01C4H         LINE#         295
+  C:01C4H         LINE#         296
+  C:01C4H         LINE#         297
+  C:01C9H         LINE#         298
+  C:01C9H         LINE#         299
+  C:01D0H         LINE#         301
+  C:01D3H         LINE#         302
+  C:01D6H         LINE#         303
+  C:01D9H         LINE#         304
+  C:01DCH         LINE#         305
+  C:01DFH         LINE#         307
+  C:01E1H         LINE#         308
+  C:01E3H         LINE#         309
+  C:01E5H         LINE#         310
+  C:01E5H         LINE#         311
+  -------         ENDPROC       _UART2_CONFIG
+  -------         PROC          UART1_INT
+  C:0191H         LINE#         323
+  C:019AH         LINE#         325
+  C:019DH         LINE#         326
+  C:019DH         LINE#         327
+  C:019FH         LINE#         328
+  C:01A6H         LINE#         329
+  C:01B6H         LINE#         330
+  C:01B6H         LINE#         332
+  C:01B9H         LINE#         333
+  C:01B9H         LINE#         334
+  C:01BBH         LINE#         335
+  C:01BDH         LINE#         336
+  C:01BDH         LINE#         337
+  -------         ENDPROC       UART1_INT
+  -------         PROC          UART2_INT
+  C:0156H         LINE#         348
+  C:015FH         LINE#         350
+  C:0165H         LINE#         351
+  C:0165H         LINE#         352
+  C:0168H         LINE#         353
+  C:016FH         LINE#         354
+  C:017FH         LINE#         355
+  C:017FH         LINE#         357
+  C:0185H         LINE#         358
+  C:0185H         LINE#         359
+  C:0188H         LINE#         360
+  C:018AH         LINE#         361
+  C:018AH         LINE#         363
+  -------         ENDPROC       UART2_INT
+  -------         ENDMOD        UART1_UART2
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  08/10/2020  17:40:07  PAGE 6
+
+
+
+  -------         MODULE        ?C?CLDPTR
+  C:0026H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+Program Size: data=77.2 xdata=0 code=532
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,454 @@
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE IR_TX
+OBJECT MODULE PLACED IN IR-Tx.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE IR-Tx.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          用户可以在宏定义中改变MCU主时钟频率. 范围 8MHZ ~ 33MHZ.
+  17          
+  18          红外接收程序。模拟市场上用量最大的NEC的编码。
+  19          
+  20          用户可以在宏定义中指定用户码.
+  21          
+  22          使用PWM4产生38KHZ载波, 1/3占空比, 每个38KHZ周期发射管发射9us,关闭16.3us.
+  23          
+  24          使用开发板上的16个IO扫描按键, MCU不睡眠, 连续扫描按键.
+  25          
+  26          当键按下, 第一帧为数据, 后面的帧为重复争,不带数据, 具体定义请自行参考NEC的编码资料.
+  27          
+  28          键释放后, 停止发送.
+  29          
+  30          ******************************************/
+  31          
+  32          
+  33          #include    "reg51.h"
+  34          #include    "intrins.h"
+  35          
+  36          #define     MAIN_Fosc       24000000UL  //定义主时钟
+  37          
+  38          typedef     unsigned char   u8;
+  39          typedef     unsigned int    u16;
+  40          typedef     unsigned long   u32;
+  41          
+  42          sfr TH2  = 0xD6;
+  43          sfr TL2  = 0xD7;
+  44          sfr IE2   = 0xAF;
+  45          sfr INT_CLKO = 0x8F;
+  46          sfr AUXR = 0x8E;
+  47          sfr AUXR1 = 0xA2;
+  48          sfr P_SW1 = 0xA2;
+  49          sfr P_SW2 = 0xBA;
+  50          sfr S2CON = 0x9A;
+  51          sfr S2BUF = 0x9B;
+  52          
+  53          sfr P4   = 0xC0;
+  54          sfr P5   = 0xC8;
+  55          sfr P6   = 0xE8;
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 2   
+
+  56          sfr P7   = 0xF8;
+  57          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  58          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  59          sfr P0M1 = 0x93;
+  60          sfr P0M0 = 0x94;
+  61          sfr P2M1 = 0x95;
+  62          sfr P2M0 = 0x96;
+  63          sfr P3M1 = 0xB1;
+  64          sfr P3M0 = 0xB2;
+  65          sfr P4M1 = 0xB3;
+  66          sfr P4M0 = 0xB4;
+  67          sfr P5M1 = 0xC9;
+  68          sfr P5M0 = 0xCA;
+  69          sfr P6M1 = 0xCB;
+  70          sfr P6M0 = 0xCC;
+  71          sfr P7M1 = 0xE1;
+  72          sfr P7M0 = 0xE2;
+  73          
+  74          sbit P00 = P0^0;
+  75          sbit P01 = P0^1;
+  76          sbit P02 = P0^2;
+  77          sbit P03 = P0^3;
+  78          sbit P04 = P0^4;
+  79          sbit P05 = P0^5;
+  80          sbit P06 = P0^6;
+  81          sbit P07 = P0^7;
+  82          sbit P10 = P1^0;
+  83          sbit P11 = P1^1;
+  84          sbit P12 = P1^2;
+  85          sbit P13 = P1^3;
+  86          sbit P14 = P1^4;
+  87          sbit P15 = P1^5;
+  88          sbit P16 = P1^6;
+  89          sbit P17 = P1^7;
+  90          sbit P20 = P2^0;
+  91          sbit P21 = P2^1;
+  92          sbit P22 = P2^2;
+  93          sbit P23 = P2^3;
+  94          sbit P24 = P2^4;
+  95          sbit P25 = P2^5;
+  96          sbit P26 = P2^6;
+  97          sbit P27 = P2^7;
+  98          sbit P30 = P3^0;
+  99          sbit P31 = P3^1;
+ 100          sbit P32 = P3^2;
+ 101          sbit P33 = P3^3;
+ 102          sbit P34 = P3^4;
+ 103          sbit P35 = P3^5;
+ 104          sbit P36 = P3^6;
+ 105          sbit P37 = P3^7;
+ 106          sbit P40 = P4^0;
+ 107          sbit P41 = P4^1;
+ 108          sbit P42 = P4^2;
+ 109          sbit P43 = P4^3;
+ 110          sbit P44 = P4^4;
+ 111          sbit P45 = P4^5;
+ 112          sbit P46 = P4^6;
+ 113          sbit P47 = P4^7;
+ 114          sbit P50 = P5^0;
+ 115          sbit P51 = P5^1;
+ 116          sbit P52 = P5^2;
+ 117          sbit P53 = P5^3;
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 3   
+
+ 118          sbit P54 = P5^4;
+ 119          sbit P55 = P5^5;
+ 120          sbit P56 = P5^6;
+ 121          sbit P57 = P5^7;
+ 122          
+ 123          /****************************** 用户定义宏 ***********************************/
+ 124          
+ 125          #define PWM1_ENO     (*(unsigned char  volatile xdata *)  0xFEB1)
+ 126          #define PWM1_PS      (*(unsigned char  volatile xdata *)  0xFEB2)
+ 127          #define PWM2_ENO     (*(unsigned char  volatile xdata *)  0xFEB5)
+ 128          #define PWM2_PS      (*(unsigned char  volatile xdata *)  0xFEB6)                               
+ 129          
+ 130          #define PWM1_CR1     (*(unsigned char  volatile xdata *)  0xFEC0)
+ 131          #define PWM1_CR2     (*(unsigned char  volatile xdata *)  0xFEC1)
+ 132          #define PWM1_SMCR    (*(unsigned char  volatile xdata *)  0xFEC2) 
+ 133          #define PWM1_ETR     (*(unsigned char  volatile xdata *)  0xFEC3) 
+ 134          #define PWM1_IER     (*(unsigned char  volatile xdata *)  0xFEC4) 
+ 135          #define PWM1_SR1     (*(unsigned char  volatile xdata *)  0xFEC5) 
+ 136          #define PWM1_SR2     (*(unsigned char  volatile xdata *)  0xFEC6) 
+ 137          #define PWM1_EGR     (*(unsigned char  volatile xdata *)  0xFEC7) 
+ 138          #define PWM1_CCMR1   (*(unsigned char  volatile xdata *)  0xFEC8) 
+ 139          #define PWM1_CCMR2   (*(unsigned char  volatile xdata *)  0xFEC9)
+ 140          #define PWM1_CCMR3   (*(unsigned char  volatile xdata *)  0xFECA)
+ 141          #define PWM1_CCMR4   (*(unsigned char  volatile xdata *)  0xFECB)
+ 142          #define PWM1_CCER1   (*(unsigned char  volatile xdata *)  0xFECC)
+ 143          #define PWM1_CCER2   (*(unsigned char  volatile xdata *)  0xFECD)
+ 144          #define PWM1_CNTRH   (*(unsigned char  volatile xdata *)  0xFECE)
+ 145          #define PWM1_CNTRL   (*(unsigned char  volatile xdata *)  0xFECF)
+ 146          #define PWM1_PSCRH   (*(unsigned char  volatile xdata *)  0xFED0)
+ 147          #define PWM1_PSCRL   (*(unsigned char  volatile xdata *)  0xFED1)
+ 148          #define PWM1_ARRH    (*(unsigned char  volatile xdata *)  0xFED2)
+ 149          #define PWM1_ARRL    (*(unsigned char  volatile xdata *)  0xFED3)
+ 150          #define PWM1_RCR     (*(unsigned char  volatile xdata *)  0xFED4)
+ 151          #define PWM1_CCR1H   (*(unsigned char  volatile xdata *)  0xFED5)
+ 152          #define PWM1_CCR1L   (*(unsigned char  volatile xdata *)  0xFED6)
+ 153          #define PWM1_CCR2H   (*(unsigned char  volatile xdata *)  0xFED7)
+ 154          #define PWM1_CCR2L   (*(unsigned char  volatile xdata *)  0xFED8)
+ 155          #define PWM1_CCR3H   (*(unsigned char  volatile xdata *)  0xFED9)
+ 156          #define PWM1_CCR3L   (*(unsigned char  volatile xdata *)  0xFEDA)
+ 157          #define PWM1_CCR4H   (*(unsigned char  volatile xdata *)  0xFEDB)
+ 158          #define PWM1_CCR4L   (*(unsigned char  volatile xdata *)  0xFEDC)
+ 159          #define PWM1_BKR     (*(unsigned char  volatile xdata *)  0xFEDD)
+ 160          #define PWM1_DTR     (*(unsigned char  volatile xdata *)  0xFEDE)
+ 161          #define PWM1_OISR    (*(unsigned char  volatile xdata *)  0xFEDF)
+ 162          
+ 163          /*************  红外发送相关变量    **************/
+ 164          #define User_code   0xFF00      //定义红外用户码
+ 165          
+ 166          sbit    P_IR_TX   = P1^6;   //定义红外发送端口
+ 167          #define IR_TX_ON    0
+ 168          #define IR_TX_OFF   1
+ 169          
+ 170          u16     tx_cnt;     //发送或空闲的脉冲计数(等于38KHZ的脉冲数，对应时间), 红外频率为38KHZ, 周期26.3us
+ 171          u8      TxTime;     //发送时间
+ 172          
+ 173          /*************  IO键盘变量声明  **************/
+ 174          
+ 175          u8  IO_KeyState, IO_KeyState1, IO_KeyHoldCnt;   //行列键盘变量
+ 176          u8  KeyHoldCnt; //键按下计时
+ 177          u8  KeyCode;    //给用户使用的键码, 1~16有效
+ 178          
+ 179          /*************  本地函数声明    **************/
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 4   
+
+ 180          void    delay_ms(u8 ms);
+ 181          void    IO_KeyScan(void);
+ 182          void    PWM_config(void);
+ 183          void    IR_TxPulse(u16 pulse);
+ 184          void    IR_TxSpace(u16 pulse);
+ 185          void    IR_TxByte(u8 dat);
+ 186          
+ 187          /********************** 主函数 ************************/
+ 188          void main(void)
+ 189          {
+ 190   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 191   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 192   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 193   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 194   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 195   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 196   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 197   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 198   1          
+ 199   1          PWM_config();
+ 200   1          P_IR_TX = IR_TX_OFF;
+ 201   1          
+ 202   1          EA = 1;                     //打开总中断
+ 203   1          
+ 204   1          while(1)
+ 205   1          {
+ 206   2              delay_ms(30);       //30ms
+ 207   2              IO_KeyScan();
+ 208   2      
+ 209   2              if(KeyCode != 0)        //检测到键码
+ 210   2              {
+ 211   3                  TxTime = 0;
+ 212   3                                      //一帧数据最小长度 = 9 + 4.5 + 0.5625 + 24 * 1.125 + 8 * 2.25 = 59.0625 ms
+ 213   3                                      //一帧数据最大长度 = 9 + 4.5 + 0.5625 + 8 * 1.125 + 24 * 2.25 = 77.0625 ms
+ 214   3                  IR_TxPulse(342);    //对应9ms，同步头       9ms
+ 215   3                  IR_TxSpace(171);    //对应4.5ms，同步头间隔 4.5ms
+ 216   3                  IR_TxPulse(21);     //开始发送数据          0.5625ms
+ 217   3      
+ 218   3                  IR_TxByte(User_code%256);   //发用户码低字节
+ 219   3                  IR_TxByte(User_code/256);   //发用户码高字节
+ 220   3                  IR_TxByte(KeyCode);         //发数据
+ 221   3                  IR_TxByte(~KeyCode);        //发数据反码
+ 222   3                  
+ 223   3                  if(TxTime < 56)     //一帧按最大77ms发送, 不够的话,补偿时间     108ms
+ 224   3                  {
+ 225   4                      TxTime = 56 - TxTime;
+ 226   4                      TxTime = TxTime + TxTime / 8;
+ 227   4                      delay_ms(TxTime);
+ 228   4                  }
+ 229   3                  delay_ms(31);
+ 230   3      
+ 231   3                  while(IO_KeyState != 0) //键未释放
+ 232   3                  {
+ 233   4                      IR_TxPulse(342);    //对应9ms，   同步头        9ms
+ 234   4                      IR_TxSpace(86);     //对应2.25ms，同步头间隔    2.25ms
+ 235   4                      IR_TxPulse(21);     //开始发送数据              0.5625ms
+ 236   4                      delay_ms(96);
+ 237   4                      IO_KeyScan();
+ 238   4                  }
+ 239   3                  KeyCode = 0;
+ 240   3              }
+ 241   2          }
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 5   
+
+ 242   1      } 
+ 243          /**********************************************/
+ 244          
+ 245          //========================================================================
+ 246          // 函数: void  delay_ms(unsigned char ms)
+ 247          // 描述: 延时函数。
+ 248          // 参数: ms,要延时的ms数, 这里只支持1~255ms. 自动适应主时钟.
+ 249          // 返回: none.
+ 250          // 版本: VER1.0
+ 251          // 日期: 2013-4-1
+ 252          // 备注: 
+ 253          //========================================================================
+ 254          void  delay_ms(u8 ms)
+ 255          {
+ 256   1           u16 i;
+ 257   1           do{
+ 258   2                i = MAIN_Fosc / 13000;
+ 259   2                while(--i)    ;   //13T per loop
+ 260   2           }while(--ms);
+ 261   1      }
+ 262          
+ 263          /*****************************************************
+ 264              行列键扫描程序
+ 265              使用XY查找4x4键的方法，只能单键，速度快
+ 266          
+ 267             Y     P04      P05      P06      P07
+ 268                    |        |        |        |
+ 269          X         |        |        |        |
+ 270          P00 ---- K00 ---- K01 ---- K02 ---- K03 ----
+ 271                    |        |        |        |
+ 272          P01 ---- K04 ---- K05 ---- K06 ---- K07 ----
+ 273                    |        |        |        |
+ 274          P02 ---- K08 ---- K09 ---- K10 ---- K11 ----
+ 275                    |        |        |        |
+ 276          P03 ---- K12 ---- K13 ---- K14 ---- K15 ----
+ 277                    |        |        |        |
+ 278          ******************************************************/
+ 279          
+ 280          
+ 281          u8 code T_KeyTable[16] = {0,1,2,0,3,0,0,0,4,0,0,0,0,0,0,0};
+ 282          
+ 283          void IO_KeyDelay(void)
+ 284          {
+ 285   1          u8 i;
+ 286   1          i = 60;
+ 287   1          while(--i)  ;
+ 288   1      }
+ 289          
+ 290          void    IO_KeyScan(void)    //50ms call
+ 291          {
+ 292   1          u8  j;
+ 293   1      
+ 294   1          j = IO_KeyState1;   //保存上一次状态
+ 295   1      
+ 296   1          P0 = 0xf0;  //X低，读Y
+ 297   1          IO_KeyDelay();
+ 298   1          IO_KeyState1 = P0 & 0xf0;
+ 299   1      
+ 300   1          P0 = 0x0f;  //Y低，读X
+ 301   1          IO_KeyDelay();
+ 302   1          IO_KeyState1 |= (P0 & 0x0f);
+ 303   1          IO_KeyState1 ^= 0xff;   //取反
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 6   
+
+ 304   1          
+ 305   1          if(j == IO_KeyState1)   //连续两次读相等
+ 306   1          {
+ 307   2              j = IO_KeyState;
+ 308   2              IO_KeyState = IO_KeyState1;
+ 309   2              if(IO_KeyState != 0)    //有键按下
+ 310   2              {
+ 311   3                  F0 = 0;
+ 312   3                  if(j == 0)  F0 = 1; //第一次按下
+ 313   3                  else if(j == IO_KeyState)
+ 314   3                  {
+ 315   4                      if(++IO_KeyHoldCnt >= 20)   //1秒后重键
+ 316   4                      {
+ 317   5                          IO_KeyHoldCnt = 18;
+ 318   5                          F0 = 1;
+ 319   5                      }
+ 320   4                  }
+ 321   3                  if(F0)
+ 322   3                  {
+ 323   4                      j = T_KeyTable[IO_KeyState >> 4];
+ 324   4                      if((j != 0) && (T_KeyTable[IO_KeyState& 0x0f] != 0)) 
+ 325   4                          KeyCode = (j - 1) * 4 + T_KeyTable[IO_KeyState & 0x0f] + 16;    //计算键码，17~32
+ 326   4                  }
+ 327   3              }
+ 328   2              else    IO_KeyHoldCnt = 0;
+ 329   2          }
+ 330   1          P0 = 0xff;
+ 331   1      }
+ 332          
+ 333          
+ 334          /************* 发送脉冲函数 **************/
+ 335          void    IR_TxPulse(u16 pulse)
+ 336          {
+ 337   1          tx_cnt = pulse;
+ 338   1          PWM1_CCER2 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+ 339   1          PWM1_CCMR4 = 0x60; //设置 PWM4 模式1 输出
+ 340   1          PWM1_CCER2 = 0xB0; //使能 CC4E 通道, 低电平有效
+ 341   1          PWM1_IER = 0x10;   //使能捕获/比较 4 中断
+ 342   1          while(tx_cnt);
+ 343   1      }
+ 344          
+ 345          /************* 发送空闲函数 **************/
+ 346          void    IR_TxSpace(u16 pulse)
+ 347          {
+ 348   1          tx_cnt = pulse;
+ 349   1          PWM1_CCER2 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+ 350   1          PWM1_CCMR4 = 0x40; //设置 PWM4 强制为无效电平
+ 351   1          PWM1_CCER2 = 0xB0; //使能 CC4E 通道, 低电平有效
+ 352   1          PWM1_IER = 0x10;   //使能捕获/比较 4 中断
+ 353   1          while(tx_cnt);
+ 354   1      }
+ 355          
+ 356          
+ 357          /************* 发送一个字节函数 **************/
+ 358          void    IR_TxByte(u8 dat)
+ 359          {
+ 360   1          u8 i;
+ 361   1          for(i=0; i<8; i++)
+ 362   1          {
+ 363   2              if(dat & 1)     IR_TxSpace(63), TxTime += 2;    //数据1对应 1.6875 + 0.5625 ms 
+ 364   2              else            IR_TxSpace(21), TxTime++;       //数据0对应 0.5625 + 0.5625 ms
+ 365   2              IR_TxPulse(21);         //脉冲都是0.5625ms
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 7   
+
+ 366   2              dat >>= 1;              //下一个位
+ 367   2          }
+ 368   1      }
+ 369          
+ 370          //========================================================================
+ 371          // 函数: void   PWM_config(void)
+ 372          // 描述: PCA配置函数.
+ 373          // 参数: None
+ 374          // 返回: none.
+ 375          // 版本: V1.0, 2012-11-22
+ 376          //========================================================================
+ 377          void    PWM_config(void)
+ 378          {
+ 379   1          P_SW2 |= 0x80;
+ 380   1          
+ 381   1          PWM1_CCER2 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+ 382   1          PWM1_CCMR4 = 0x60; //设置 PWM4 模式1 输出
+ 383   1          //PWM1_CCER2 = 0xB0; //使能 CC4E 通道, 低电平有效
+ 384   1      
+ 385   1          PWM1_ARRH = 0x02; //设置周期时间
+ 386   1          PWM1_ARRL = 0x77;
+ 387   1          PWM1_CCR4H = 0;
+ 388   1          PWM1_CCR4L = 210; //设置占空比时间
+ 389   1      
+ 390   1      //  PWM1_ENO = 0x80; //使能 PWM4N 输出
+ 391   1          PWM1_ENO = 0x40; //使能 PWM4P 输出
+ 392   1      //  PWM1_PS = 0x00;  //高级 PWM 通道 4N 输出脚选择位, 0x00:P1.7, 0x40:P2.7, 0x80:P6.7, 0xC0:P3.3
+ 393   1          PWM1_PS = 0x00;  //高级 PWM 通道 4P 输出脚选择位, 0x00:P1.6, 0x40:P2.6, 0x80:P6.6, 0xC0:P3.4
+ 394   1          PWM1_BKR = 0x80; //使能主输出
+ 395   1      //    PWM1_IER = 0x10; // 使能中断
+ 396   1          PWM1_CR1 |= 0x01; //开始计时
+ 397   1      //    P_SW2 &= 0x7f;
+ 398   1      }
+ 399          
+ 400          /******************* PWM中断函数 ********************/
+ 401          void PWM1_ISR() interrupt 26
+ 402          {
+ 403   1          if(PWM1_SR1 & 0X10)
+ 404   1          {
+ 405   2              //PWM1_SR1 &=~0X10;
+ 406   2              PWM1_SR1 = 0;
+ 407   2            
+ 408   2              if(--tx_cnt == 0)
+ 409   2              {
+ 410   3                  PWM1_CCER2 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+ 411   3                  PWM1_CCMR4 = 0x40; //设置 PWM4 强制为无效电平
+ 412   3                  PWM1_CCER2 = 0xB0; //使能 CC4E 通道, 低电平有效
+ 413   3                  PWM1_IER = 0x00;   // 关闭中断
+ 414   3              }
+ 415   2          }
+ 416   1      }
+ 417          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    541    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V9.59.0.0   IR_TX                                                             06/22/2020 19:10:14 PAGE 8   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

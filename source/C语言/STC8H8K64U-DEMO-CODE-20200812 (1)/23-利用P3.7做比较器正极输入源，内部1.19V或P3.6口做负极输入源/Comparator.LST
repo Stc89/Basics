@@ -1,0 +1,179 @@
+C51 COMPILER V9.59.0.0   COMPARATOR                                                        08/11/2020 16:05:55 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE COMPARATOR
+OBJECT MODULE PLACED IN Comparator.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Comparator.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  功能说明    **************
+  15          
+  16          比较器的正极可以是 P3.7 端口或者 ADC 的模拟输入通道，
+  17          
+  18          而负极可以是 P3.6 端口或者是内部 BandGap 经过 OP 后的 REFV 电压（1.19V内部固定比较电压）。
+  19          
+  20          通过中断或者查询方式读取比较器比较结果，CMP+的电平低于CMP-的电平P47口输出低电平(LED10亮)，反之输出高电平(L
+             -ED10灭)。
+  21          
+  22          ******************************************/
+  23          
+  24          #include "reg51.h"
+  25          #include "intrins.h"
+  26          
+  27          sfr P4   = 0xC0;
+  28          sfr P5   = 0xC8;
+  29          sfr P6   = 0xE8;
+  30          sfr P7   = 0xF8;
+  31          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  32          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  33          sfr P0M1 = 0x93;
+  34          sfr P0M0 = 0x94;
+  35          sfr P2M1 = 0x95;
+  36          sfr P2M0 = 0x96;
+  37          sfr P3M1 = 0xB1;
+  38          sfr P3M0 = 0xB2;
+  39          sfr P4M1 = 0xB3;
+  40          sfr P4M0 = 0xB4;
+  41          sfr P5M1 = 0xC9;
+  42          sfr P5M0 = 0xCA;
+  43          sfr P6M1 = 0xCB;
+  44          sfr P6M0 = 0xCC;
+  45          sfr P7M1 = 0xE1;
+  46          sfr P7M0 = 0xE2;
+  47          
+  48          sbit P00 = P0^0;
+  49          sbit P01 = P0^1;
+  50          sbit P02 = P0^2;
+  51          sbit P03 = P0^3;
+  52          sbit P04 = P0^4;
+  53          sbit P05 = P0^5;
+  54          sbit P06 = P0^6;
+C51 COMPILER V9.59.0.0   COMPARATOR                                                        08/11/2020 16:05:55 PAGE 2   
+
+  55          sbit P07 = P0^7;
+  56          sbit P10 = P1^0;
+  57          sbit P11 = P1^1;
+  58          sbit P12 = P1^2;
+  59          sbit P13 = P1^3;
+  60          sbit P14 = P1^4;
+  61          sbit P15 = P1^5;
+  62          sbit P16 = P1^6;
+  63          sbit P17 = P1^7;
+  64          sbit P20 = P2^0;
+  65          sbit P21 = P2^1;
+  66          sbit P22 = P2^2;
+  67          sbit P23 = P2^3;
+  68          sbit P24 = P2^4;
+  69          sbit P25 = P2^5;
+  70          sbit P26 = P2^6;
+  71          sbit P27 = P2^7;
+  72          sbit P30 = P3^0;
+  73          sbit P31 = P3^1;
+  74          sbit P32 = P3^2;
+  75          sbit P33 = P3^3;
+  76          sbit P34 = P3^4;
+  77          sbit P35 = P3^5;
+  78          sbit P36 = P3^6;
+  79          sbit P37 = P3^7;
+  80          sbit P40 = P4^0;
+  81          sbit P41 = P4^1;
+  82          sbit P42 = P4^2;
+  83          sbit P43 = P4^3;
+  84          sbit P44 = P4^4;
+  85          sbit P45 = P4^5;
+  86          sbit P46 = P4^6;
+  87          sbit P47 = P4^7;
+  88          sbit P50 = P5^0;
+  89          sbit P51 = P5^1;
+  90          sbit P52 = P5^2;
+  91          sbit P53 = P5^3;
+  92          sbit P54 = P5^4;
+  93          sbit P55 = P5^5;
+  94          sbit P56 = P5^6;
+  95          sbit P57 = P5^7;
+  96          
+  97          sfr P_SW2 = 0xBA;
+  98          sfr CMPCR1 = 0xE6;
+  99          sfr CMPCR2 = 0xE7;
+ 100          
+ 101          void CMP_Isr() interrupt 21
+ 102          {
+ 103   1          CMPCR1 &= ~0x40;                         //清中断标志
+ 104   1          P47 = CMPCR1 & 0x01;                     //中断方式读取比较器比较结果
+ 105   1      }
+ 106          
+ 107          void main()
+ 108          {
+ 109   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 110   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 111   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 112   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 113   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 114   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 115   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 116   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+C51 COMPILER V9.59.0.0   COMPARATOR                                                        08/11/2020 16:05:55 PAGE 3   
+
+ 117   1        
+ 118   1          CMPCR2 = 0x00;
+ 119   1          CMPCR2 &= ~0x80;                            //比较器正向输出
+ 120   1      //  CMPCR2 |= 0x80;                             //比较器反向输出
+ 121   1          CMPCR2 &= ~0x40;                            //禁止0.1us滤波
+ 122   1      //  CMPCR2 |= 0x40;                             //使能0.1us滤波
+ 123   1      //  CMPCR2 &= ~0x3f;                            //比较器结果直接输出
+ 124   1          CMPCR2 |= 0x10;                             //比较器结果经过16个去抖时钟后输出
+ 125   1          CMPCR1 = 0x00;
+ 126   1          CMPCR1 |= 0x30;                             //使能比较器边沿中断
+ 127   1      //  CMPCR1 &= ~0x20;                            //禁止比较器上升沿中断
+ 128   1      //  CMPCR1 |= 0x20;                             //使能比较器上升沿中断
+ 129   1      //  CMPCR1 &= ~0x10;                            //禁止比较器下降沿中断
+ 130   1      //  CMPCR1 |= 0x10;                             //使能比较器下降沿中断
+ 131   1      
+ 132   1          CMPCR1 &= ~0x08;                            //P3.7为CMP+输入脚
+ 133   1      //  CMPCR1 |= 0x08;                             //ADC输入脚为CMP+输入教
+ 134   1      
+ 135   1          CMPCR1 &= ~0x04;                            //内部参考电压为CMP-输入脚
+ 136   1      //  CMPCR1 |= 0x04;                             //P3.6为CMP-输入脚
+ 137   1      
+ 138   1      //  CMPCR1 &= ~0x02;                            //禁止比较器输出
+ 139   1          CMPCR1 |= 0x02;                             //使能比较器输出
+ 140   1          P_SW2 &= ~0x08;                             //选择P3.4作为比较器输出脚
+ 141   1      //  P_SW2 |= 0x08;                              //选择P4.1作为比较器输出脚
+ 142   1          CMPCR1 |= 0x80;                             //使能比较器模块
+ 143   1      
+ 144   1          EA = 1;
+ 145   1      
+ 146   1          while (1)
+ 147   1          {
+ 148   2      //      P50 = CMPCR1 & 0x01;  //查询方式读取比较器比较结果
+ 149   2          }
+ 150   1      }
+ 151          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     85    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

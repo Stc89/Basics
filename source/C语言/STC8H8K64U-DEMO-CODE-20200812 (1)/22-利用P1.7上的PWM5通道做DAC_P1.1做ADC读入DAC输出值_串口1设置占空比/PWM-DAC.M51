@@ -1,0 +1,440 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/18/2020  14:06:50  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE PWM-DAC.obj TO PWM-DAC RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  PWM-DAC.obj (PWM_DAC)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?IMUL)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
+
+
+LINK MAP OF MODULE:  PWM-DAC (PWM_DAC)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000FH     UNIT         ?DT?PWM_DAC
+            DATA    0017H     0003H     UNIT         _DATA_GROUP_
+                    001AH     0006H                  *** GAP ***
+            BIT     0020H.0   0000H.2   UNIT         ?BI?PWM_DAC
+                    0020H.2   0000H.6                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *  X D A T A   M E M O R Y  * * * * * * *
+            XDATA   0000H     0080H     UNIT         ?XD?PWM_DAC
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0008H     UNIT         ?PR?_UART1_TXBYTE?PWM_DAC
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0013H     UNIT         ?PR?_PRINTSTRING1?PWM_DAC
+                    0021H     0002H                  *** GAP ***
+            CODE    0023H     0003H     ABSOLUTE     
+            CODE    0026H     0080H     UNIT         ?C?LIB_CODE
+            CODE    00A6H     0025H     UNIT         ?PR?TIMER0?PWM_DAC
+            CODE    00CBH     000CH     UNIT         ?C_C51STARTUP
+                    00D7H     0004H                  *** GAP ***
+            CODE    00DBH     0003H     ABSOLUTE     
+            CODE    00DEH     0251H     UNIT         ?PR?MAIN?PWM_DAC
+            CODE    032FH     00E1H     UNIT         ?CO?PWM_DAC
+            CODE    0410H     0043H     UNIT         ?PR?_UART1_CONFIG?PWM_DAC
+            CODE    0453H     003EH     UNIT         ?PR?UART1_INT?PWM_DAC
+            CODE    0491H     0037H     UNIT         ?PR?DISPLAYSCAN?PWM_DAC
+            CODE    04C8H     0020H     UNIT         ?PR?_GET_ADC12BITRESULT?PWM_DAC
+            CODE    04E8H     001AH     UNIT         ?PR?PWM2_ISR?PWM_DAC
+            CODE    0502H     001AH     UNIT         ?PR?_SETTIMER2BAUDRAYE?PWM_DAC
+            CODE    051CH     0013H     UNIT         ?PR?_UPDATEPWM?PWM_DAC
+
+
+
+OVERLAY MAP OF MODULE:   PWM-DAC (PWM_DAC)
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 2
+
+
+
+
+SEGMENT                                   DATA_GROUP 
+  +--> CALLED SEGMENT                   START    LENGTH
+-------------------------------------------------------
+?PR?TIMER0?PWM_DAC                      -----    -----
+  +--> ?PR?DISPLAYSCAN?PWM_DAC
+
+?PR?DISPLAYSCAN?PWM_DAC                 -----    -----
+  +--> ?CO?PWM_DAC
+
+*** NEW ROOT ***************************************************
+
+?C_C51STARTUP                           -----    -----
+  +--> ?PR?MAIN?PWM_DAC
+
+?PR?MAIN?PWM_DAC                        0017H    0003H
+  +--> ?PR?_UPDATEPWM?PWM_DAC
+  +--> ?PR?_UART1_CONFIG?PWM_DAC
+  +--> ?CO?PWM_DAC
+  +--> ?PR?_PRINTSTRING1?PWM_DAC
+  +--> ?PR?_GET_ADC12BITRESULT?PWM_DAC
+
+?PR?_UART1_CONFIG?PWM_DAC               -----    -----
+  +--> ?PR?_SETTIMER2BAUDRAYE?PWM_DAC
+
+?PR?_PRINTSTRING1?PWM_DAC               -----    -----
+  +--> ?PR?_UART1_TXBYTE?PWM_DAC
+
+
+
+SYMBOL TABLE OF MODULE:  PWM-DAC (PWM_DAC)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        PWM_DAC
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 3
+
+
+  D:00C8H         PUBLIC        P5
+  B:0020H.0       PUBLIC        B_TX1_Busy
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  B:00A8H.7       PUBLIC        EA
+  D:00F8H         PUBLIC        P7
+  D:0008H         PUBLIC        RX1_TimeOut
+  D:00A2H         PUBLIC        P_SW1
+  D:00BAH         PUBLIC        P_SW2
+  D:0009H         PUBLIC        LED8
+  C:0408H         PUBLIC        T_COM
+  D:00BDH         PUBLIC        ADC_RES
+  C:0502H         PUBLIC        _SetTimer2Baudraye
+  B:00A8H.4       PUBLIC        ES
+  X:0000H         PUBLIC        RX1_Buffer
+  D:00DEH         PUBLIC        ADCCFG
+  B:0098H.0       PUBLIC        RI
+  C:0453H         PUBLIC        UART1_int
+  C:051CH         PUBLIC        _UpdatePwm
+  B:0098H.1       PUBLIC        TI
+  C:00DEH         PUBLIC        main
+  D:0011H         PUBLIC        adc
+  D:00BCH         PUBLIC        ADC_CONTR
+  D:0099H         PUBLIC        SBUF
+  C:0003H         PUBLIC        _UART1_TxByte
+  B:0020H.1       PUBLIC        B_1ms
+  D:0098H         PUBLIC        SCON
+  B:00C8H.0       PUBLIC        P50
+  D:0089H         PUBLIC        TMOD
+  D:0013H         PUBLIC        cnt200ms
+  C:000EH         PUBLIC        _PrintString1
+  D:00AFH         PUBLIC        IE2
+  D:008EH         PUBLIC        AUXR
+  C:0410H         PUBLIC        _UART1_config
+  B:00A8H.1       PUBLIC        ET0
+  B:00A8H.3       PUBLIC        ET1
+  D:008CH         PUBLIC        TH0
+  D:008DH         PUBLIC        TH1
+  D:00D6H         PUBLIC        TH2
+  C:03DDH         PUBLIC        t_display
+  D:008AH         PUBLIC        TL0
+  D:008BH         PUBLIC        TL1
+  D:00D7H         PUBLIC        TL2
+  C:00A6H         PUBLIC        timer0
+  B:0088H.4       PUBLIC        TR0
+  B:0088H.6       PUBLIC        TR1
+  D:00BEH         PUBLIC        ADC_RESL
+  C:0491H         PUBLIC        DisplayScan
+  D:0014H         PUBLIC        RX1_Cnt
+  D:0015H         PUBLIC        TX1_Cnt
+  B:0098H.4       PUBLIC        REN
+  C:04C8H         PUBLIC        _Get_ADC12bitResult
+  B:00D0H.5       PUBLIC        F0
+  C:04E8H         PUBLIC        PWM2_ISR
+  D:0016H         PUBLIC        display_index
+  D:008FH         PUBLIC        INT_CLKO
+  D:0094H         PUBLIC        P0M0
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 4
+
+
+  -------         PROC          MAIN
+  -------         DO            
+  D:0017H         SYMBOL        i
+  D:0018H         SYMBOL        j
+  -------         ENDDO         
+  C:00DEH         LINE#         203
+  C:00DEH         LINE#         204
+  C:00DEH         LINE#         208
+  C:00E3H         LINE#         209
+  C:00E7H         LINE#         210
+  C:00EBH         LINE#         211
+  C:00EFH         LINE#         212
+  C:00F3H         LINE#         213
+  C:00F7H         LINE#         214
+  C:00FBH         LINE#         215
+  C:0100H         LINE#         217
+  C:0102H         LINE#         220
+  C:0105H         LINE#         221
+  C:0108H         LINE#         222
+  C:010BH         LINE#         223
+  C:010DH         LINE#         224
+  C:010FH         LINE#         227
+  C:0112H         LINE#         228
+  C:0118H         LINE#         229
+  C:011BH         LINE#         230
+  C:011EH         LINE#         231
+  C:0121H         LINE#         233
+  C:0124H         LINE#         234
+  C:0129H         LINE#         235
+  C:012FH         LINE#         236
+  C:0135H         LINE#         238
+  C:013AH         LINE#         239
+  C:013DH         LINE#         240
+  C:0141H         LINE#         241
+  C:0145H         LINE#         242
+  C:014BH         LINE#         243
+  C:014DH         LINE#         244
+  C:0153H         LINE#         246
+  C:015AH         LINE#         247
+  C:015DH         LINE#         249
+  C:0164H         LINE#         251
+  C:0169H         LINE#         252
+  C:016BH         LINE#         254
+  C:0184H         LINE#         256
+  C:0187H         LINE#         257
+  C:018AH         LINE#         258
+  C:018DH         LINE#         259
+  C:0190H         LINE#         261
+  C:0199H         LINE#         263
+  C:0199H         LINE#         264
+  C:0199H         LINE#         265
+  C:019CH         LINE#         266
+  C:019CH         LINE#         267
+  C:019EH         LINE#         268
+  C:01ABH         LINE#         269
+  C:01ABH         LINE#         270
+  C:01AEH         LINE#         271
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 5
+
+
+  C:01B7H         LINE#         272
+  C:01CDH         LINE#         273
+  C:01D0H         LINE#         274
+  C:01EAH         LINE#         275
+  C:0204H         LINE#         276
+  C:0211H         LINE#         277
+  C:0211H         LINE#         279
+  C:021FH         LINE#         280
+  C:021FH         LINE#         281
+  C:0228H         LINE#         282
+  C:0228H         LINE#         283
+  C:0245H         LINE#         284
+  C:0245H         LINE#         285
+  C:0247H         LINE#         286
+  C:024CH         LINE#         287
+  C:0255H         LINE#         288
+  C:0255H         LINE#         289
+  C:026DH         LINE#         290
+  C:026DH         LINE#         291
+  C:0292H         LINE#         292
+  C:0294H         LINE#         294
+  C:0294H         LINE#         295
+  C:0296H         LINE#         296
+  C:029FH         LINE#         297
+  C:02A1H         LINE#         298
+  C:02A1H         LINE#         299
+  C:02A5H         LINE#         300
+  C:02ABH         LINE#         301
+  C:02ABH         LINE#         302
+  C:02BEH         LINE#         304
+  C:02BEH         LINE#         305
+  C:02C5H         LINE#         306
+  C:02EEH         LINE#         307
+  C:02F1H         LINE#         308
+  C:030BH         LINE#         309
+  C:0318H         LINE#         310
+  C:031EH         LINE#         311
+  C:031EH         LINE#         312
+  C:031EH         LINE#         313
+  C:0320H         LINE#         314
+  C:0329H         LINE#         315
+  C:032CH         LINE#         316
+  C:032CH         LINE#         317
+  C:032CH         LINE#         318
+  C:032CH         LINE#         319
+  -------         ENDPROC       MAIN
+  -------         PROC          PWM2_ISR
+  C:04E8H         LINE#         323
+  C:04EEH         LINE#         325
+  C:04F5H         LINE#         326
+  C:04F5H         LINE#         327
+  C:04F7H         LINE#         328
+  C:04FBH         LINE#         329
+  C:04FBH         LINE#         330
+  -------         ENDPROC       PWM2_ISR
+  -------         PROC          _UART1_TXBYTE
+  D:0007H         SYMBOL        dat
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 6
+
+
+  C:0003H         LINE#         339
+  C:0003H         LINE#         340
+  C:0003H         LINE#         341
+  C:0005H         LINE#         342
+  C:0007H         LINE#         343
+  C:000AH         LINE#         344
+  -------         ENDPROC       _UART1_TXBYTE
+  -------         PROC          _PRINTSTRING1
+  D:0001H         SYMBOL        puts
+  C:000EH         LINE#         355
+  C:000EH         LINE#         356
+  C:000EH         LINE#         357
+  C:0020H         LINE#         358
+  -------         ENDPROC       _PRINTSTRING1
+  -------         PROC          _SETTIMER2BAUDRAYE
+  D:0004H         SYMBOL        dat
+  C:0502H         LINE#         369
+  C:0506H         LINE#         370
+  C:0506H         LINE#         371
+  C:0509H         LINE#         372
+  C:050CH         LINE#         373
+  C:050FH         LINE#         374
+  C:0511H         LINE#         375
+  C:0515H         LINE#         376
+  C:0518H         LINE#         377
+  C:051BH         LINE#         378
+  -------         ENDPROC       _SETTIMER2BAUDRAYE
+  -------         PROC          _UART1_CONFIG
+  D:0007H         SYMBOL        brt
+  C:0410H         LINE#         389
+  C:0410H         LINE#         390
+  C:0410H         LINE#         392
+  C:0415H         LINE#         393
+  C:0415H         LINE#         394
+  C:0418H         LINE#         395
+  C:041FH         LINE#         396
+  C:0421H         LINE#         400
+  C:0421H         LINE#         401
+  C:0423H         LINE#         402
+  C:0426H         LINE#         403
+  C:0429H         LINE#         404
+  C:042CH         LINE#         405
+  C:042FH         LINE#         406
+  C:0432H         LINE#         407
+  C:0435H         LINE#         408
+  C:0437H         LINE#         409
+  C:043AH         LINE#         410
+  C:043CH         LINE#         411
+  C:043CH         LINE#         414
+  C:0444H         LINE#         416
+  C:0446H         LINE#         417
+  C:0448H         LINE#         418
+  C:044BH         LINE#         422
+  C:044DH         LINE#         423
+  C:0450H         LINE#         424
+  C:0452H         LINE#         425
+  -------         ENDPROC       _UART1_CONFIG
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 7
+
+
+  -------         PROC          UART1_INT
+  C:0453H         LINE#         437
+  C:045BH         LINE#         439
+  C:045EH         LINE#         440
+  C:045EH         LINE#         441
+  C:0460H         LINE#         442
+  C:046EH         LINE#         443
+  C:047CH         LINE#         444
+  C:047EH         LINE#         445
+  C:0481H         LINE#         446
+  C:0481H         LINE#         448
+  C:0484H         LINE#         449
+  C:0484H         LINE#         450
+  C:0486H         LINE#         451
+  C:0488H         LINE#         452
+  C:0488H         LINE#         453
+  -------         ENDPROC       UART1_INT
+  -------         PROC          DISPLAYSCAN
+  C:0491H         LINE#         456
+  C:0491H         LINE#         457
+  C:0491H         LINE#         458
+  C:04AAH         LINE#         459
+  C:04B7H         LINE#         460
+  C:04C7H         LINE#         461
+  -------         ENDPROC       DISPLAYSCAN
+  -------         PROC          TIMER0
+  C:00A6H         LINE#         465
+  C:00B7H         LINE#         467
+  C:00BAH         LINE#         468
+  C:00BCH         LINE#         469
+  -------         ENDPROC       TIMER0
+  -------         PROC          _GET_ADC12BITRESULT
+  D:0007H         SYMBOL        channel
+  C:04C8H         LINE#         479
+  C:04C8H         LINE#         480
+  C:04C8H         LINE#         481
+  C:04CBH         LINE#         482
+  C:04CDH         LINE#         484
+  C:04D2H         LINE#         485
+  C:04D3H         LINE#         486
+  C:04D4H         LINE#         487
+  C:04D5H         LINE#         488
+  C:04D6H         LINE#         490
+  C:04DCH         LINE#         491
+  C:04DFH         LINE#         492
+  C:04E7H         LINE#         493
+  -------         ENDPROC       _GET_ADC12BITRESULT
+  -------         PROC          _UPDATEPWM
+  D:0004H         SYMBOL        pwm_value
+  C:051CH         LINE#         502
+  C:0520H         LINE#         503
+  C:0520H         LINE#         504
+  C:0523H         LINE#         505
+  C:0528H         LINE#         506
+  C:052BH         LINE#         507
+  C:052EH         LINE#         508
+  -------         ENDPROC       _UPDATEPWM
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/18/2020  14:06:50  PAGE 8
+
+
+  -------         ENDMOD        PWM_DAC
+
+  -------         MODULE        ?C?CLDPTR
+  C:0026H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?IMUL
+  C:003FH         PUBLIC        ?C?IMUL
+  -------         ENDMOD        ?C?IMUL
+
+  -------         MODULE        ?C?UIDIV
+  C:0051H         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+Program Size: data=27.2 xdata=128 code=1321
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

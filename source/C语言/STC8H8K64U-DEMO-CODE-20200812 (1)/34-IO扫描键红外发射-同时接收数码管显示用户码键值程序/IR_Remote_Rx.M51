@@ -1,0 +1,446 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/23/2020  13:41:58  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE IR_Remote_Rx.obj TO IR_Remote_Rx RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  IR_Remote_Rx.obj (IR_REMOTE_RX)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULCMP)
+
+
+LINK MAP OF MODULE:  IR_Remote_Rx (IR_REMOTE_RX)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0001H     UNIT         _DATA_GROUP_
+                    0009H     0017H                  *** GAP ***
+            BIT     0020H.0   0000H.4   UNIT         ?BI?IR_REMOTE_RX
+                    0020H.4   0000H.4                *** GAP ***
+            DATA    0021H     001BH     UNIT         ?DT?IR_REMOTE_RX
+            IDATA   003CH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0005H     UNIT         ?PR?IO_KEYDELAY?IR_REMOTE_RX
+                    0008H     0003H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     00B8H     UNIT         ?PR?IR_RX_NEC?IR_REMOTE_RX
+            CODE    00C6H     000CH     UNIT         ?C_C51STARTUP
+                    00D2H     0001H                  *** GAP ***
+            CODE    00D3H     0003H     ABSOLUTE     
+            CODE    00D6H     00DAH     UNIT         ?PR?MAIN?IR_REMOTE_RX
+            CODE    01B0H     0076H     UNIT         ?PR?IO_KEYSCAN?IR_REMOTE_RX
+            CODE    0226H     0049H     UNIT         ?PR?TIMER0?IR_REMOTE_RX
+            CODE    026FH     0043H     UNIT         ?CO?IR_REMOTE_RX
+            CODE    02B2H     0038H     UNIT         ?PR?PWM_CONFIG?IR_REMOTE_RX
+            CODE    02EAH     0038H     UNIT         ?PR?PWM1_ISR?IR_REMOTE_RX
+            CODE    0322H     0037H     UNIT         ?PR?DISPLAYSCAN?IR_REMOTE_RX
+            CODE    0359H     002CH     UNIT         ?PR?_IR_TXBYTE?IR_REMOTE_RX
+            CODE    0385H     0022H     UNIT         ?PR?_IR_TXPULSE?IR_REMOTE_RX
+            CODE    03A7H     0022H     UNIT         ?PR?_IR_TXSPACE?IR_REMOTE_RX
+            CODE    03C9H     0011H     UNIT         ?C?LIB_CODE
+
+
+
+OVERLAY MAP OF MODULE:   IR_Remote_Rx (IR_REMOTE_RX)
+
+
+SEGMENT                                DATA_GROUP 
+  +--> CALLED SEGMENT                START    LENGTH
+----------------------------------------------------
+?PR?TIMER0?IR_REMOTE_RX              -----    -----
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 2
+
+
+  +--> ?PR?IR_RX_NEC?IR_REMOTE_RX
+  +--> ?PR?DISPLAYSCAN?IR_REMOTE_RX
+
+?PR?IR_RX_NEC?IR_REMOTE_RX           0008H    0001H
+
+?PR?DISPLAYSCAN?IR_REMOTE_RX         -----    -----
+  +--> ?CO?IR_REMOTE_RX
+
+*** NEW ROOT ***************************************************
+
+?C_C51STARTUP                        -----    -----
+  +--> ?PR?MAIN?IR_REMOTE_RX
+
+?PR?MAIN?IR_REMOTE_RX                -----    -----
+  +--> ?PR?PWM_CONFIG?IR_REMOTE_RX
+  +--> ?PR?IO_KEYSCAN?IR_REMOTE_RX
+  +--> ?PR?_IR_TXPULSE?IR_REMOTE_RX
+  +--> ?PR?_IR_TXSPACE?IR_REMOTE_RX
+  +--> ?PR?_IR_TXBYTE?IR_REMOTE_RX
+
+?PR?IO_KEYSCAN?IR_REMOTE_RX          -----    -----
+  +--> ?PR?IO_KEYDELAY?IR_REMOTE_RX
+  +--> ?CO?IR_REMOTE_RX
+
+?PR?_IR_TXBYTE?IR_REMOTE_RX          -----    -----
+  +--> ?PR?_IR_TXSPACE?IR_REMOTE_RX
+  +--> ?PR?_IR_TXPULSE?IR_REMOTE_RX
+
+
+
+SYMBOL TABLE OF MODULE:  IR_Remote_Rx (IR_REMOTE_RX)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        IR_REMOTE_RX
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 3
+
+
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  B:00A8H.7       PUBLIC        EA
+  D:00F8H         PUBLIC        P7
+  D:0021H         PUBLIC        IR_SampleCnt
+  D:00BAH         PUBLIC        P_SW2
+  D:0022H         PUBLIC        LED8
+  D:002AH         PUBLIC        IR_DataShit
+  D:002BH         PUBLIC        tx_cnt
+  C:029AH         PUBLIC        T_COM
+  C:0003H         PUBLIC        IO_KeyDelay
+  D:002DH         PUBLIC        IR_data
+  D:002EH         PUBLIC        IR_code
+  D:002FH         PUBLIC        UserCode
+  C:00D6H         PUBLIC        main
+  D:0031H         PUBLIC        KeyCode
+  D:0032H         PUBLIC        IO_KeyState
+  C:01B0H         PUBLIC        IO_KeyScan
+  B:0020H.0       PUBLIC        B_IR_Press
+  B:0020H.1       PUBLIC        B_1ms
+  C:03A7H         PUBLIC        _IR_TxSpace
+  D:0033H         PUBLIC        cnt_1ms
+  B:0020H.2       PUBLIC        B_IR_Sync
+  D:008EH         PUBLIC        AUXR
+  D:0034H         PUBLIC        IR_BitCnt
+  B:00A8H.1       PUBLIC        ET0
+  C:02A2H         PUBLIC        T_KeyTable
+  D:008CH         PUBLIC        TH0
+  C:02B2H         PUBLIC        PWM_config
+  C:026FH         PUBLIC        t_display
+  D:008AH         PUBLIC        TL0
+  C:0226H         PUBLIC        timer0
+  D:0035H         PUBLIC        IO_KeyHoldCnt
+  C:0385H         PUBLIC        _IR_TxPulse
+  B:00B0H.2       PUBLIC        P_IR_RX
+  B:0088H.4       PUBLIC        TR0
+  D:0036H         PUBLIC        IO_KeyState1
+  D:0037H         PUBLIC        KeyHoldCnt
+  C:000EH         PUBLIC        IR_RX_NEC
+  C:0359H         PUBLIC        _IR_TxByte
+  C:0322H         PUBLIC        DisplayScan
+  D:0038H         PUBLIC        IR_UserH
+  D:0039H         PUBLIC        IR_UserL
+  B:0020H.3       PUBLIC        P_IR_RX_temp
+  D:003AH         PUBLIC        cnt_27ms
+  C:02EAH         PUBLIC        PWM1_ISR
+  B:00D0H.5       PUBLIC        F0
+  D:003BH         PUBLIC        display_index
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:00D6H         LINE#         227
+  C:00D6H         LINE#         228
+  C:00D6H         LINE#         231
+  C:00DBH         LINE#         232
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 4
+
+
+  C:00DFH         LINE#         233
+  C:00E3H         LINE#         234
+  C:00E7H         LINE#         235
+  C:00EBH         LINE#         236
+  C:00EFH         LINE#         237
+  C:00F3H         LINE#         238
+  C:00F7H         LINE#         240
+  C:00F9H         LINE#         242
+  C:00FCH         LINE#         243
+  C:00FFH         LINE#         244
+  C:0102H         LINE#         245
+  C:0104H         LINE#         246
+  C:0106H         LINE#         247
+  C:0108H         LINE#         249
+  C:010BH         LINE#         251
+  C:0120H         LINE#         252
+  C:0123H         LINE#         253
+  C:0126H         LINE#         255
+  C:0126H         LINE#         256
+  C:0126H         LINE#         257
+  C:0129H         LINE#         258
+  C:0129H         LINE#         259
+  C:012BH         LINE#         260
+  C:0138H         LINE#         261
+  C:0138H         LINE#         262
+  C:013BH         LINE#         263
+  C:013EH         LINE#         265
+  C:0149H         LINE#         266
+  C:0149H         LINE#         267
+  C:0150H         LINE#         268
+  C:0157H         LINE#         269
+  C:015EH         LINE#         271
+  C:0163H         LINE#         272
+  C:0168H         LINE#         273
+  C:016DH         LINE#         274
+  C:0174H         LINE#         276
+  C:0177H         LINE#         277
+  C:0177H         LINE#         278
+  C:0177H         LINE#         280
+  C:017AH         LINE#         281
+  C:017AH         LINE#         282
+  C:017CH         LINE#         284
+  C:0183H         LINE#         285
+  C:0189H         LINE#         286
+  C:019AH         LINE#         287
+  C:01A0H         LINE#         288
+  C:01A7H         LINE#         289
+  C:01ADH         LINE#         290
+  C:01ADH         LINE#         291
+  C:01ADH         LINE#         292
+  -------         ENDPROC       MAIN
+  -------         PROC          IO_KEYDELAY
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:0003H         LINE#         314
+  C:0003H         LINE#         315
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 5
+
+
+  C:0003H         LINE#         317
+  C:0005H         LINE#         318
+  C:0007H         LINE#         319
+  -------         ENDPROC       IO_KEYDELAY
+  -------         PROC          IO_KEYSCAN
+  -------         DO            
+  D:0006H         SYMBOL        j
+  -------         ENDDO         
+  C:01B0H         LINE#         321
+  C:01B0H         LINE#         322
+  C:01B0H         LINE#         325
+  C:01B2H         LINE#         327
+  C:01B5H         LINE#         328
+  C:01B8H         LINE#         329
+  C:01BEH         LINE#         331
+  C:01C1H         LINE#         332
+  C:01C4H         LINE#         333
+  C:01CAH         LINE#         334
+  C:01CDH         LINE#         336
+  C:01D2H         LINE#         337
+  C:01D2H         LINE#         338
+  C:01D4H         LINE#         339
+  C:01D7H         LINE#         340
+  C:01DBH         LINE#         341
+  C:01DBH         LINE#         342
+  C:01DDH         LINE#         343
+  C:01E4H         LINE#         344
+  C:01E8H         LINE#         345
+  C:01E8H         LINE#         346
+  C:01F5H         LINE#         347
+  C:01F5H         LINE#         348
+  C:01F8H         LINE#         349
+  C:01FAH         LINE#         350
+  C:01FAH         LINE#         351
+  C:01FAH         LINE#         352
+  C:01FDH         LINE#         353
+  C:01FDH         LINE#         354
+  C:0207H         LINE#         355
+  C:0211H         LINE#         356
+  C:021DH         LINE#         357
+  C:021DH         LINE#         358
+  C:021FH         LINE#         359
+  C:0222H         LINE#         360
+  C:0222H         LINE#         361
+  C:0225H         LINE#         362
+  -------         ENDPROC       IO_KEYSCAN
+  -------         PROC          DISPLAYSCAN
+  C:0322H         LINE#         365
+  C:0322H         LINE#         366
+  C:0322H         LINE#         367
+  C:033BH         LINE#         368
+  C:0348H         LINE#         369
+  C:0358H         LINE#         370
+  -------         ENDPROC       DISPLAYSCAN
+  -------         PROC          IR_RX_NEC
+  -------         DO            
+  D:0008H         SYMBOL        SampleTime
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 6
+
+
+  -------         ENDDO         
+  C:000EH         LINE#         409
+  C:000EH         LINE#         410
+  C:000EH         LINE#         413
+  C:0010H         LINE#         415
+  C:0014H         LINE#         416
+  C:0018H         LINE#         417
+  C:0024H         LINE#         418
+  C:0024H         LINE#         419
+  C:0027H         LINE#         420
+  C:002AH         LINE#         422
+  C:003DH         LINE#         423
+  C:004EH         LINE#         424
+  C:004EH         LINE#         425
+  C:005CH         LINE#         426
+  C:005CH         LINE#         427
+  C:005EH         LINE#         428
+  C:0061H         LINE#         429
+  C:0061H         LINE#         430
+  C:0062H         LINE#         431
+  C:0065H         LINE#         432
+  C:0065H         LINE#         433
+  C:0079H         LINE#         435
+  C:0079H         LINE#         436
+  C:007FH         LINE#         437
+  C:0093H         LINE#         438
+  C:0099H         LINE#         439
+  C:0099H         LINE#         440
+  C:009BH         LINE#         441
+  C:00A2H         LINE#         442
+  C:00A2H         LINE#         443
+  C:00B0H         LINE#         444
+  C:00B3H         LINE#         445
+  C:00B5H         LINE#         446
+  C:00B5H         LINE#         447
+  C:00B6H         LINE#         448
+  C:00BCH         LINE#         449
+  C:00BCH         LINE#         450
+  C:00BFH         LINE#         451
+  C:00C2H         LINE#         452
+  C:00C5H         LINE#         453
+  C:00C5H         LINE#         454
+  C:00C5H         LINE#         455
+  C:00C5H         LINE#         456
+  C:00C5H         LINE#         457
+  -------         ENDPROC       IR_RX_NEC
+  -------         PROC          TIMER0
+  C:0226H         LINE#         461
+  C:0243H         LINE#         463
+  C:0246H         LINE#         464
+  C:024CH         LINE#         465
+  C:024CH         LINE#         466
+  C:024FH         LINE#         467
+  C:0251H         LINE#         468
+  C:0254H         LINE#         469
+  C:0254H         LINE#         470
+  -------         ENDPROC       TIMER0
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 7
+
+
+  -------         PROC          _IR_TXPULSE
+  D:0006H         SYMBOL        pulse
+  C:0385H         LINE#         474
+  C:0385H         LINE#         475
+  C:0385H         LINE#         476
+  C:0389H         LINE#         477
+  C:038EH         LINE#         478
+  C:0394H         LINE#         479
+  C:039AH         LINE#         480
+  C:03A0H         LINE#         481
+  C:03A6H         LINE#         482
+  -------         ENDPROC       _IR_TXPULSE
+  -------         PROC          _IR_TXSPACE
+  D:0006H         SYMBOL        pulse
+  C:03A7H         LINE#         485
+  C:03A7H         LINE#         486
+  C:03A7H         LINE#         487
+  C:03ABH         LINE#         488
+  C:03B0H         LINE#         489
+  C:03B6H         LINE#         490
+  C:03BCH         LINE#         491
+  C:03C2H         LINE#         492
+  C:03C8H         LINE#         493
+  -------         ENDPROC       _IR_TXSPACE
+  -------         PROC          _IR_TXBYTE
+  D:0005H         SYMBOL        dat
+  -------         DO            
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:0359H         LINE#         496
+  C:035BH         LINE#         497
+  C:035BH         LINE#         499
+  C:0367H         LINE#         500
+  C:0367H         LINE#         501
+  C:036FH         LINE#         502
+  C:0376H         LINE#         503
+  C:037DH         LINE#         504
+  C:0381H         LINE#         505
+  C:0384H         LINE#         506
+  -------         ENDPROC       _IR_TXBYTE
+  -------         PROC          PWM_CONFIG
+  C:02B2H         LINE#         515
+  C:02B2H         LINE#         516
+  C:02B2H         LINE#         517
+  C:02B5H         LINE#         519
+  C:02BAH         LINE#         520
+  C:02C0H         LINE#         523
+  C:02C6H         LINE#         524
+  C:02CAH         LINE#         525
+  C:02CFH         LINE#         526
+  C:02D3H         LINE#         529
+  C:02D9H         LINE#         531
+  C:02DCH         LINE#         532
+  C:02E2H         LINE#         534
+  C:02E9H         LINE#         536
+  -------         ENDPROC       PWM_CONFIG
+  -------         PROC          PWM1_ISR
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/23/2020  13:41:58  PAGE 8
+
+
+  C:02EAH         LINE#         539
+  C:02F0H         LINE#         541
+  C:02F7H         LINE#         542
+  C:02F7H         LINE#         544
+  C:02F9H         LINE#         546
+  C:0306H         LINE#         547
+  C:0306H         LINE#         548
+  C:030AH         LINE#         549
+  C:0310H         LINE#         550
+  C:0316H         LINE#         551
+  C:031BH         LINE#         552
+  C:031BH         LINE#         553
+  C:031BH         LINE#         554
+  -------         ENDPROC       PWM1_ISR
+  -------         ENDMOD        IR_REMOTE_RX
+
+  -------         MODULE        ?C?ULCMP
+  C:03C9H         PUBLIC        ?C?ULCMP
+  -------         ENDMOD        ?C?ULCMP
+
+Program Size: data=37.4 xdata=0 code=982
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

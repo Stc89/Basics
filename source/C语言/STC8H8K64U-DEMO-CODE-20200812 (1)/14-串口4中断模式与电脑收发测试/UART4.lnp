@@ -1,0 +1,3 @@
+"UART4.obj" 
+TO "UART4" 
+RAMSIZE(256) 

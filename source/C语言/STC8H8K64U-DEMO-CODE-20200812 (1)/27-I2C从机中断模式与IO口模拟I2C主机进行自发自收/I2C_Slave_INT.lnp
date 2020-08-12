@@ -1,0 +1,3 @@
+"I2C_Slave_INT.obj" 
+TO "I2C_Slave_INT" 
+RAMSIZE(256) 

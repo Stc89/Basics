@@ -1,0 +1,428 @@
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE ADC_KEYSCAN
+OBJECT MODULE PLACED IN ADC_KeyScan.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ADC_KeyScan.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          用STC的MCU的IO方式驱动8位数码管。
+  17          
+  18          显示效果为: 数码时钟.
+  19          
+  20          使用Timer0的16位自动重装来产生1ms节拍,程序运行于这个节拍下,用户修改MCU主时钟频率时,自动定时于1ms.
+  21          
+  22          左边4位LED显示时间(小时,分钟), 右边最后两位显示按键值.
+  23          
+  24          ADC按键键码为1~16.
+  25          
+  26          按键只支持单键按下, 不支持多键同时按下, 那样将会有不可预知的结果.
+  27          
+  28          键按下超过1秒后,将以10键/秒的速度提供重键输出. 用户只需要检测KeyCode是否非0来判断键是否按下.
+  29          
+  30          调整时间键:
+  31          键码1: 小时+.
+  32          键码2: 小时-.
+  33          键码3: 分钟+.
+  34          键码4: 分钟-.
+  35          
+  36          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  37          
+  38          ******************************************/
+  39          
+  40          #include    "reg51.h"
+  41          #include    "intrins.h"
+  42          
+  43          #define     MAIN_Fosc       24000000L   //定义主时钟
+  44          
+  45          typedef     unsigned char   u8;
+  46          typedef     unsigned int    u16;
+  47          typedef     unsigned long   u32;
+  48          
+  49          sfr TH2  = 0xD6;
+  50          sfr TL2  = 0xD7;
+  51          sfr IE2   = 0xAF;
+  52          sfr INT_CLKO = 0x8F;
+  53          sfr AUXR = 0x8E;
+  54          sfr AUXR1 = 0xA2;
+  55          sfr P_SW1 = 0xA2;
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 2   
+
+  56          sfr P_SW2 = 0xBA;
+  57          sfr S2CON = 0x9A;
+  58          sfr S2BUF = 0x9B;
+  59          
+  60          sfr ADC_CONTR = 0xBC;   //带AD系列
+  61          sfr ADC_RES   = 0xBD;   //带AD系列
+  62          sfr ADC_RESL  = 0xBE;   //带AD系列
+  63          sfr ADCCFG = 0xDE;
+  64          
+  65          sfr P4   = 0xC0;
+  66          sfr P5   = 0xC8;
+  67          sfr P6   = 0xE8;
+  68          sfr P7   = 0xF8;
+  69          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  70          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  71          sfr P0M1 = 0x93;
+  72          sfr P0M0 = 0x94;
+  73          sfr P2M1 = 0x95;
+  74          sfr P2M0 = 0x96;
+  75          sfr P3M1 = 0xB1;
+  76          sfr P3M0 = 0xB2;
+  77          sfr P4M1 = 0xB3;
+  78          sfr P4M0 = 0xB4;
+  79          sfr P5M1 = 0xC9;
+  80          sfr P5M0 = 0xCA;
+  81          sfr P6M1 = 0xCB;
+  82          sfr P6M0 = 0xCC;
+  83          sfr P7M1 = 0xE1;
+  84          sfr P7M0 = 0xE2;
+  85          
+  86          sbit P00 = P0^0;
+  87          sbit P01 = P0^1;
+  88          sbit P02 = P0^2;
+  89          sbit P03 = P0^3;
+  90          sbit P04 = P0^4;
+  91          sbit P05 = P0^5;
+  92          sbit P06 = P0^6;
+  93          sbit P07 = P0^7;
+  94          sbit P10 = P1^0;
+  95          sbit P11 = P1^1;
+  96          sbit P12 = P1^2;
+  97          sbit P13 = P1^3;
+  98          sbit P14 = P1^4;
+  99          sbit P15 = P1^5;
+ 100          sbit P16 = P1^6;
+ 101          sbit P17 = P1^7;
+ 102          sbit P20 = P2^0;
+ 103          sbit P21 = P2^1;
+ 104          sbit P22 = P2^2;
+ 105          sbit P23 = P2^3;
+ 106          sbit P24 = P2^4;
+ 107          sbit P25 = P2^5;
+ 108          sbit P26 = P2^6;
+ 109          sbit P27 = P2^7;
+ 110          sbit P30 = P3^0;
+ 111          sbit P31 = P3^1;
+ 112          sbit P32 = P3^2;
+ 113          sbit P33 = P3^3;
+ 114          sbit P34 = P3^4;
+ 115          sbit P35 = P3^5;
+ 116          sbit P36 = P3^6;
+ 117          sbit P37 = P3^7;
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 3   
+
+ 118          sbit P40 = P4^0;
+ 119          sbit P41 = P4^1;
+ 120          sbit P42 = P4^2;
+ 121          sbit P43 = P4^3;
+ 122          sbit P44 = P4^4;
+ 123          sbit P45 = P4^5;
+ 124          sbit P46 = P4^6;
+ 125          sbit P47 = P4^7;
+ 126          sbit P50 = P5^0;
+ 127          sbit P51 = P5^1;
+ 128          sbit P52 = P5^2;
+ 129          sbit P53 = P5^3;
+ 130          sbit P54 = P5^4;
+ 131          sbit P55 = P5^5;
+ 132          sbit P56 = P5^6;
+ 133          sbit P57 = P5^7;
+ 134          
+ 135          
+ 136          #define ADCTIM (*(unsigned char volatile xdata *)0xfea8)
+ 137          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 138          
+ 139          #define DIS_DOT     0x20
+ 140          #define DIS_BLACK   0x10
+ 141          #define DIS_        0x11
+ 142          
+ 143          
+ 144          u8 code t_display[]={                       //标准字库
+ 145          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 146              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 147          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 148              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 149              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 150          
+ 151          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 152          
+ 153          
+ 154          u8  LED8[8];        //显示缓冲
+ 155          u8  display_index;  //显示位索引
+ 156          bit B_1ms;          //1ms标志
+ 157          
+ 158          u8  ADC_KeyState,ADC_KeyState1,ADC_KeyState2,ADC_KeyState3; //键状态
+ 159          u8  ADC_KeyHoldCnt; //键按下计时
+ 160          u8  KeyCode;    //给用户使用的键码, 1~16有效
+ 161          u8  cnt10ms;
+ 162          
+ 163          u8  hour,minute,second; //RTC变量
+ 164          u16 msecond;
+ 165          
+ 166          void    CalculateAdcKey(u16 adc);
+ 167          u16     Get_ADC12bitResult(u8 channel); //channel = 0~7
+ 168          void    DisplayRTC(void);
+ 169          void    RTC(void);
+ 170          
+ 171          
+ 172          /**********************************************/
+ 173          void main(void)
+ 174          {
+ 175   1          u8  i;
+ 176   1          u16 j;
+ 177   1      
+ 178   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 179   1          P1M1 = 1;   P1M0 = 0;   //设置 P1.0 为 ADC 输入口
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 4   
+
+ 180   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 181   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 182   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 183   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 184   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 185   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 186   1          
+ 187   1          display_index = 0;
+ 188   1        
+ 189   1          P_SW2 |= 0x80;
+ 190   1          ADCTIM = 0x3f;    //设置 ADC 内部时序，ADC采样时间建议设最大值
+ 191   1          P_SW2 &= 0x7f;
+ 192   1          ADCCFG = 0x2f;    //设置 ADC 时钟为系统时钟/2/16/16
+ 193   1          ADC_CONTR = 0x80; //使能 ADC 模块
+ 194   1      
+ 195   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 196   1          TH0 = (u8)(Timer0_Reload / 256);
+ 197   1          TL0 = (u8)(Timer0_Reload % 256);
+ 198   1          ET0 = 1;    //Timer0 interrupt enable
+ 199   1          TR0 = 1;    //Tiner0 run
+ 200   1          EA = 1;     //打开总中断
+ 201   1          
+ 202   1          for(i=0; i<8; i++)  LED8[i] = 0x10; //上电消隐
+ 203   1      
+ 204   1          hour   = 12;    //初始化时间值
+ 205   1          minute = 0;
+ 206   1          second = 0;
+ 207   1          DisplayRTC();
+ 208   1      
+ 209   1          ADC_KeyState  = 0;
+ 210   1          ADC_KeyState1 = 0;
+ 211   1          ADC_KeyState2 = 0;
+ 212   1          ADC_KeyState3 = 0;  //键状态
+ 213   1          ADC_KeyHoldCnt = 0; //键按下计时
+ 214   1          KeyCode = 0;    //给用户使用的键码, 1~16有效
+ 215   1          cnt10ms = 0;
+ 216   1      
+ 217   1          while(1)
+ 218   1          {
+ 219   2              if(B_1ms)   //1ms到
+ 220   2              {
+ 221   3                  B_1ms = 0;
+ 222   3                  if(++msecond >= 1000)   //1秒到
+ 223   3                  {
+ 224   4                      msecond = 0;
+ 225   4                      RTC();
+ 226   4                      DisplayRTC();
+ 227   4                  }
+ 228   3                  if(msecond == 500)  DisplayRTC();   //小时后的小数点做秒闪
+ 229   3      
+ 230   3                  if(++cnt10ms >= 10) //10ms读一次ADC
+ 231   3                  {
+ 232   4                      cnt10ms = 0;
+ 233   4                      j = Get_ADC12bitResult(0);  //参数0~7,查询方式做一次ADC, 返回值就是结果, == 4096 为错误
+ 234   4                      if(j < 4096)    CalculateAdcKey(j); //计算按键
+ 235   4                              
+ 236   4                  }
+ 237   3      
+ 238   3                  if(KeyCode > 0)     //有键按下
+ 239   3                  {
+ 240   4                      LED8[6] = KeyCode / 10; //显示键码
+ 241   4                      LED8[7] = KeyCode % 10; //显示键码
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 5   
+
+ 242   4      
+ 243   4                      if(KeyCode == 1)    //hour +1
+ 244   4                      {
+ 245   5                          if(++hour >= 24)    hour = 0;
+ 246   5                          DisplayRTC();
+ 247   5                      }
+ 248   4                      if(KeyCode == 2)    //hour -1
+ 249   4                      {
+ 250   5                          if(--hour >= 24)    hour = 23;
+ 251   5                          DisplayRTC();
+ 252   5                      }
+ 253   4                      if(KeyCode == 3)    //minute +1
+ 254   4                      {
+ 255   5                          second = 0;
+ 256   5                          if(++minute >= 60)  minute = 0;
+ 257   5                          DisplayRTC();
+ 258   5                      }
+ 259   4                      if(KeyCode == 4)    //minute -1
+ 260   4                      {
+ 261   5                          second = 0;
+ 262   5                          if(--minute >= 60)  minute = 59;
+ 263   5                          DisplayRTC();
+ 264   5                      }
+ 265   4                      KeyCode = 0;
+ 266   4                  }
+ 267   3              }
+ 268   2          }
+ 269   1      } 
+ 270          /**********************************************/
+ 271          
+ 272          
+ 273          /********************** 显示时钟函数 ************************/
+ 274          void DisplayRTC(void)
+ 275          {
+ 276   1          if(hour >= 10)  LED8[0] = hour / 10;
+ 277   1          else            LED8[0] = DIS_BLACK;
+ 278   1          LED8[1] = hour % 10;
+ 279   1          LED8[2] = minute / 10;
+ 280   1          LED8[3] = minute % 10;
+ 281   1          if(msecond >= 500)      LED8[1] |= DIS_DOT; //小时后的小数点做秒闪
+ 282   1      }
+ 283          
+ 284          /********************** RTC演示函数 ************************/
+ 285          void RTC(void)
+ 286          {
+ 287   1          if(++second >= 60)
+ 288   1          {
+ 289   2              second = 0;
+ 290   2              if(++minute >= 60)
+ 291   2              {
+ 292   3                  minute = 0;
+ 293   3                  if(++hour >= 24)    hour = 0;
+ 294   3              }
+ 295   2          }
+ 296   1      }
+ 297          
+ 298          
+ 299          //========================================================================
+ 300          // 函数: u16 Get_ADC12bitResult(u8 channel)
+ 301          // 描述: 查询法读一次ADC结果.
+ 302          // 参数: channel: 选择要转换的ADC.
+ 303          // 返回: 12位ADC结果.
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 6   
+
+ 304          // 版本: V1.0, 2012-10-22
+ 305          //========================================================================
+ 306          u16 Get_ADC12bitResult(u8 channel)  //channel = 0~7
+ 307          {
+ 308   1          ADC_RES = 0;
+ 309   1          ADC_RESL = 0;
+ 310   1      
+ 311   1          ADC_CONTR |= (0x40 | channel); //启动 AD 转换
+ 312   1          _nop_();
+ 313   1          _nop_();
+ 314   1          _nop_();
+ 315   1          _nop_();
+ 316   1      
+ 317   1          while((ADC_CONTR & 0x20) == 0)  ;   //wait for ADC finish
+ 318   1          ADC_CONTR &= ~0x20;     //清除ADC结束标志
+ 319   1          return  (((u16)ADC_RES << 8) | ADC_RESL);
+ 320   1      }
+ 321          
+ 322          /***************** ADC键盘计算键码 *****************************
+ 323          电路和软件算法设计: Coody
+ 324          本ADC键盘方案在很多实际产品设计中, 验证了其稳定可靠, 即使按键使用导电膜,都很可靠.
+ 325          16个键,理论上各个键对应的ADC值为 (4096 / 16) * k = 256 * k, k = 1 ~ 16, 特别的, k=16时,对应的ADC值是4095.
+ 326          但是实际会有偏差,则判断时限制这个偏差, ADC_OFFSET为+-偏差, 则ADC值在 (256*k-ADC_OFFSET) 与 (256*k+ADC_OFFS
+             -ET)之间为键有效.
+ 327          间隔一定的时间,就采样一次ADC,比如10ms.
+ 328          为了避免偶然的ADC值误判, 或者避免ADC在上升或下降时误判, 使用连续3次ADC值均在偏差范围内时, ADC值才认为有效.
+ 329          以上算法, 能保证读键非常可靠.
+ 330          **********************************************/
+ 331          #define ADC_OFFSET  64
+ 332          void CalculateAdcKey(u16 adc)
+ 333          {
+ 334   1          u8  i;
+ 335   1          u16 j;
+ 336   1          
+ 337   1          if(adc < (256-ADC_OFFSET))
+ 338   1          {
+ 339   2              ADC_KeyState = 0;   //键状态归0
+ 340   2              ADC_KeyHoldCnt = 0;
+ 341   2          }
+ 342   1          j = 256;
+ 343   1          for(i=1; i<=16; i++)
+ 344   1          {
+ 345   2              if((adc >= (j - ADC_OFFSET)) && (adc <= (j + ADC_OFFSET)))  break;  //判断是否在偏差范围内
+ 346   2              j += 256;
+ 347   2          }
+ 348   1          ADC_KeyState3 = ADC_KeyState2;
+ 349   1          ADC_KeyState2 = ADC_KeyState1;
+ 350   1          if(i > 16)  ADC_KeyState1 = 0;  //键无效
+ 351   1          else                        //键有效
+ 352   1          {
+ 353   2              ADC_KeyState1 = i;
+ 354   2              if((ADC_KeyState3 == ADC_KeyState2) && (ADC_KeyState2 == ADC_KeyState1) &&
+ 355   2                 (ADC_KeyState3 > 0) && (ADC_KeyState2 > 0) && (ADC_KeyState1 > 0))
+ 356   2              {
+ 357   3                  if(ADC_KeyState == 0)   //第一次检测到
+ 358   3                  {
+ 359   4                      KeyCode  = i;   //保存键码
+ 360   4                      ADC_KeyState = i;   //保存键状态
+ 361   4                      ADC_KeyHoldCnt = 0;
+ 362   4                  }
+ 363   3                  if(ADC_KeyState == i)   //连续检测到同一键按着
+ 364   3                  {
+C51 COMPILER V9.59.0.0   ADC_KEYSCAN                                                       06/12/2020 17:37:02 PAGE 7   
+
+ 365   4                      if(++ADC_KeyHoldCnt >= 100) //按下1秒后,以10次每秒的速度Repeat Key
+ 366   4                      {
+ 367   5                          ADC_KeyHoldCnt = 90;
+ 368   5                          KeyCode  = i;   //保存键码
+ 369   5                      }
+ 370   4                  }
+ 371   3                  else ADC_KeyHoldCnt = 0; //按下时间计数归0
+ 372   3              }
+ 373   2          }
+ 374   1      }
+ 375          
+ 376          
+ 377          /********************** 显示扫描函数 ************************/
+ 378          void DisplayScan(void)
+ 379          {   
+ 380   1          P7 = ~T_COM[7-display_index];
+ 381   1          P6 = ~t_display[LED8[display_index]];
+ 382   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 383   1      }
+ 384          
+ 385          
+ 386          /********************** Timer0 1ms中断函数 ************************/
+ 387          void timer0 (void) interrupt 1
+ 388          {
+ 389   1          DisplayScan();  //1ms扫描显示一位
+ 390   1          B_1ms = 1;      //1ms标志
+ 391   1      }
+ 392          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    749    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     21    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

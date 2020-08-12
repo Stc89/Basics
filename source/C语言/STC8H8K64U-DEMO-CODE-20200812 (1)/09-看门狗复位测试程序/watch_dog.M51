@@ -1,0 +1,159 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/12/2020  16:34:25  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE watch_dog.obj TO watch_dog RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  watch_dog.obj (WATCH_DOG)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+
+
+LINK MAP OF MODULE:  watch_dog (WATCH_DOG)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000CH     UNIT         ?DT?WATCH_DOG
+            IDATA   0014H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0074H     UNIT         ?PR?MAIN?WATCH_DOG
+            CODE    0077H     0037H     UNIT         ?PR?DISPLAYSCAN?WATCH_DOG
+            CODE    00AEH     0033H     UNIT         ?CO?WATCH_DOG
+            CODE    00E1H     0010H     UNIT         ?PR?_DELAY_MS?WATCH_DOG
+            CODE    00F1H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   watch_dog (WATCH_DOG)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?WATCH_DOG
+
+?PR?MAIN?WATCH_DOG
+  +--> ?PR?_DELAY_MS?WATCH_DOG
+  +--> ?PR?DISPLAYSCAN?WATCH_DOG
+
+?PR?DISPLAYSCAN?WATCH_DOG
+  +--> ?CO?WATCH_DOG
+
+
+
+SYMBOL TABLE OF MODULE:  watch_dog (WATCH_DOG)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        WATCH_DOG
+  C:0000H         SYMBOL        _ICE_DUMMY_
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  16:34:25  PAGE 2
+
+
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  D:00F8H         PUBLIC        P7
+  D:0008H         PUBLIC        ms_cnt
+  D:000AH         PUBLIC        LED8
+  C:00D9H         PUBLIC        T_COM
+  C:0003H         PUBLIC        main
+  C:00AEH         PUBLIC        t_display
+  C:00E1H         PUBLIC        _delay_ms
+  D:00C1H         PUBLIC        WDT_CONTR
+  C:0077H         PUBLIC        DisplayScan
+  D:0012H         PUBLIC        tes_cnt
+  D:0013H         PUBLIC        display_index
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:0003H         LINE#         152
+  C:0003H         LINE#         153
+  C:0003H         LINE#         156
+  C:0008H         LINE#         157
+  C:000CH         LINE#         158
+  C:0010H         LINE#         159
+  C:0014H         LINE#         160
+  C:0018H         LINE#         161
+  C:001CH         LINE#         162
+  C:0020H         LINE#         163
+  C:0024H         LINE#         165
+  C:0026H         LINE#         166
+  C:003AH         LINE#         168
+  C:003DH         LINE#         169
+  C:0041H         LINE#         170
+  C:0044H         LINE#         172
+  C:0044H         LINE#         173
+  C:0044H         LINE#         174
+  C:0049H         LINE#         175
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  16:34:25  PAGE 3
+
+
+  C:004CH         LINE#         176
+  C:0057H         LINE#         177
+  C:005AH         LINE#         179
+  C:006BH         LINE#         180
+  C:006BH         LINE#         181
+  C:0070H         LINE#         182
+  C:0072H         LINE#         183
+  C:0075H         LINE#         184
+  C:0075H         LINE#         186
+  -------         ENDPROC       MAIN
+  -------         PROC          _DELAY_MS
+  D:0007H         SYMBOL        ms
+  -------         DO            
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:00E1H         LINE#         200
+  C:00E1H         LINE#         201
+  C:00E1H         LINE#         203
+  C:00E1H         LINE#         204
+  C:00E5H         LINE#         205
+  C:00EEH         LINE#         206
+  C:00F0H         LINE#         207
+  -------         ENDPROC       _DELAY_MS
+  -------         PROC          DISPLAYSCAN
+  C:0077H         LINE#         211
+  C:0077H         LINE#         212
+  C:0077H         LINE#         213
+  C:0090H         LINE#         214
+  C:009DH         LINE#         215
+  C:00ADH         LINE#         216
+  -------         ENDPROC       DISPLAYSCAN
+  -------         ENDMOD        WATCH_DOG
+
+Program Size: data=21.0 xdata=0 code=253
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

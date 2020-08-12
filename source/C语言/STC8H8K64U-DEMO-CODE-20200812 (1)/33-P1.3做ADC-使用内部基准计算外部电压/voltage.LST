@@ -1,0 +1,319 @@
+C51 COMPILER V9.59.0.0   VOLTAGE                                                           06/21/2020 18:40:20 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE VOLTAGE
+OBJECT MODULE PLACED IN voltage.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE voltage.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          读ADC测量外部电压，使用内部基准计算电压.
+  17          
+  18          用STC的MCU的IO方式驱动8位数码管。
+  19          
+  20          使用Timer0的16位自动重装来产生1ms节拍,程序运行于这个节拍下, 用户修改MCU主时钟频率时,自动定时于1ms.
+  21          
+  22          右边4位数码管显示测量的电压值值.
+  23          
+  24          外部电压从板上测温电阻两端输入, 输入电压0~VDD, 不要超过VDD或低于0V. 
+  25          
+  26          实际项目使用请串一个1K的电阻到ADC输入口, ADC输入口再并一个电容到地.
+  27          
+  28          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  29          
+  30          ******************************************/
+  31          
+  32          
+  33          #include    "reg51.h"
+  34          #include    "intrins.h"
+  35          
+  36          #define     MAIN_Fosc       24000000L   //定义主时钟
+  37          
+  38          typedef     unsigned char   u8;
+  39          typedef     unsigned int    u16;
+  40          typedef     unsigned long   u32;
+  41          
+  42          sfr TH2  = 0xD6;
+  43          sfr TL2  = 0xD7;
+  44          sfr IE2   = 0xAF;
+  45          sfr INT_CLKO = 0x8F;
+  46          sfr AUXR = 0x8E;
+  47          sfr AUXR1 = 0xA2;
+  48          sfr P_SW1 = 0xA2;
+  49          sfr P_SW2 = 0xBA;
+  50          sfr S2CON = 0x9A;
+  51          sfr S2BUF = 0x9B;
+  52          
+  53          sfr ADC_CONTR = 0xBC;   //带AD系列
+  54          sfr ADC_RES   = 0xBD;   //带AD系列
+  55          sfr ADC_RESL  = 0xBE;   //带AD系列
+C51 COMPILER V9.59.0.0   VOLTAGE                                                           06/21/2020 18:40:20 PAGE 2   
+
+  56          sfr ADCCFG = 0xDE;
+  57          
+  58          sfr P4   = 0xC0;
+  59          sfr P5   = 0xC8;
+  60          sfr P6   = 0xE8;
+  61          sfr P7   = 0xF8;
+  62          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  63          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  64          sfr P0M1 = 0x93;
+  65          sfr P0M0 = 0x94;
+  66          sfr P2M1 = 0x95;
+  67          sfr P2M0 = 0x96;
+  68          sfr P3M1 = 0xB1;
+  69          sfr P3M0 = 0xB2;
+  70          sfr P4M1 = 0xB3;
+  71          sfr P4M0 = 0xB4;
+  72          sfr P5M1 = 0xC9;
+  73          sfr P5M0 = 0xCA;
+  74          sfr P6M1 = 0xCB;
+  75          sfr P6M0 = 0xCC;
+  76          sfr P7M1 = 0xE1;
+  77          sfr P7M0 = 0xE2;
+  78          
+  79          sbit P00 = P0^0;
+  80          sbit P01 = P0^1;
+  81          sbit P02 = P0^2;
+  82          sbit P03 = P0^3;
+  83          sbit P04 = P0^4;
+  84          sbit P05 = P0^5;
+  85          sbit P06 = P0^6;
+  86          sbit P07 = P0^7;
+  87          sbit P10 = P1^0;
+  88          sbit P11 = P1^1;
+  89          sbit P12 = P1^2;
+  90          sbit P13 = P1^3;
+  91          sbit P14 = P1^4;
+  92          sbit P15 = P1^5;
+  93          sbit P16 = P1^6;
+  94          sbit P17 = P1^7;
+  95          sbit P20 = P2^0;
+  96          sbit P21 = P2^1;
+  97          sbit P22 = P2^2;
+  98          sbit P23 = P2^3;
+  99          sbit P24 = P2^4;
+ 100          sbit P25 = P2^5;
+ 101          sbit P26 = P2^6;
+ 102          sbit P27 = P2^7;
+ 103          sbit P30 = P3^0;
+ 104          sbit P31 = P3^1;
+ 105          sbit P32 = P3^2;
+ 106          sbit P33 = P3^3;
+ 107          sbit P34 = P3^4;
+ 108          sbit P35 = P3^5;
+ 109          sbit P36 = P3^6;
+ 110          sbit P37 = P3^7;
+ 111          sbit P40 = P4^0;
+ 112          sbit P41 = P4^1;
+ 113          sbit P42 = P4^2;
+ 114          sbit P43 = P4^3;
+ 115          sbit P44 = P4^4;
+ 116          sbit P45 = P4^5;
+ 117          sbit P46 = P4^6;
+C51 COMPILER V9.59.0.0   VOLTAGE                                                           06/21/2020 18:40:20 PAGE 3   
+
+ 118          sbit P47 = P4^7;
+ 119          sbit P50 = P5^0;
+ 120          sbit P51 = P5^1;
+ 121          sbit P52 = P5^2;
+ 122          sbit P53 = P5^3;
+ 123          sbit P54 = P5^4;
+ 124          sbit P55 = P5^5;
+ 125          sbit P56 = P5^6;
+ 126          sbit P57 = P5^7;
+ 127          
+ 128          
+ 129          /***********************************************************/
+ 130          
+ 131          #define DIS_DOT     0x20
+ 132          #define DIS_BLACK   0x10
+ 133          #define DIS_        0x11
+ 134          
+ 135          #define P1n_pure_input(bitn)        P1M1 |=  (bitn),    P1M0 &= ~(bitn)
+ 136          
+ 137          /****************************** 用户定义宏 ***********************************/
+ 138          
+ 139              #define Cal_MODE    0   //每次测量只读1次ADC. 分辨率0.01V
+ 140          //  #define Cal_MODE    1   //每次测量连续读16次ADC 再平均计算. 分辨率0.01V
+ 141          
+ 142          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 143          #define ADCTIM (*(unsigned char volatile xdata *)0xfea8)
+ 144          
+ 145          /*****************************************************************************/
+ 146          
+ 147          
+ 148          /*************  本地常量声明    **************/
+ 149          u8 code t_display[]={                       //标准字库
+ 150          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 151              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 152          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 153              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 154              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 155          
+ 156          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 157          
+ 158          
+ 159          /*************  本地变量声明    **************/
+ 160          
+ 161          u8  LED8[8];        //显示缓冲
+ 162          u8  display_index;  //显示位索引
+ 163          bit B_1ms;          //1ms标志
+ 164          
+ 165          u16 msecond;
+ 166          u16 Bandgap;    //
+ 167          u16 Get_ADC12bitResult(u8 channel); //channel = 0~7
+ 168          
+ 169          /**********************************************/
+ 170          void main(void)
+ 171          {
+ 172   1          u8  i;
+ 173   1          u16 j;
+ 174   1      
+ 175   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 176   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 177   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 178   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 179   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+C51 COMPILER V9.59.0.0   VOLTAGE                                                           06/21/2020 18:40:20 PAGE 4   
+
+ 180   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 181   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 182   1          P1M1 = 0x08;   P1M0 = 0;   //设置 P1.3 为 ADC 输入口
+ 183   1          
+ 184   1          display_index = 0;
+ 185   1          P_SW2 |= 0x80;
+ 186   1          ADCTIM = 0x3f;    //设置 ADC 内部时序，ADC采样时间建议设最大值
+ 187   1          P_SW2 &= 0x7f;
+ 188   1          ADCCFG = 0x2f;    //设置 ADC 时钟为系统时钟/2/16/16
+ 189   1          ADC_CONTR = 0x80; //使能 ADC 模块
+ 190   1      
+ 191   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 192   1          TH0 = (u8)(Timer0_Reload / 256);
+ 193   1          TL0 = (u8)(Timer0_Reload % 256);
+ 194   1          ET0 = 1;    //Timer0 interrupt enable
+ 195   1          TR0 = 1;    //Tiner0 run
+ 196   1          EA = 1;     //打开总中断
+ 197   1          
+ 198   1          for(i=0; i<8; i++)  LED8[i] = 0x10; //上电消隐
+ 199   1      
+ 200   1          while(1)
+ 201   1          {
+ 202   2              if(B_1ms)   //1ms到
+ 203   2              {
+ 204   3                  B_1ms = 0;
+ 205   3                  if(++msecond >= 300)    //300ms到
+ 206   3                  {
+ 207   4                      msecond = 0;
+ 208   4      
+ 209   4                  #if (Cal_MODE == 0)
+ 210   4                  //=================== 只读1次ADC, 12bit ADC. 分辨率0.01V ===============================
+ 211   4                      //Get_ADC12bitResult(15);  //先读一次并丢弃结果, 让内部的采样电容的电压等于输入值.
+ 212   4                      Bandgap = Get_ADC12bitResult(15);    //读内部基准ADC, 读15通道
+ 213   4                      j = Get_ADC12bitResult(3);  //读外部电压ADC
+ 214   4                      j = (u16)((u32)j * 119 / Bandgap);  //计算外部电压, Bandgap为1.19V, 测电压分辨率0.01V
+ 215   4                  #endif
+ 216   4                  //==========================================================================
+ 217   4      
+ 218   4                  //===== 连续读16次ADC 再平均计算. 分辨率0.01V =========
+ 219   4                  #if (Cal_MODE == 1)
+                              //Get_ADC12bitResult(15);  //先读一次并丢弃结果, 让内部的采样电容的电压等于输入值.
+                              for(j=0, i=0; i<16; i++)
+                              {
+                                  j += Get_ADC12bitResult(15); //读内部基准ADC, 读15通道
+                              }
+                              Bandgap = j >> 4;   //16次平均
+                              for(j=0, i=0; i<16; i++)
+                              {
+                                  j += Get_ADC12bitResult(3); //读外部电压ADC
+                              }
+                              j = j >> 4; //16次平均
+                              j = (u16)((u32)j * 119 / Bandgap);  //计算外部电压, Bandgap为1.19V, 测电压分辨率0.01V
+                          #endif
+ 233   4                  //==========================================================================
+ 234   4      
+ 235   4                      LED8[5] = j / 100 + DIS_DOT;    //显示外部电压值
+ 236   4                      LED8[6] = (j % 100) / 10;
+ 237   4                      LED8[7] = j % 10;
+ 238   4      /*
+ 239   4                      j = Bandgap;
+ 240   4                      LED8[0] = j / 1000;     //显示Bandgap ADC值
+ 241   4                      LED8[1] = (j % 1000) / 100;
+C51 COMPILER V9.59.0.0   VOLTAGE                                                           06/21/2020 18:40:20 PAGE 5   
+
+ 242   4                      LED8[2] = (j % 100) / 10;
+ 243   4                      LED8[3] = j % 10;
+ 244   4      */
+ 245   4                  }
+ 246   3              }
+ 247   2          }
+ 248   1      } 
+ 249          /**********************************************/
+ 250          
+ 251          //========================================================================
+ 252          // 函数: u16 Get_ADC12bitResult(u8 channel)
+ 253          // 描述: 查询法读一次ADC结果.
+ 254          // 参数: channel: 选择要转换的ADC.
+ 255          // 返回: 12位ADC结果.
+ 256          // 版本: V1.0, 2012-10-22
+ 257          //========================================================================
+ 258          u16 Get_ADC12bitResult(u8 channel)  //channel = 0~7
+ 259          {
+ 260   1          ADC_RES = 0;
+ 261   1          ADC_RESL = 0;
+ 262   1      
+ 263   1          ADC_CONTR = (ADC_CONTR & 0xF0) | 0x40 | channel;    //启动 AD 转换
+ 264   1          _nop_();
+ 265   1          _nop_();
+ 266   1          _nop_();
+ 267   1          _nop_();
+ 268   1      
+ 269   1          while((ADC_CONTR & 0x20) == 0)  ;   //wait for ADC finish
+ 270   1          ADC_CONTR &= ~0x20;     //清除ADC结束标志
+ 271   1          return  (((u16)ADC_RES << 8) | ADC_RESL);
+ 272   1      }
+ 273          
+ 274          /********************** 显示扫描函数 ************************/
+ 275          void DisplayScan(void)
+ 276          {   
+ 277   1          P7 = ~T_COM[7-display_index];
+ 278   1          P6 = ~t_display[LED8[display_index]];
+ 279   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 280   1      }
+ 281          
+ 282          /********************** Timer0 1ms中断函数 ************************/
+ 283          void timer0 (void) interrupt 1
+ 284          {
+ 285   1          DisplayScan();  //1ms扫描显示一位
+ 286   1          B_1ms = 1;      //1ms标志
+ 287   1      }
+ 288          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    354    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

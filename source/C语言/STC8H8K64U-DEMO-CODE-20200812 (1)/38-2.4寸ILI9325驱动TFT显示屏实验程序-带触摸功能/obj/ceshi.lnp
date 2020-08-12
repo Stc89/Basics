@@ -1,0 +1,10 @@
+"..\obj\gui.obj",
+"..\obj\main.obj",
+"..\obj\test.obj",
+"..\obj\sys.obj",
+"..\obj\STARTUP.obj",
+"..\obj\LCD.obj",
+"..\obj\touch.obj" 
+TO "..\obj\ceshi" 
+PRINT(".\ceshi.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 

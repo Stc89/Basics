@@ -1,0 +1,222 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/21/2020  18:40:20  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE voltage.obj TO voltage RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  voltage.obj (VOLTAGE)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LIMUL)
+
+
+LINK MAP OF MODULE:  voltage (VOLTAGE)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000DH     UNIT         ?DT?VOLTAGE
+                    0015H     000BH                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         ?BI?VOLTAGE
+                    0020H.1   0000H.7                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0150H     UNIT         ?C?LIB_CODE
+            CODE    015EH     00E2H     UNIT         ?PR?MAIN?VOLTAGE
+            CODE    0240H     0037H     UNIT         ?PR?DISPLAYSCAN?VOLTAGE
+            CODE    0277H     0033H     UNIT         ?CO?VOLTAGE
+            CODE    02AAH     0025H     UNIT         ?PR?TIMER0?VOLTAGE
+            CODE    02CFH     0024H     UNIT         ?PR?_GET_ADC12BITRESULT?VOLTAGE
+            CODE    02F3H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   voltage (VOLTAGE)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?PR?TIMER0?VOLTAGE
+  +--> ?PR?DISPLAYSCAN?VOLTAGE
+
+?PR?DISPLAYSCAN?VOLTAGE
+  +--> ?CO?VOLTAGE
+
+*** NEW ROOT ***************************************************
+
+?C_C51STARTUP
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/21/2020  18:40:20  PAGE 2
+
+
+  +--> ?PR?MAIN?VOLTAGE
+
+?PR?MAIN?VOLTAGE
+  +--> ?PR?_GET_ADC12BITRESULT?VOLTAGE
+
+
+
+SYMBOL TABLE OF MODULE:  voltage (VOLTAGE)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        VOLTAGE
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  B:00A8H.7       PUBLIC        EA
+  D:00F8H         PUBLIC        P7
+  D:00BAH         PUBLIC        P_SW2
+  D:0008H         PUBLIC        LED8
+  C:02A2H         PUBLIC        T_COM
+  D:00BDH         PUBLIC        ADC_RES
+  D:00DEH         PUBLIC        ADCCFG
+  C:015EH         PUBLIC        main
+  D:0010H         PUBLIC        Bandgap
+  D:00BCH         PUBLIC        ADC_CONTR
+  B:0020H.0       PUBLIC        B_1ms
+  D:008EH         PUBLIC        AUXR
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  C:0277H         PUBLIC        t_display
+  D:008AH         PUBLIC        TL0
+  C:02AAH         PUBLIC        timer0
+  B:0088H.4       PUBLIC        TR0
+  D:00BEH         PUBLIC        ADC_RESL
+  C:0240H         PUBLIC        DisplayScan
+  D:0012H         PUBLIC        msecond
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/21/2020  18:40:20  PAGE 3
+
+
+  C:02CFH         PUBLIC        _Get_ADC12bitResult
+  D:0014H         PUBLIC        display_index
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  D:0002H         SYMBOL        j
+  -------         ENDDO         
+  C:015EH         LINE#         170
+  C:015EH         LINE#         171
+  C:015EH         LINE#         175
+  C:0163H         LINE#         176
+  C:0167H         LINE#         177
+  C:016BH         LINE#         178
+  C:016FH         LINE#         179
+  C:0173H         LINE#         180
+  C:0177H         LINE#         181
+  C:017BH         LINE#         182
+  C:0180H         LINE#         184
+  C:0182H         LINE#         185
+  C:0185H         LINE#         186
+  C:018BH         LINE#         187
+  C:018EH         LINE#         188
+  C:0191H         LINE#         189
+  C:0194H         LINE#         191
+  C:0197H         LINE#         192
+  C:019AH         LINE#         193
+  C:019DH         LINE#         194
+  C:019FH         LINE#         195
+  C:01A1H         LINE#         196
+  C:01A3H         LINE#         198
+  C:01B8H         LINE#         200
+  C:01B8H         LINE#         201
+  C:01B8H         LINE#         202
+  C:01BBH         LINE#         203
+  C:01BBH         LINE#         204
+  C:01BDH         LINE#         205
+  C:01CEH         LINE#         206
+  C:01CEH         LINE#         207
+  C:01D3H         LINE#         212
+  C:01DCH         LINE#         213
+  C:01E5H         LINE#         214
+  C:020AH         LINE#         235
+  C:0216H         LINE#         236
+  C:0230H         LINE#         237
+  C:023DH         LINE#         245
+  C:023DH         LINE#         246
+  C:023DH         LINE#         247
+  -------         ENDPROC       MAIN
+  -------         PROC          _GET_ADC12BITRESULT
+  D:0007H         SYMBOL        channel
+  C:02CFH         LINE#         258
+  C:02CFH         LINE#         259
+  C:02CFH         LINE#         260
+  C:02D2H         LINE#         261
+  C:02D4H         LINE#         263
+  C:02DDH         LINE#         264
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/21/2020  18:40:20  PAGE 4
+
+
+  C:02DEH         LINE#         265
+  C:02DFH         LINE#         266
+  C:02E0H         LINE#         267
+  C:02E1H         LINE#         269
+  C:02E7H         LINE#         270
+  C:02EAH         LINE#         271
+  C:02F2H         LINE#         272
+  -------         ENDPROC       _GET_ADC12BITRESULT
+  -------         PROC          DISPLAYSCAN
+  C:0240H         LINE#         275
+  C:0240H         LINE#         276
+  C:0240H         LINE#         277
+  C:0259H         LINE#         278
+  C:0266H         LINE#         279
+  C:0276H         LINE#         280
+  -------         ENDPROC       DISPLAYSCAN
+  -------         PROC          TIMER0
+  C:02AAH         LINE#         283
+  C:02BBH         LINE#         285
+  C:02BEH         LINE#         286
+  C:02C0H         LINE#         287
+  -------         ENDPROC       TIMER0
+  -------         ENDMOD        VOLTAGE
+
+  -------         MODULE        ?C?UIDIV
+  C:000EH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+  -------         MODULE        ?C?ULDIV
+  C:009FH         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+  -------         MODULE        ?C?LIMUL
+  C:0131H         PUBLIC        ?C?LIMUL
+  -------         ENDMOD        ?C?LIMUL
+
+Program Size: data=22.1 xdata=0 code=759
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

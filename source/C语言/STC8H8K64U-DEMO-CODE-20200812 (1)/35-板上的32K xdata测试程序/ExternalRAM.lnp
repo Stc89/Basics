@@ -1,0 +1,3 @@
+"ExternalRAM.obj" 
+TO "ExternalRAM" 
+RAMSIZE(256) 

@@ -1,0 +1,20 @@
+强烈推荐的PDF阅读器：【Sumatra PDF】有32位及64位版，功能强大而且无插件，开源的！
+下载地址： http://www.sumatrapdfreader.org/download-free-pdf-viewer.html
+
+
+Foxit阅读器下载链接
+
+https://www.foxitsoftware.cn/downloads/
+
+===强烈推荐，速度超快
+
+ 
+Adobe官方直接下载链接
+ 
+https://get.adobe.com/cn/reader/enterprise/
+
+
+代码编辑神器，倾情奉献
+https://www.sublimetext.com/3
+https://notepad-plus-plus.org/download/
+https://code.visualstudio.com/Download

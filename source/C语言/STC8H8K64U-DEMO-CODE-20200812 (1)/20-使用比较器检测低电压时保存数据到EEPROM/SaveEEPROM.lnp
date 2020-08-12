@@ -1,0 +1,3 @@
+"SaveEEPROM.obj" 
+TO "SaveEEPROM" 
+RAMSIZE(256) 

@@ -1,0 +1,367 @@
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN PWM.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE PWM.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  功能说明    **************
+  15          
+  16          高级PWM定时器 PWM5,PWM6,PWM7,PWM8 每个通道都可独立实现PWM输出.
+  17          
+  18          4个通道PWM根据需要设置对应输出口，可通过示波器观察输出的信号.
+  19          
+  20          PWM周期和占空比可以自定义设置，最高可达65535.
+  21          
+  22          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  23          
+  24          ******************************************/
+  25          
+  26          #include    "reg51.h"
+  27          #include    "intrins.h"
+  28          
+  29          #define     MAIN_Fosc       24000000L   //定义主时钟
+  30          
+  31          typedef     unsigned char   u8;
+  32          typedef     unsigned int    u16;
+  33          typedef     unsigned long   u32;
+  34          
+  35          sfr TH2  = 0xD6;
+  36          sfr TL2  = 0xD7;
+  37          sfr IE2  = 0xAF;
+  38          sfr AUXR = 0x8E;
+  39          sfr INT_CLKO = 0x8F;
+  40          sfr P_SW1 = 0xA2;
+  41          sfr P_SW2 = 0xBA;
+  42          
+  43          sfr P4   = 0xC0;
+  44          sfr P5   = 0xC8;
+  45          sfr P6   = 0xE8;
+  46          sfr P7   = 0xF8;
+  47          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  48          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  49          sfr P0M1 = 0x93;
+  50          sfr P0M0 = 0x94;
+  51          sfr P2M1 = 0x95;
+  52          sfr P2M0 = 0x96;
+  53          sfr P3M1 = 0xB1;
+  54          sfr P3M0 = 0xB2;
+  55          sfr P4M1 = 0xB3;
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 2   
+
+  56          sfr P4M0 = 0xB4;
+  57          sfr P5M1 = 0xC9;
+  58          sfr P5M0 = 0xCA;
+  59          sfr P6M1 = 0xCB;
+  60          sfr P6M0 = 0xCC;
+  61          sfr P7M1 = 0xE1;
+  62          sfr P7M0 = 0xE2;
+  63          
+  64          sbit P00 = P0^0;
+  65          sbit P01 = P0^1;
+  66          sbit P02 = P0^2;
+  67          sbit P03 = P0^3;
+  68          sbit P04 = P0^4;
+  69          sbit P05 = P0^5;
+  70          sbit P06 = P0^6;
+  71          sbit P07 = P0^7;
+  72          sbit P10 = P1^0;
+  73          sbit P11 = P1^1;
+  74          sbit P12 = P1^2;
+  75          sbit P13 = P1^3;
+  76          sbit P14 = P1^4;
+  77          sbit P15 = P1^5;
+  78          sbit P16 = P1^6;
+  79          sbit P17 = P1^7;
+  80          sbit P20 = P2^0;
+  81          sbit P21 = P2^1;
+  82          sbit P22 = P2^2;
+  83          sbit P23 = P2^3;
+  84          sbit P24 = P2^4;
+  85          sbit P25 = P2^5;
+  86          sbit P26 = P2^6;
+  87          sbit P27 = P2^7;
+  88          sbit P30 = P3^0;
+  89          sbit P31 = P3^1;
+  90          sbit P32 = P3^2;
+  91          sbit P33 = P3^3;
+  92          sbit P34 = P3^4;
+  93          sbit P35 = P3^5;
+  94          sbit P36 = P3^6;
+  95          sbit P37 = P3^7;
+  96          sbit P40 = P4^0;
+  97          sbit P41 = P4^1;
+  98          sbit P42 = P4^2;
+  99          sbit P43 = P4^3;
+ 100          sbit P44 = P4^4;
+ 101          sbit P45 = P4^5;
+ 102          sbit P46 = P4^6;
+ 103          sbit P47 = P4^7;
+ 104          sbit P50 = P5^0;
+ 105          sbit P51 = P5^1;
+ 106          sbit P52 = P5^2;
+ 107          sbit P53 = P5^3;
+ 108          sbit P54 = P5^4;
+ 109          sbit P55 = P5^5;
+ 110          sbit P56 = P5^6;
+ 111          sbit P57 = P5^7;
+ 112          
+ 113          /****************************** 用户定义宏 ***********************************/
+ 114          
+ 115          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 116          
+ 117          #define PWM2_ETRPS   (*(unsigned char  volatile xdata *)  0xFEB4)
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 3   
+
+ 118          #define PWM2_ENO     (*(unsigned char  volatile xdata *)  0xFEB5)
+ 119          #define PWM2_PS      (*(unsigned char  volatile xdata *)  0xFEB6)
+ 120          #define PWM2_IOAUX   (*(unsigned char  volatile xdata *)  0xFEB7)
+ 121          
+ 122          #define PWM2_CR1     (*(unsigned char  volatile xdata *)  0xFEE0)
+ 123          #define PWM2_CR2     (*(unsigned char  volatile xdata *)  0xFEE1)
+ 124          #define PWM2_SMCR    (*(unsigned char  volatile xdata *)  0xFEE2)
+ 125          #define PWM2_ETR     (*(unsigned char  volatile xdata *)  0xFEE3)
+ 126          #define PWM2_IER     (*(unsigned char  volatile xdata *)  0xFEE4)
+ 127          #define PWM2_SR1     (*(unsigned char  volatile xdata *)  0xFEE5)
+ 128          #define PWM2_SR2     (*(unsigned char  volatile xdata *)  0xFEE6)
+ 129          #define PWM2_EGR     (*(unsigned char  volatile xdata *)  0xFEE7)
+ 130          #define PWM2_CCMR1   (*(unsigned char  volatile xdata *)  0xFEE8)
+ 131          #define PWM2_CCMR2   (*(unsigned char  volatile xdata *)  0xFEE9)
+ 132          #define PWM2_CCMR3   (*(unsigned char  volatile xdata *)  0xFEEA)
+ 133          #define PWM2_CCMR4   (*(unsigned char  volatile xdata *)  0xFEEB)
+ 134          #define PWM2_CCER1   (*(unsigned char  volatile xdata *)  0xFEEC)
+ 135          #define PWM2_CCER2   (*(unsigned char  volatile xdata *)  0xFEED)
+ 136          #define PWM2_CNTRH   (*(unsigned char  volatile xdata *)  0xFEEE)
+ 137          #define PWM2_CNTRL   (*(unsigned char  volatile xdata *)  0xFEEF)
+ 138          #define PWM2_PSCRH   (*(unsigned char  volatile xdata *)  0xFEF0)
+ 139          #define PWM2_PSCRL   (*(unsigned char  volatile xdata *)  0xFEF1)
+ 140          #define PWM2_ARRH    (*(unsigned char  volatile xdata *)  0xFEF2)
+ 141          #define PWM2_ARRL    (*(unsigned char  volatile xdata *)  0xFEF3)
+ 142          #define PWM2_RCR     (*(unsigned char  volatile xdata *)  0xFEF4)
+ 143          #define PWM2_CCR1H   (*(unsigned char  volatile xdata *)  0xFEF5)
+ 144          #define PWM2_CCR1L   (*(unsigned char  volatile xdata *)  0xFEF6)
+ 145          #define PWM2_CCR2H   (*(unsigned char  volatile xdata *)  0xFEF7)
+ 146          #define PWM2_CCR2L   (*(unsigned char  volatile xdata *)  0xFEF8)
+ 147          #define PWM2_CCR3H   (*(unsigned char  volatile xdata *)  0xFEF9)
+ 148          #define PWM2_CCR3L   (*(unsigned char  volatile xdata *)  0xFEFA)
+ 149          #define PWM2_CCR4H   (*(unsigned char  volatile xdata *)  0xFEFB)
+ 150          #define PWM2_CCR4L   (*(unsigned char  volatile xdata *)  0xFEFC)
+ 151          #define PWM2_BKR     (*(unsigned char  volatile xdata *)  0xFEFD)
+ 152          #define PWM2_DTR     (*(unsigned char  volatile xdata *)  0xFEFE)
+ 153          #define PWM2_OISR    (*(unsigned char  volatile xdata *)  0xFEFF)
+ 154          
+ 155          /*****************************************************************************/
+ 156          
+ 157          #define PWM5_0      0x00  //P2.0
+ 158          #define PWM5_1      0x01  //P1.7
+ 159          #define PWM5_2      0x02  //P0.0
+ 160          #define PWM5_3      0x03  //P7.4
+ 161          
+ 162          #define PWM6_0      0x00  //P2.1
+ 163          #define PWM6_1      0x04  //P5.4
+ 164          #define PWM6_2      0x08  //P0.1
+ 165          #define PWM6_3      0x0C  //P7.5
+ 166          
+ 167          #define PWM7_0      0x00  //P2.2
+ 168          #define PWM7_1      0x10  //P3.3
+ 169          #define PWM7_2      0x20  //P0.2
+ 170          #define PWM7_3      0x30  //P7.6
+ 171          
+ 172          #define PWM8_0      0x00  //P2.3
+ 173          #define PWM8_1      0x40  //P3.4
+ 174          #define PWM8_2      0x80  //P0.3
+ 175          #define PWM8_3      0xC0  //P7.7
+ 176          
+ 177          #define ENO5P       0x01
+ 178          #define ENO6P       0x04
+ 179          #define ENO7P       0x10
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 4   
+
+ 180          #define ENO8P       0x40
+ 181          
+ 182          /***************************** 本地变量声明 **********************************/
+ 183          bit B_1ms;          //1ms标志
+ 184          
+ 185          u16 PWM5_Duty;
+ 186          u16 PWM6_Duty;
+ 187          u16 PWM7_Duty;
+ 188          u16 PWM8_Duty;
+ 189          
+ 190          bit PWM5_Flag;
+ 191          bit PWM6_Flag;
+ 192          bit PWM7_Flag;
+ 193          bit PWM8_Flag;
+ 194          
+ 195          void UpdatePwm(void);
+ 196          
+ 197          /******************************** 主函数 ************************************/
+ 198          void main(void)
+ 199          {
+ 200   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 201   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 202   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 203   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 204   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 205   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 206   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 207   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 208   1      
+ 209   1          PWM5_Flag = 0;
+ 210   1          PWM6_Flag = 0;
+ 211   1          PWM7_Flag = 0;
+ 212   1          PWM8_Flag = 0;
+ 213   1        
+ 214   1          PWM5_Duty = 0;
+ 215   1          PWM6_Duty = 256;
+ 216   1          PWM7_Duty = 512;
+ 217   1          PWM8_Duty = 1024;
+ 218   1      
+ 219   1          //  Timer0初始化
+ 220   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 221   1          TH0 = (u8)(Timer0_Reload / 256);
+ 222   1          TL0 = (u8)(Timer0_Reload % 256);
+ 223   1          ET0 = 1;    //Timer0 interrupt enable
+ 224   1          TR0 = 1;    //Tiner0 run
+ 225   1      
+ 226   1          P_SW2 |= 0x80;
+ 227   1          PWM2_CCER1 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+ 228   1          PWM2_CCER2 = 0x00;
+ 229   1          PWM2_CCMR1 = 0x60; //通道模式配置
+ 230   1          PWM2_CCMR2 = 0x60;
+ 231   1          PWM2_CCMR3 = 0x60;
+ 232   1          PWM2_CCMR4 = 0x60;
+ 233   1          PWM2_CCER1 = 0x33; //配置通道输出使能和极性
+ 234   1          PWM2_CCER2 = 0x33;
+ 235   1      
+ 236   1          PWM2_ARRH = 0x03; //设置周期时间
+ 237   1          PWM2_ARRL = 0xff;
+ 238   1      
+ 239   1          PWM2_ENO = 0x00;
+ 240   1          PWM2_ENO |= ENO5P; //使能输出
+ 241   1          PWM2_ENO |= ENO6P; //使能输出
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 5   
+
+ 242   1          PWM2_ENO |= ENO7P; //使能输出
+ 243   1          PWM2_ENO |= ENO8P; //使能输出
+ 244   1      
+ 245   1          PWM2_PS = 0x00;    //高级 PWM 通道输出脚选择位
+ 246   1          PWM2_PS |= PWM5_0; //选择 PWM5_0 通道
+ 247   1          PWM2_PS |= PWM6_0; //选择 PWM6_0 通道
+ 248   1          PWM2_PS |= PWM7_0; //选择 PWM7_0 通道
+ 249   1          PWM2_PS |= PWM8_0; //选择 PWM8_0 通道
+ 250   1      
+ 251   1          PWM2_BKR = 0x80;   //使能主输出
+ 252   1          PWM2_CR1 |= 0x01;  //开始计时
+ 253   1          P_SW2 &= 0x7f;
+ 254   1      
+ 255   1          EA = 1;     //打开总中断
+ 256   1      
+ 257   1          while (1)
+ 258   1          {
+ 259   2          }
+ 260   1      }
+ 261          
+ 262          
+ 263          /********************** Timer0 1ms中断函数 ************************/
+ 264          void timer0(void) interrupt 1
+ 265          {
+ 266   1          if(!PWM5_Flag)
+ 267   1          {
+ 268   2              PWM5_Duty++;
+ 269   2              if(PWM5_Duty >= 2047) PWM5_Flag = 1;
+ 270   2          }
+ 271   1          else
+ 272   1          {
+ 273   2              PWM5_Duty--;
+ 274   2              if(PWM5_Duty <= 0) PWM5_Flag = 0;
+ 275   2          }
+ 276   1      
+ 277   1          if(!PWM6_Flag)
+ 278   1          {
+ 279   2              PWM6_Duty++;
+ 280   2              if(PWM6_Duty >= 2047) PWM6_Flag = 1;
+ 281   2          }
+ 282   1          else
+ 283   1          {
+ 284   2              PWM6_Duty--;
+ 285   2              if(PWM6_Duty <= 0) PWM6_Flag = 0;
+ 286   2          }
+ 287   1      
+ 288   1          if(!PWM7_Flag)
+ 289   1          {
+ 290   2              PWM7_Duty++;
+ 291   2              if(PWM7_Duty >= 2047) PWM7_Flag = 1;
+ 292   2          }
+ 293   1          else
+ 294   1          {
+ 295   2              PWM7_Duty--;
+ 296   2              if(PWM7_Duty <= 0) PWM7_Flag = 0;
+ 297   2          }
+ 298   1      
+ 299   1          if(!PWM8_Flag)
+ 300   1          {
+ 301   2              PWM8_Duty++;
+ 302   2              if(PWM8_Duty >= 2047) PWM8_Flag = 1;
+ 303   2          }
+C51 COMPILER V9.59.0.0   PWM                                                               06/16/2020 13:51:32 PAGE 6   
+
+ 304   1          else
+ 305   1          {
+ 306   2              PWM8_Duty--;
+ 307   2              if(PWM8_Duty <= 0) PWM8_Flag = 0;
+ 308   2          }
+ 309   1          
+ 310   1          UpdatePwm();
+ 311   1      }
+ 312          
+ 313          
+ 314          //========================================================================
+ 315          // 函数: UpdatePwm(void)
+ 316          // 描述: 更新PWM占空比. 
+ 317          // 参数: none.
+ 318          // 返回: none.
+ 319          // 版本: V1.0, 2012-11-22
+ 320          //========================================================================
+ 321          void UpdatePwm(void)
+ 322          {
+ 323   1          P_SW2 |= 0x80;
+ 324   1          PWM2_CCR1H = (u8)(PWM5_Duty >> 8); //设置占空比时间
+ 325   1          PWM2_CCR1L = (u8)(PWM5_Duty);
+ 326   1          PWM2_CCR2H = (u8)(PWM6_Duty >> 8); //设置占空比时间
+ 327   1          PWM2_CCR2L = (u8)(PWM6_Duty);
+ 328   1          PWM2_CCR3H = (u8)(PWM7_Duty >> 8); //设置占空比时间
+ 329   1          PWM2_CCR3L = (u8)(PWM7_Duty);
+ 330   1          PWM2_CCR4H = (u8)(PWM8_Duty >> 8); //设置占空比时间
+ 331   1          PWM2_CCR4L = (u8)(PWM8_Duty);
+ 332   1          P_SW2 &= 0x7f;
+ 333   1      }
+ 334          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    442    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      5    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

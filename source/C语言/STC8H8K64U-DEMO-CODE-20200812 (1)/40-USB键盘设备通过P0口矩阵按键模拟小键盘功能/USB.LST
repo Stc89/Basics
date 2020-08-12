@@ -1,0 +1,817 @@
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE USB
+OBJECT MODULE PLACED IN USB.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE USB.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          /*************  功能说明    **************
+  14          
+  15          将USB配置为HID键盘设备；
+  16          
+  17          P0口4*4行列扫描按键模拟成小键盘按键，用户可修改按键码定义成其它功能按键；
+  18          
+  19          支持复合按键，比如 CTRL + ALT + DEL，最多可识别3个按键同时按下；
+  20          
+  21          使用P6口显示键盘指示灯状态，如P60对应NumLock指示灯，P61对应CapsLock指示灯...
+  22          
+  23          下载时, 选择时钟 24MHZ (用户可自行修改频率)。
+  24          
+  25          ******************************************/
+  26          
+  27          #include "reg51.h"
+  28          #include "intrins.h"
+  29          #include "USB.h"
+  30          
+  31          #define MAIN_Fosc       24000000L   //定义主时钟
+  32          
+  33          sfr IE2 = 0xAF;
+  34          sfr USBCLK = 0xDC;
+  35          sfr USBADR = 0xFC;
+  36          sfr USBCON = 0xF4;
+  37          sfr USBDAT = 0xEC;
+  38          
+  39          sfr TH2  = 0xD6;
+  40          sfr TL2  = 0xD7;
+  41          sfr INT_CLKO = 0x8F;
+  42          sfr AUXR = 0x8E;
+  43          sfr AUXR1 = 0xA2;
+  44          sfr P_SW1 = 0xA2;
+  45          sfr P_SW2 = 0xBA;
+  46          sfr S2CON = 0x9A;
+  47          sfr S2BUF = 0x9B;
+  48          
+  49          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+  50          
+  51          #define IRC48MCR (*(unsigned char volatile xdata *)0xfe07)
+  52          #define RSTFLAG (*(unsigned char volatile xdata *)0xfe09)
+  53          
+  54          #define KeyIO P0    //P0口做行列按键矩阵
+  55          
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 2   
+
+  56          bit  B_1ms;         //1ms标志
+  57          WORD cnt50ms;
+  58          WORD KeyCode;       //键码, 16个按键状态
+  59          WORD OldKeyCode;    //旧键码状态
+  60          WORD NewKeyCode;    //新键码状态
+  61          
+  62          WORD KeyHoldTime;   //按键保持时间
+  63          bit  KeyChangeTemp;
+  64          bit  KeyChangeFlag; //按键状态已更新(USB上传标志)
+  65          
+  66          char code DEVICEDESC[18] =
+  67          {
+  68            0x12, //bLength(18);
+  69            0x01, //bDescriptorType(Device);
+  70            0x00,0x02, //bcdUSB(2.00);
+  71            0x00, //bDeviceClass(0);
+  72            0x00, //bDeviceSubClass0);
+  73            0x00, //bDeviceProtocol(0);
+  74            0x40, //bMaxPacketSize0(64);
+  75            0x54,0x53, //idVendor(5354);
+  76            0x80,0x44, //idProduct(4480);
+  77            0x00,0x01, //bcdDevice(1.00);
+  78            0x01, //iManufacturer(1);
+  79            0x02, //iProduct(2);
+  80            0x03, //iSerialNumber(3);
+  81            0x01, //bNumConfigurations(1);
+  82          };
+  83          
+  84          char code CONFIGDESC[41] =
+  85          {
+  86            0x09, //bLength(9);
+  87            0x02, //bDescriptorType(Configuration);
+  88            0x29,0x00, //wTotalLength(41);
+  89            0x01, //bNumInterfaces(1);
+  90            0x01, //bConfigurationValue(1);
+  91            0x00, //iConfiguration(0);
+  92            0xa0, //bmAttributes(BUSPower);
+  93            0xc8, //MaxPower(400mA);
+  94            
+  95            0x09, //bLength(9);
+  96            0x04, //bDescriptorType(Interface);
+  97            0x00, //bInterfaceNumber(0);
+  98            0x00, //bAlternateSetting(0);
+  99            0x02, //bNumEndpoints(2);
+ 100            0x03, //bInterfaceClass(HID);
+ 101            0x01, //bInterfaceSubClass(1);
+ 102            0x01, //bInterfaceProtocol(1);
+ 103            0x00, //iInterface(0);
+ 104            
+ 105            0x09, //bLength(9);
+ 106            0x21, //bDescriptorType(HID);
+ 107            0x01,0x10, //bcdHID(1.01);
+ 108            0x00, //bCountryCode(0);
+ 109            0x01, //bNumDescriptors(1);
+ 110            0x22, //bDescriptorType(HID Report);
+ 111            0x3f,0x00, //wDescriptorLength(63);
+ 112            0x07, //bLength(7);
+ 113            0x05, //bDescriptorType(Endpoint);
+ 114            0x81, //bEndpointAddress(EndPoint1 as IN);
+ 115            0x03, //bmAttributes(Interrupt);
+ 116            0x40,0x00, //wMaxPacketSize(64);
+ 117            0x0a, //bInterval(10ms);
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 3   
+
+ 118            0x07, //bLength(7);
+ 119            0x05, //bDescriptorType(Endpoint);
+ 120            0x01, //bEndpointAddress(EndPoint1 as OUT);
+ 121            0x03, //bmAttributes(Interrupt);
+ 122            0x40,0x00, //wMaxPacketSize(64);
+ 123            0x0a, //bInterval(10ms);
+ 124          };
+ 125          
+ 126          char code HIDREPORTDESC[63] =
+ 127          {
+ 128            0x05, 0x01,    // USAGE_PAGE (Generic Desktop)
+ 129            0x09, 0x06,    // USAGE (Keyboard)
+ 130            0xa1, 0x01,    // COLLECTION (Application)
+ 131            0x05, 0x07,    //   USAGE_PAGE (Keyboard)
+ 132            0x19, 0xe0,    //   USAGE_MINIMUM (Keyboard LeftControl)
+ 133            0x29, 0xe7,    //   USAGE_MAXIMUM (Keyboard Right GUI)
+ 134            0x15, 0x00,    //   LOGICAL_MINIMUM (0)
+ 135            0x25, 0x01,    //   LOGICAL_MAXIMUM (1)
+ 136            0x75, 0x01,    //   REPORT_SIZE (1)
+ 137            0x95, 0x08,    //   REPORT_COUNT (8)
+ 138            0x81, 0x02,    //   INPUT (Data,Var,Abs)
+ 139            0x95, 0x01,    //   REPORT_COUNT (1)
+ 140            0x75, 0x08,    //   REPORT_SIZE (8)
+ 141            0x81, 0x03,    //   INPUT (Cnst,Var,Abs)
+ 142            0x95, 0x05,    //   REPORT_COUNT (5)
+ 143            0x75, 0x01,    //   REPORT_SIZE (1)
+ 144            0x05, 0x08,    //   USAGE_PAGE (LEDs)
+ 145            0x19, 0x01,    //   USAGE_MINIMUM (Num Lock)
+ 146            0x29, 0x05,    //   USAGE_MAXIMUM (Kana)
+ 147            0x91, 0x02,    //   OUTPUT (Data,Var,Abs)
+ 148            0x95, 0x01,    //   REPORT_COUNT (1)
+ 149            0x75, 0x03,    //   REPORT_SIZE (3)
+ 150            0x91, 0x03,    //   OUTPUT (Cnst,Var,Abs)
+ 151            0x95, 0x06,    //   REPORT_COUNT (6)
+ 152            0x75, 0x08,    //   REPORT_SIZE (8)
+ 153            0x15, 0x00,    //   LOGICAL_MINIMUM (0)
+ 154            0x25, 0xFF,    //   LOGICAL_MAXIMUM (255)
+ 155            0x05, 0x07,    //   USAGE_PAGE (Keyboard)
+ 156            0x19, 0x00,    //   USAGE_MINIMUM (Reserved (no event indicated))
+ 157            0x29, 0x65,    //   USAGE_MAXIMUM (Keyboard Application)
+ 158            0x81, 0x00,    //   INPUT (Data,Ary,Abs)
+ 159            0xc0           // END_COLLECTION
+ 160          };
+ 161          
+ 162          char code LANGIDDESC[4] =
+ 163          {
+ 164            0x04,0x03,
+ 165            0x09,0x04,
+ 166          };
+ 167          
+ 168          char code MANUFACTDESC[8] =
+ 169          {
+ 170            0x08,0x03,
+ 171            'S',0,
+ 172            'T',0,
+ 173            'C',0,
+ 174          };
+ 175          
+ 176          char code PRODUCTDESC[30] =
+ 177          {
+ 178            0x1e,0x03,
+ 179            'S',0,
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 4   
+
+ 180            'T',0,
+ 181            'C',0,
+ 182            ' ',0,
+ 183            'U',0,
+ 184            'S',0,
+ 185            'B',0,
+ 186            ' ',0,
+ 187            'D',0,
+ 188            'e',0,
+ 189            'v',0,
+ 190            'i',0,
+ 191            'c',0,
+ 192            'e',0,
+ 193          };
+ 194          
+ 195          char code KeyBoardCode[16] = {
+ 196            0x53, //0: Num Lock键
+ 197            0xFF, //1: NULL - 左Ctrl键
+ 198            0xFF, //2: NULL - 左ALT键
+ 199            0x2A, //3: BackSpace
+ 200          
+ 201            0x5F, //4: 7键
+ 202            0x60, //5: 8键
+ 203            0x61, //6: 9键
+ 204            0x62, //7: 0键
+ 205          
+ 206            0x5C, //8: 4键
+ 207            0x5D, //9: 5键
+ 208            0x5E, //A: 6键
+ 209            0x63, //B: DEL键
+ 210          
+ 211            0x59, //C: 1键
+ 212            0x5A, //D: 2键
+ 213            0x5B, //E: 3键
+ 214            0x58, //F: 回车键
+ 215          };
+ 216          
+ 217          char code SetReport[8] = {0x21,0x09,0x00,0x02,0x00,0x00,0x01,0x00};
+ 218          
+ 219          void UsbInit();
+ 220          BYTE ReadReg(BYTE addr);
+ 221          void WriteReg(BYTE addr, BYTE dat);
+ 222          BYTE ReadFifo(BYTE fifo, BYTE *pdat);
+ 223          void WriteFifo(BYTE fifo, BYTE *pdat, BYTE cnt);
+ 224          void Timer0_Config(WORD tReload);
+ 225          void KeyScan(void);
+ 226          void SendKeyStatus(void);
+ 227          
+ 228          /******************** 主函数 **************************/
+ 229          void main()
+ 230          {
+ 231   1        BYTE i;
+ 232   1        
+ 233   1        P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 234   1        P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 235   1        P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 236   1        P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 237   1        P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 238   1        P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 239   1        P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 240   1        P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 241   1        
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 5   
+
+ 242   1        Timer0_Config(Timer0_Reload);
+ 243   1        UsbInit();
+ 244   1        EA = 1;
+ 245   1      
+ 246   1         for(i=0;i<8;i++)
+ 247   1        {
+ 248   2         HidInput[i]=0;
+ 249   2        }
+ 250   1      
+ 251   1        P40 = 0;      //打开P6口LED电源
+ 252   1        while (1)
+ 253   1        {
+ 254   2          if(B_1ms)   //1ms到
+ 255   2          {
+ 256   3            B_1ms = 0;
+ 257   3          
+ 258   3            if(++cnt50ms >= 30)     //30ms扫描一次行列键盘
+ 259   3            {
+ 260   4              cnt50ms = 0;
+ 261   4              KeyScan();
+ 262   4            }
+ 263   3      
+ 264   3            if(KeyChangeFlag)   //按键状态产生变化
+ 265   3            {
+ 266   4              KeyChangeFlag = 0;
+ 267   4              SendKeyStatus();
+ 268   4            }
+ 269   3          }
+ 270   2        }
+ 271   1      }
+ 272          
+ 273          BYTE ReadReg(BYTE addr)
+ 274          {
+ 275   1        BYTE dat;
+ 276   1        while (USBADR & 0x80);
+ 277   1        USBADR = addr | 0x80;
+ 278   1        while (USBADR & 0x80);
+ 279   1        dat = USBDAT;
+ 280   1        return dat;
+ 281   1      }
+ 282          
+ 283          void WriteReg(BYTE addr, BYTE dat)
+ 284          {
+ 285   1        while (USBADR & 0x80);
+ 286   1        USBADR = addr & 0x7f;
+ 287   1        USBDAT = dat;
+ 288   1      }
+ 289          
+ 290          BYTE ReadFifo(BYTE fifo, BYTE *pdat)
+ 291          {
+ 292   1        BYTE cnt;
+ 293   1        BYTE ret;
+ 294   1        ret = cnt = ReadReg(COUNT0);
+ 295   1        while (cnt--)
+ 296   1        {
+ 297   2          *pdat++ = ReadReg(fifo);
+ 298   2        }
+ 299   1        return ret;
+ 300   1      }
+ 301          
+ 302          void WriteFifo(BYTE fifo, BYTE *pdat, BYTE cnt)
+ 303          {
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 6   
+
+ 304   1        while (cnt--)
+ 305   1        {
+ 306   2          WriteReg(fifo, *pdat++);
+ 307   2        }
+ 308   1      }
+ 309          
+ 310          void UsbInit()
+ 311          {
+ 312   1        P3M0 = 0x00;
+ 313   1        P3M1 = 0x03;
+ 314   1        P_SW2 |= 0x80;
+ 315   1        RSTFLAG = 0x07;
+ 316   1        IRC48MCR = 0x80;
+ 317   1        while (!(IRC48MCR & 0x01));
+ 318   1        P_SW2 &= ~0x80;
+ 319   1        USBCLK = 0x00;
+ 320   1        USBCON = 0x90;
+ 321   1        WriteReg(FADDR, 0x00);
+ 322   1        WriteReg(POWER, 0x08);
+ 323   1        WriteReg(INTRIN1E, 0x3f);
+ 324   1        WriteReg(INTROUT1E, 0x3f);
+ 325   1        WriteReg(INTRUSBE, 0x00);
+ 326   1        WriteReg(POWER, 0x01);
+ 327   1        Ep0Stage.bStage = EPIDLE;
+ 328   1        IE2 |= 0x80;
+ 329   1      }
+ 330          
+ 331          void usb_isr() interrupt 25
+ 332          {
+ 333   1        BYTE intrusb;
+ 334   1        BYTE intrin;
+ 335   1        BYTE introut;
+ 336   1        BYTE csr;
+ 337   1        BYTE cnt;
+ 338   1        WORD len;
+ 339   1        intrusb = ReadReg(INTRUSB);
+ 340   1        intrin = ReadReg(INTRIN1);
+ 341   1        introut = ReadReg(INTROUT1);
+ 342   1        if (intrusb & RSTIF)
+ 343   1        {
+ 344   2          WriteReg(INDEX, 1);
+ 345   2          WriteReg(INCSR1, INCLRDT);
+ 346   2          WriteReg(INDEX, 1);
+ 347   2          WriteReg(OUTCSR1, OUTCLRDT);
+ 348   2          Ep0Stage.bStage = EPIDLE;
+ 349   2        }
+ 350   1        if (intrin & EP0IF)
+ 351   1        {
+ 352   2          WriteReg(INDEX, 0);
+ 353   2          csr = ReadReg(CSR0);
+ 354   2          if (csr & STSTL)
+ 355   2          {
+ 356   3            WriteReg(CSR0, csr & ~STSTL);
+ 357   3            Ep0Stage.bStage = EPIDLE;
+ 358   3          }
+ 359   2          if (csr & SUEND)
+ 360   2          {
+ 361   3            WriteReg(CSR0, csr | SSUEND);
+ 362   3          }
+ 363   2          switch (Ep0Stage.bStage)
+ 364   2          {
+ 365   3            case EPIDLE:
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 7   
+
+ 366   3            if (csr & OPRDY)
+ 367   3            {
+ 368   4              Ep0Stage.bStage = EPSTATUS;
+ 369   4              ReadFifo(FIFO0, (BYTE *)&Setup);
+ 370   4              ((BYTE *)&Ep0Stage.wResidue)[0] = Setup.wLengthH;
+ 371   4              ((BYTE *)&Ep0Stage.wResidue)[1]= Setup.wLengthL;
+ 372   4              switch (Setup.bmRequestType & REQUEST_MASK)
+ 373   4              {
+ 374   5                case STANDARD_REQUEST:
+ 375   5                switch (Setup.bRequest)
+ 376   5                {
+ 377   6                  case SET_ADDRESS:
+ 378   6                    WriteReg(FADDR, Setup.wValueL);
+ 379   6                  break;
+ 380   6                  
+ 381   6                  case SET_CONFIG:
+ 382   6                    WriteReg(INDEX, 1);
+ 383   6                    WriteReg(INCSR2, INMODEIN);
+ 384   6                    WriteReg(INMAXP, 8);
+ 385   6                    WriteReg(INDEX, 1);
+ 386   6                    WriteReg(INCSR2, INMODEOUT);
+ 387   6                    WriteReg(OUTMAXP, 8);
+ 388   6                    WriteReg(INDEX, 0);
+ 389   6                  break;
+ 390   6                  
+ 391   6                  case GET_DESCRIPTOR:
+ 392   6                    Ep0Stage.bStage = EPDATAIN;
+ 393   6                    switch (Setup.wValueH)
+ 394   6                    {
+ 395   7                      case DESC_DEVICE:
+ 396   7                        Ep0Stage.pData = DEVICEDESC;
+ 397   7                        len = sizeof(DEVICEDESC);
+ 398   7                      break;
+ 399   7                      
+ 400   7                      case DESC_CONFIG:
+ 401   7                        Ep0Stage.pData = CONFIGDESC;
+ 402   7                        len = sizeof(CONFIGDESC);
+ 403   7                      break;
+ 404   7                      
+ 405   7                      case DESC_STRING:
+ 406   7                      switch (Setup.wValueL)
+ 407   7                      {
+ 408   8                        case 0:
+ 409   8                          Ep0Stage.pData = LANGIDDESC;
+ 410   8                          len = sizeof(LANGIDDESC);
+ 411   8                        break;
+ 412   8                        
+ 413   8                        case 1:
+ 414   8                          Ep0Stage.pData = MANUFACTDESC;
+ 415   8                          len = sizeof(MANUFACTDESC);
+ 416   8                        break;
+ 417   8                        
+ 418   8                        case 2:
+ 419   8                          Ep0Stage.pData = PRODUCTDESC;
+ 420   8                          len = sizeof(PRODUCTDESC);
+ 421   8                        break;
+ 422   8                        
+ 423   8                        default:
+ 424   8                          Ep0Stage.bStage = EPSTALL;
+ 425   8                        break;
+ 426   8                      }
+ 427   7                      break;
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 8   
+
+ 428   7                      
+ 429   7                      case DESC_HIDREPORT:
+ 430   7                        Ep0Stage.pData = HIDREPORTDESC;
+ 431   7                        len = sizeof(HIDREPORTDESC);
+ 432   7                      break;
+ 433   7                      
+ 434   7                      default:
+ 435   7                        Ep0Stage.bStage = EPSTALL;
+ 436   7                      break;
+ 437   7                    }
+ 438   6                    if (len < Ep0Stage.wResidue)
+ 439   6                    {
+ 440   7                      Ep0Stage.wResidue = len;
+ 441   7                    }
+ 442   6                  break;
+ 443   6                    
+ 444   6                  default:
+ 445   6                    Ep0Stage.bStage = EPSTALL;
+ 446   6                  break;
+ 447   6                }
+ 448   5                break;
+ 449   5                
+ 450   5                case CLASS_REQUEST:
+ 451   5                  switch (Setup.bRequest)
+ 452   5                  {
+ 453   6                    case GET_REPORT:
+ 454   6                      Ep0Stage.pData = HidFreature;
+ 455   6                      Ep0Stage.bStage = EPDATAIN;
+ 456   6                    break;
+ 457   6                    
+ 458   6                    case SET_REPORT:
+ 459   6                      Ep0Stage.pData = HidFreature;
+ 460   6                      Ep0Stage.bStage = EPDATAOUT;
+ 461   6                    break;
+ 462   6                    
+ 463   6                    case SET_IDLE:
+ 464   6                    break;
+ 465   6                    
+ 466   6                    case GET_IDLE:
+ 467   6                    case GET_PROTOCOL:
+ 468   6                    case SET_PROTOCOL:
+ 469   6                    default:
+ 470   6                      Ep0Stage.bStage = EPSTALL;
+ 471   6                    break;
+ 472   6                  }
+ 473   5                break;
+ 474   5                  
+ 475   5                default:
+ 476   5                  Ep0Stage.bStage = EPSTALL;
+ 477   5                break;
+ 478   5              }
+ 479   4              
+ 480   4              switch (Ep0Stage.bStage)
+ 481   4              {
+ 482   5                case EPDATAIN:
+ 483   5                  WriteReg(CSR0, SOPRDY);
+ 484   5                  goto L_Ep0SendData;
+ 485   5                break;
+ 486   5                
+ 487   5                case EPDATAOUT:
+ 488   5                  WriteReg(CSR0, SOPRDY);
+ 489   5                break;
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 9   
+
+ 490   5                
+ 491   5                case EPSTATUS:
+ 492   5                  WriteReg(CSR0, SOPRDY | DATEND);
+ 493   5                  Ep0Stage.bStage = EPIDLE;
+ 494   5                break;
+ 495   5                
+ 496   5                case EPSTALL:
+ 497   5                  WriteReg(CSR0, SOPRDY | SDSTL);
+ 498   5                  Ep0Stage.bStage = EPIDLE;
+ 499   5                break;
+ 500   5              }
+ 501   4            }
+ 502   3            break;
+ 503   3            
+ 504   3            case EPDATAIN:
+ 505   3              if (!(csr & IPRDY))
+ 506   3              {
+ 507   4                L_Ep0SendData:
+ 508   4                cnt = Ep0Stage.wResidue > 64 ? 64 : Ep0Stage.wResidue;
+ 509   4                WriteFifo(FIFO0, Ep0Stage.pData, cnt);
+ 510   4                Ep0Stage.wResidue -= cnt;
+ 511   4                Ep0Stage.pData += cnt;
+ 512   4                if (Ep0Stage.wResidue == 0)
+ 513   4                {
+ 514   5                  WriteReg(CSR0, IPRDY | DATEND);
+ 515   5                  Ep0Stage.bStage = EPIDLE;
+ 516   5                }
+ 517   4                else
+ 518   4                {
+ 519   5                  WriteReg(CSR0, IPRDY);
+ 520   5                }
+ 521   4              }
+ 522   3            break;
+ 523   3            
+ 524   3            case EPDATAOUT:
+ 525   3            if (csr & OPRDY)
+ 526   3            {
+ 527   4              cnt = ReadFifo(FIFO0, Ep0Stage.pData);
+ 528   4              Ep0Stage.wResidue -= cnt;
+ 529   4              Ep0Stage.pData += cnt;
+ 530   4              if (Ep0Stage.wResidue == 0)
+ 531   4              {
+ 532   5                WriteReg(CSR0, SOPRDY | DATEND);
+ 533   5                Ep0Stage.bStage = EPIDLE;
+ 534   5              }
+ 535   4              else
+ 536   4              {
+ 537   5                WriteReg(CSR0, SOPRDY);
+ 538   5              }
+ 539   4            }
+ 540   3            break;
+ 541   3          }
+ 542   2        }
+ 543   1        
+ 544   1        if (intrin & EP1INIF)
+ 545   1        {
+ 546   2          WriteReg(INDEX, 1);
+ 547   2          csr = ReadReg(INCSR1);
+ 548   2          if (csr & INSTSTL)
+ 549   2          {
+ 550   3            WriteReg(INCSR1, INCLRDT);
+ 551   3          }
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 10  
+
+ 552   2          if (csr & INUNDRUN)
+ 553   2          {
+ 554   3            WriteReg(INCSR1, 0);
+ 555   3          }
+ 556   2        }
+ 557   1        
+ 558   1        if (introut & EP1OUTIF)
+ 559   1        {
+ 560   2          WriteReg(INDEX, 1);
+ 561   2          csr = ReadReg(OUTCSR1);
+ 562   2          if (csr & OUTSTSTL)
+ 563   2          {
+ 564   3            WriteReg(OUTCSR1, OUTCLRDT);
+ 565   3          }
+ 566   2          if (csr & OUTOPRDY)
+ 567   2          {
+ 568   3            ReadFifo(FIFO1, HidOutput);
+ 569   3            WriteReg(OUTCSR1, 0);
+ 570   3            
+ 571   3            P6 = ~HidOutput[0]; //显示指示灯状态
+ 572   3          }
+ 573   2        }
+ 574   1      }
+ 575          
+ 576          BYTE KeyCount(WORD dat)
+ 577          {
+ 578   1        BYTE i;
+ 579   1      
+ 580   1        i = 0;
+ 581   1        while(dat)
+ 582   1        {
+ 583   2          if(dat & 0x8000) i++;
+ 584   2          dat <<= 1;
+ 585   2        }
+ 586   1        return i;
+ 587   1      }
+ 588          
+ 589          //HidInput 第一字节用来表示特殊按键，第二字节保留，后面的六字节为普通按键
+ 590          void SendKeyStatus(void)
+ 591          {
+ 592   1        BYTE i,n;
+ 593   1        
+ 594   1        if(KeyCode) //如果有按键按下
+ 595   1        {
+ 596   2          //4*4的键盘，最多能够识别3个按键同时按下，
+ 597   2          //如果开关上接二极管可以同时识别更多的按键
+ 598   2          if(KeyCount(KeyCode) > 3) 
+ 599   2          {
+ 600   3            return;  //按键过多
+ 601   3          }
+ 602   2          else
+ 603   2          {
+ 604   3            n = 2;
+ 605   3            for(i=0;i<16;i++)
+ 606   3            {
+ 607   4              if(i == 1)
+ 608   4              {
+ 609   5                if(KeyCode & (1<<i)) //左Ctrl键
+ 610   5                {
+ 611   6                  HidInput[0] |= 1;
+ 612   6                }
+ 613   5                else
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 11  
+
+ 614   5                {
+ 615   6                  HidInput[0] &= ~1;
+ 616   6                }
+ 617   5              }
+ 618   4              else if(i == 2)
+ 619   4              {
+ 620   5                if(KeyCode & (1<<i)) //左ALT键
+ 621   5                {
+ 622   6                  HidInput[0] |= 1<<2;
+ 623   6                }
+ 624   5                else
+ 625   5                {
+ 626   6                  HidInput[0] &= ~(1<<2);
+ 627   6                }
+ 628   5              }
+ 629   4              else
+ 630   4              {
+ 631   5                if(KeyCode & (1<<i))
+ 632   5                {
+ 633   6                  HidInput[n++] = KeyBoardCode[i];   //按键码表
+ 634   6                }
+ 635   5              }
+ 636   4            }
+ 637   3            
+ 638   3            for(;n<8;n++)
+ 639   3            {
+ 640   4              HidInput[n]=0;  //多余的清0
+ 641   4            }
+ 642   3          }
+ 643   2        }
+ 644   1        else //如果无按键按下，则返回0
+ 645   1        {
+ 646   2          for(i=0;i<8;i++)
+ 647   2          {
+ 648   3            HidInput[i]=0;
+ 649   3          }
+ 650   2        }
+ 651   1      
+ 652   1        //返回8个字节数据
+ 653   1        WriteReg(INDEX, 1);
+ 654   1        for(i=0;i<8;i++)
+ 655   1        {
+ 656   2          WriteReg(FIFO1, HidInput[i]);
+ 657   2        }
+ 658   1        WriteReg(INCSR1, INIPRDY);
+ 659   1      }
+ 660          
+ 661          /********************** Timer0 1ms中断函数 ************************/
+ 662          void timer0 (void) interrupt 1
+ 663          {
+ 664   1          B_1ms = 1;      //1ms标志
+ 665   1      }
+ 666          
+ 667          //========================================================================
+ 668          // 函数: void Timer0_Config(u16 tReload)
+ 669          // 描述: 定时器设置.
+ 670          // 参数: tReload: 定时时间..
+ 671          // 返回: NULL.
+ 672          // 版本: V1.0, 2012-10-22
+ 673          //========================================================================
+ 674          void Timer0_Config(WORD tReload)
+ 675          {
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 12  
+
+ 676   1        AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 677   1        TH0 = (BYTE)(tReload / 256);
+ 678   1        TL0 = (BYTE)(tReload % 256);
+ 679   1        ET0 = 1;    //Timer0 interrupt enable
+ 680   1        TR0 = 1;    //Tiner0 run
+ 681   1      }
+ 682          
+ 683          /*****************************************************
+ 684              行列键扫描程序
+ 685              使用XY查找4x4键的方法，只能单键，速度快
+ 686          
+ 687             Y     P04      P05      P06      P07
+ 688                    |        |        |        |
+ 689          X         |        |        |        |
+ 690          P00 ---- K00 ---- K01 ---- K02 ---- K03 ----
+ 691                    |        |        |        |
+ 692          P01 ---- K04 ---- K05 ---- K06 ---- K07 ----
+ 693                    |        |        |        |
+ 694          P02 ---- K08 ---- K09 ---- K10 ---- K11 ----
+ 695                    |        |        |        |
+ 696          P03 ---- K12 ---- K13 ---- K14 ---- K15 ----
+ 697                    |        |        |        |
+ 698          ******************************************************/
+ 699          void IO_KeyDelay(void)
+ 700          {
+ 701   1          BYTE i;
+ 702   1          i = 5;
+ 703   1          while(--i)  ;
+ 704   1      }
+ 705          
+ 706          void KeyScan(void)
+ 707          {
+ 708   1        BYTE temp;
+ 709   1        
+ 710   1        KeyIO = 0x0F;
+ 711   1        IO_KeyDelay();
+ 712   1        if((KeyIO & 0x0F) == 0x0F)  //如果现在没有按键按下
+ 713   1        {
+ 714   2          NewKeyCode = 0;   //没有键按下
+ 715   2        }
+ 716   1        else  //开始键盘扫描
+ 717   1        {
+ 718   2          //扫描第一行
+ 719   2          KeyIO = ~0x10;
+ 720   2          IO_KeyDelay();
+ 721   2          //保存四个开关状态
+ 722   2          temp = KeyIO & 0x0F;
+ 723   2      
+ 724   2          //扫描第二行
+ 725   2          KeyIO = ~0x20;
+ 726   2          IO_KeyDelay();
+ 727   2          //保存四个开关状态
+ 728   2          temp |= KeyIO<<4;
+ 729   2      
+ 730   2          //保存当前按键状态
+ 731   2          NewKeyCode = (~temp) & 0xFF;
+ 732   2      
+ 733   2          //扫描第三行
+ 734   2          KeyIO = ~0x40;
+ 735   2          IO_KeyDelay();
+ 736   2          //保存四个开关状态
+ 737   2          temp = KeyIO & 0x0F;
+C51 COMPILER V9.59.0.0   USB                                                               07/24/2020 18:04:08 PAGE 13  
+
+ 738   2      
+ 739   2          //扫描第四行
+ 740   2          KeyIO = ~0x80;
+ 741   2          IO_KeyDelay();
+ 742   2          //保存四个开关状态
+ 743   2          temp |= KeyIO<<4; 
+ 744   2           
+ 745   2          //保存全部16个开关的状态
+ 746   2          //总共有16个bit，当某个开关按下时，对应的bit为1
+ 747   2          NewKeyCode |= (((WORD)~temp)<<8);
+ 748   2        }
+ 749   1      
+ 750   1        if(NewKeyCode != OldKeyCode) //判断按键是否发生了改变
+ 751   1        {
+ 752   2          KeyHoldTime = 0;           //键盘按下时间为0
+ 753   2          OldKeyCode = NewKeyCode;   //保存当前按键状态
+ 754   2          KeyChangeTemp = 1;
+ 755   2        }
+ 756   1        else
+ 757   1        {
+ 758   2          KeyHoldTime++;         //按下时间累计
+ 759   2          if(KeyHoldTime >= 1)   //如果按下时间足够
+ 760   2          {
+ 761   3            KeyHoldTime = 1;
+ 762   3            KeyCode = OldKeyCode;  //保存按键
+ 763   3            if(KeyChangeTemp)
+ 764   3            {
+ 765   4              KeyChangeTemp = 0;
+ 766   4              KeyChangeFlag = 1;   //设置发送标志
+ 767   4            }
+ 768   3          }
+ 769   2        }
+ 770   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1565    ----
+   CONSTANT SIZE    =    188    ----
+   XDATA SIZE       =    192    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     24      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

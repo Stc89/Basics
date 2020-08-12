@@ -164,6 +164,34 @@ ClassGenCCAutoEnabled=1
 ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 
+[Document11]
+DocumentPath=STC8GSCH\stc15xx-STC8-sch-pcb-library_ver1.0_20200530\stc15xx-STC8-sch-pcb-library\STC_Protel_Altium\stcmcu_Altium20.1.10_Lib\stcmcu_altium20.1.10.PcbLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+
+[Document12]
+DocumentPath=STC8GSCH\stc15xx-STC8-sch-pcb-library_ver1.0_20200530\stc15xx-STC8-sch-pcb-library\STC_Protel_Altium\stcmcu_Altium20.1.10_Lib\stcmcu_altium20.1.10.SchLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+
 [GeneratedDocument1]
 DocumentPath=ch340g-lib\CH340G.PcbLib.htm
 

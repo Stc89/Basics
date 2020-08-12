@@ -1,0 +1,359 @@
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE IR_REMOTE_RX
+OBJECT MODULE PLACED IN IR_Remote_Rx.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE IR_Remote_Rx.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          红外接收程序。适用于市场上用量最大的NEC编码。
+  17          
+  18          应用层查询 B_IR_Press标志为,则已接收到一个键码放在IR_code中, 处理完键码后， 用户程序清除B_IR_Press标志.
+  19          
+  20          数码管左起4位显示用户码, 最右边两位显示数据, 均为十六进制.
+  21          
+  22          下载时, 选择时钟 24MHz (用户可自行修改频率).
+  23          
+  24          ******************************************/
+  25          
+  26          #include    "reg51.h"
+  27          #include    "intrins.h"
+  28          
+  29          #define     MAIN_Fosc       24000000L   //定义主时钟
+  30          
+  31          typedef     unsigned char   u8;
+  32          typedef     unsigned int    u16;
+  33          typedef     unsigned long   u32;
+  34          
+  35          sfr TH2  = 0xD6;
+  36          sfr TL2  = 0xD7;
+  37          sfr IE2   = 0xAF;
+  38          sfr INT_CLKO = 0x8F;
+  39          sfr AUXR = 0x8E;
+  40          sfr P_SW1 = 0xA2;
+  41          sfr P_SW2 = 0xBA;
+  42          sfr S2CON = 0x9A;
+  43          sfr S2BUF = 0x9B;
+  44          
+  45          sfr P4   = 0xC0;
+  46          sfr P5   = 0xC8;
+  47          sfr P6   = 0xE8;
+  48          sfr P7   = 0xF8;
+  49          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  50          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  51          sfr P0M1 = 0x93;
+  52          sfr P0M0 = 0x94;
+  53          sfr P2M1 = 0x95;
+  54          sfr P2M0 = 0x96;
+  55          sfr P3M1 = 0xB1;
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 2   
+
+  56          sfr P3M0 = 0xB2;
+  57          sfr P4M1 = 0xB3;
+  58          sfr P4M0 = 0xB4;
+  59          sfr P5M1 = 0xC9;
+  60          sfr P5M0 = 0xCA;
+  61          sfr P6M1 = 0xCB;
+  62          sfr P6M0 = 0xCC;
+  63          sfr P7M1 = 0xE1;
+  64          sfr P7M0 = 0xE2;
+  65          
+  66          sbit P00 = P0^0;
+  67          sbit P01 = P0^1;
+  68          sbit P02 = P0^2;
+  69          sbit P03 = P0^3;
+  70          sbit P04 = P0^4;
+  71          sbit P05 = P0^5;
+  72          sbit P06 = P0^6;
+  73          sbit P07 = P0^7;
+  74          sbit P10 = P1^0;
+  75          sbit P11 = P1^1;
+  76          sbit P12 = P1^2;
+  77          sbit P13 = P1^3;
+  78          sbit P14 = P1^4;
+  79          sbit P15 = P1^5;
+  80          sbit P16 = P1^6;
+  81          sbit P17 = P1^7;
+  82          sbit P20 = P2^0;
+  83          sbit P21 = P2^1;
+  84          sbit P22 = P2^2;
+  85          sbit P23 = P2^3;
+  86          sbit P24 = P2^4;
+  87          sbit P25 = P2^5;
+  88          sbit P26 = P2^6;
+  89          sbit P27 = P2^7;
+  90          sbit P30 = P3^0;
+  91          sbit P31 = P3^1;
+  92          sbit P32 = P3^2;
+  93          sbit P33 = P3^3;
+  94          sbit P34 = P3^4;
+  95          sbit P35 = P3^5;
+  96          sbit P36 = P3^6;
+  97          sbit P37 = P3^7;
+  98          sbit P40 = P4^0;
+  99          sbit P41 = P4^1;
+ 100          sbit P42 = P4^2;
+ 101          sbit P43 = P4^3;
+ 102          sbit P44 = P4^4;
+ 103          sbit P45 = P4^5;
+ 104          sbit P46 = P4^6;
+ 105          sbit P47 = P4^7;
+ 106          sbit P50 = P5^0;
+ 107          sbit P51 = P5^1;
+ 108          sbit P52 = P5^2;
+ 109          sbit P53 = P5^3;
+ 110          sbit P54 = P5^4;
+ 111          sbit P55 = P5^5;
+ 112          sbit P56 = P5^6;
+ 113          sbit P57 = P5^7;
+ 114          
+ 115          #define SysTick     10000       // 次/秒, 系统滴答频率, 在4000~16000之间
+ 116          
+ 117          /***********************************************************/
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 3   
+
+ 118          
+ 119          #define DIS_DOT     0x20
+ 120          #define DIS_BLACK   0x10
+ 121          #define DIS_        0x11
+ 122          
+ 123          /****************************** 自动定义宏 ***********************************/
+ 124          
+ 125          #define Timer0_Reload   (65536UL - ((MAIN_Fosc + SysTick/2) / SysTick))     //Timer 0 中断频率
+ 126          
+ 127          /*****************************************************************************/
+ 128          
+ 129          
+ 130          /*************  本地常量声明    **************/
+ 131          u8 code t_display[]={                       //标准字库
+ 132          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 133              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 134          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 135              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 136              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 137          
+ 138          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 139          
+ 140          
+ 141          /*************  本地变量声明    **************/
+ 142          
+ 143          u8  LED8[8];        //显示缓冲
+ 144          u8  display_index;  //显示位索引
+ 145          bit B_1ms;          //1ms标志
+ 146          
+ 147          u8  cnt_1ms;        //1ms基本计时
+ 148          
+ 149          /*************  红外接收程序变量声明    **************/
+ 150          sbit    P_IR_RX = P3^5;         //定义红外接收输入IO口
+ 151          
+ 152          u8  IR_SampleCnt;       //采样计数
+ 153          u8  IR_BitCnt;          //编码位数
+ 154          u8  IR_UserH;           //用户码(地址)高字节
+ 155          u8  IR_UserL;           //用户码(地址)低字节
+ 156          u8  IR_data;            //数据原码
+ 157          u8  IR_DataShit;        //数据移位
+ 158          
+ 159          bit P_IR_RX_temp;       //Last sample
+ 160          bit B_IR_Sync;          //已收到同步标志
+ 161          bit B_IR_Press;         //红外接收标志
+ 162          u8  IR_code;            //红外键码
+ 163          u16 UserCode;           //用户码
+ 164          
+ 165          
+ 166          /********************** 主函数 ************************/
+ 167          void main(void)
+ 168          {
+ 169   1          u8  i;
+ 170   1      
+ 171   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 172   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 173   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 174   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 175   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 176   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 177   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 178   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 179   1          
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 4   
+
+ 180   1          display_index = 0;
+ 181   1      
+ 182   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 183   1          TH0 = (u8)(Timer0_Reload / 256);
+ 184   1          TL0 = (u8)(Timer0_Reload % 256);
+ 185   1          ET0 = 1;    //Timer0 interrupt enable
+ 186   1          TR0 = 1;    //Tiner0 run
+ 187   1      
+ 188   1          cnt_1ms = SysTick / 1000;
+ 189   1          EA = 1;     //打开总中断
+ 190   1          
+ 191   1          for(i=0; i<8; i++)  LED8[i] = DIS_;
+ 192   1          LED8[4] = DIS_BLACK;
+ 193   1          LED8[5] = DIS_BLACK;
+ 194   1      
+ 195   1          while(1)
+ 196   1          {
+ 197   2              if(B_1ms)   //1ms到
+ 198   2              {
+ 199   3                  B_1ms = 0;
+ 200   3                  
+ 201   3                  if(B_IR_Press)      //检测到收到红外键码
+ 202   3                  {
+ 203   4                      B_IR_Press = 0;
+ 204   4                      
+ 205   4                      LED8[0] = (u8)((UserCode >> 12) & 0x0f);    //用户码高字节的高半字节
+ 206   4                      LED8[1] = (u8)((UserCode >> 8)  & 0x0f);    //用户码高字节的低半字节
+ 207   4                      LED8[2] = (u8)((UserCode >> 4)  & 0x0f);    //用户码低字节的高半字节
+ 208   4                      LED8[3] = (u8)(UserCode & 0x0f);            //用户码低字节的低半字节
+ 209   4                      LED8[6] = IR_code >> 4;
+ 210   4                      LED8[7] = IR_code & 0x0f;
+ 211   4                  }
+ 212   3              }
+ 213   2          }
+ 214   1      } 
+ 215          /******************************************************/
+ 216          
+ 217          
+ 218          /********************** 显示扫描函数 ************************/
+ 219          void DisplayScan(void)
+ 220          {   
+ 221   1          P7 = ~T_COM[7-display_index];
+ 222   1          P6 = ~t_display[LED8[display_index]];
+ 223   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 224   1      }
+ 225          
+ 226          
+ 227          //*******************************************************************
+ 228          //*********************** IR Remote Module **************************
+ 229          //*********************** By  (Coody) 2002-8-24 *********************
+ 230          //*********************** IR Remote Module **************************
+ 231          //this programme is used for Receive IR Remote (NEC Code).
+ 232          
+ 233          //data format: Synchro, AddressH, AddressL, data, /data, (total 32 bit).
+ 234          
+ 235          //send a frame(85ms), pause 23ms, send synchro of continue frame, pause 94ms
+ 236          
+ 237          //data rate: 108ms/Frame
+ 238          
+ 239          
+ 240          //Synchro: low=9ms, high=4.5 / 2.25ms, low=0.5626ms
+ 241          //Bit0: high=0.5626ms, low=0.5626ms
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 5   
+
+ 242          //Bit1: high=1.6879ms, low=0.5626ms
+ 243          //frame rate = 108ms ( pause 23 ms or 96 ms)
+ 244          
+ 245          /******************** 红外采样时间宏定义, 用户不要随意修改  *******************/
+ 246          
+ 247          #define IR_SAMPLE_TIME      (1000000UL/SysTick)     //查询时间间隔, us, 红外接收要求在60us~250us之间
+ 248          #if ((IR_SAMPLE_TIME <= 250) && (IR_SAMPLE_TIME >= 60))
+ 249              #define D_IR_sample         IR_SAMPLE_TIME      //定义采样时间，在60us~250us之间
+ 250          #endif
+ 251          
+ 252          #define D_IR_SYNC_MAX       (15000/D_IR_sample) //SYNC max time
+ 253          #define D_IR_SYNC_MIN       (9700 /D_IR_sample) //SYNC min time
+ 254          #define D_IR_SYNC_DIVIDE    (12375/D_IR_sample) //decide data 0 or 1
+ 255          #define D_IR_DATA_MAX       (3000 /D_IR_sample) //data max time
+ 256          #define D_IR_DATA_MIN       (600  /D_IR_sample) //data min time
+ 257          #define D_IR_DATA_DIVIDE    (1687 /D_IR_sample) //decide data 0 or 1
+ 258          #define D_IR_BIT_NUMBER     32                  //bit number
+ 259          
+ 260          //*******************************************************************************************
+ 261          //**************************** IR RECEIVE MODULE ********************************************
+ 262          
+ 263          void IR_RX_NEC(void)
+ 264          {
+ 265   1          u8  SampleTime;
+ 266   1      
+ 267   1          IR_SampleCnt++;                         //Sample + 1
+ 268   1      
+ 269   1          F0 = P_IR_RX_temp;                      //Save Last sample status
+ 270   1          P_IR_RX_temp = P_IR_RX;                 //Read current status
+ 271   1          if(F0 && !P_IR_RX_temp)                 //Pre-sample is high，and current sample is low, so is fall ed
+             -ge
+ 272   1          {
+ 273   2              SampleTime = IR_SampleCnt;          //get the sample time
+ 274   2              IR_SampleCnt = 0;                   //Clear the sample counter
+ 275   2      
+ 276   2                   if(SampleTime > D_IR_SYNC_MAX)     B_IR_Sync = 0;  //large the Maxim SYNC time, then error
+ 277   2              else if(SampleTime >= D_IR_SYNC_MIN)                    //SYNC
+ 278   2              {
+ 279   3                  if(SampleTime >= D_IR_SYNC_DIVIDE)
+ 280   3                  {
+ 281   4                      B_IR_Sync = 1;                  //has received SYNC
+ 282   4                      IR_BitCnt = D_IR_BIT_NUMBER;    //Load bit number
+ 283   4                  }
+ 284   3              }
+ 285   2              else if(B_IR_Sync)                      //has received SYNC
+ 286   2              {
+ 287   3                  if(SampleTime > D_IR_DATA_MAX)      B_IR_Sync=0;    //data samlpe time too large
+ 288   3                  else
+ 289   3                  {
+ 290   4                      IR_DataShit >>= 1;                  //data shift right 1 bit
+ 291   4                      if(SampleTime >= D_IR_DATA_DIVIDE)  IR_DataShit |= 0x80;    //devide data 0 or 1
+ 292   4                      if(--IR_BitCnt == 0)                //bit number is over?
+ 293   4                      {
+ 294   5                          B_IR_Sync = 0;                  //Clear SYNC
+ 295   5                          if(~IR_DataShit == IR_data)     //判断数据正反码
+ 296   5                          {
+ 297   6                              UserCode = ((u16)IR_UserH << 8) + IR_UserL;
+ 298   6                              IR_code      = IR_data;
+ 299   6                              B_IR_Press   = 1;           //数据有效
+ 300   6                          }
+ 301   5                      }
+ 302   4                      else if((IR_BitCnt & 7)== 0)        //one byte receive
+C51 COMPILER V9.59.0.0   IR_REMOTE_RX                                                      08/11/2020 10:39:57 PAGE 6   
+
+ 303   4                      {
+ 304   5                          IR_UserL = IR_UserH;            //Save the User code high byte
+ 305   5                          IR_UserH = IR_data;             //Save the User code low byte
+ 306   5                          IR_data  = IR_DataShit;         //Save the IR data byte
+ 307   5                      }
+ 308   4                  }
+ 309   3              }
+ 310   2          }
+ 311   1      }
+ 312          
+ 313          
+ 314          /********************** Timer0中断函数 ************************/
+ 315          void timer0 (void) interrupt 1
+ 316          {
+ 317   1          IR_RX_NEC();
+ 318   1          if(--cnt_1ms == 0)
+ 319   1          {
+ 320   2              cnt_1ms = SysTick / 1000;
+ 321   2              B_1ms = 1;      //1ms标志
+ 322   2              DisplayScan();  //1ms扫描显示一位
+ 323   2          }
+ 324   1      }
+ 325          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    452    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     19       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,558 @@
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE RTC
+OBJECT MODULE PLACED IN RTC.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE RTC.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          读写RTC, IC为PCF8563.
+  17          
+  18          用STC的MCU的IO方式驱动8位数码管。
+  19          
+  20          使用Timer0的16位自动重装来产生1ms节拍,程序运行于这个节拍下, 用户修改MCU主时钟频率时,自动定时于1ms.
+  21          
+  22          8位数码管显示时间(小时-分钟-秒).
+  23          
+  24          行列扫描按键键码为17~32.
+  25          
+  26          按键只支持单键按下, 不支持多键同时按下, 那样将会有不可预知的结果.
+  27          
+  28          键按下超过1秒后,将以10键/秒的速度提供重键输出. 用户只需要检测KeyCode是否非0来判断键是否按下.
+  29          
+  30          调整时间键:
+  31          键码17: 小时+.
+  32          键码18: 小时-.
+  33          键码19: 分钟+.
+  34          键码20: 分钟-.
+  35          
+  36          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  37          
+  38          ******************************************/
+  39          
+  40          
+  41          #include    "reg51.h"
+  42          #include    "intrins.h"
+  43          
+  44          #define     MAIN_Fosc       24000000L   //定义主时钟
+  45          
+  46          typedef     unsigned char   u8;
+  47          typedef     unsigned int    u16;
+  48          typedef     unsigned long   u32;
+  49          
+  50          sfr TH2  = 0xD6;
+  51          sfr TL2  = 0xD7;
+  52          sfr IE2   = 0xAF;
+  53          sfr INT_CLKO = 0x8F;
+  54          sfr AUXR = 0x8E;
+  55          sfr AUXR1 = 0xA2;
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 2   
+
+  56          sfr P_SW1 = 0xA2;
+  57          sfr P_SW2 = 0xBA;
+  58          sfr S2CON = 0x9A;
+  59          sfr S2BUF = 0x9B;
+  60          
+  61          sfr P4   = 0xC0;
+  62          sfr P5   = 0xC8;
+  63          sfr P6   = 0xE8;
+  64          sfr P7   = 0xF8;
+  65          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  66          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  67          sfr P0M1 = 0x93;
+  68          sfr P0M0 = 0x94;
+  69          sfr P2M1 = 0x95;
+  70          sfr P2M0 = 0x96;
+  71          sfr P3M1 = 0xB1;
+  72          sfr P3M0 = 0xB2;
+  73          sfr P4M1 = 0xB3;
+  74          sfr P4M0 = 0xB4;
+  75          sfr P5M1 = 0xC9;
+  76          sfr P5M0 = 0xCA;
+  77          sfr P6M1 = 0xCB;
+  78          sfr P6M0 = 0xCC;
+  79          sfr P7M1 = 0xE1;
+  80          sfr P7M0 = 0xE2;
+  81          
+  82          sbit P00 = P0^0;
+  83          sbit P01 = P0^1;
+  84          sbit P02 = P0^2;
+  85          sbit P03 = P0^3;
+  86          sbit P04 = P0^4;
+  87          sbit P05 = P0^5;
+  88          sbit P06 = P0^6;
+  89          sbit P07 = P0^7;
+  90          sbit P10 = P1^0;
+  91          sbit P11 = P1^1;
+  92          sbit P12 = P1^2;
+  93          sbit P13 = P1^3;
+  94          sbit P14 = P1^4;
+  95          sbit P15 = P1^5;
+  96          sbit P16 = P1^6;
+  97          sbit P17 = P1^7;
+  98          sbit P20 = P2^0;
+  99          sbit P21 = P2^1;
+ 100          sbit P22 = P2^2;
+ 101          sbit P23 = P2^3;
+ 102          sbit P24 = P2^4;
+ 103          sbit P25 = P2^5;
+ 104          sbit P26 = P2^6;
+ 105          sbit P27 = P2^7;
+ 106          sbit P30 = P3^0;
+ 107          sbit P31 = P3^1;
+ 108          sbit P32 = P3^2;
+ 109          sbit P33 = P3^3;
+ 110          sbit P34 = P3^4;
+ 111          sbit P35 = P3^5;
+ 112          sbit P36 = P3^6;
+ 113          sbit P37 = P3^7;
+ 114          sbit P40 = P4^0;
+ 115          sbit P41 = P4^1;
+ 116          sbit P42 = P4^2;
+ 117          sbit P43 = P4^3;
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 3   
+
+ 118          sbit P44 = P4^4;
+ 119          sbit P45 = P4^5;
+ 120          sbit P46 = P4^6;
+ 121          sbit P47 = P4^7;
+ 122          sbit P50 = P5^0;
+ 123          sbit P51 = P5^1;
+ 124          sbit P52 = P5^2;
+ 125          sbit P53 = P5^3;
+ 126          sbit P54 = P5^4;
+ 127          sbit P55 = P5^5;
+ 128          sbit P56 = P5^6;
+ 129          sbit P57 = P5^7;
+ 130          
+ 131          #define I2CCFG          (*(unsigned char volatile xdata *)0xfe80)
+ 132          #define I2CMSCR         (*(unsigned char volatile xdata *)0xfe81)
+ 133          #define I2CMSST         (*(unsigned char volatile xdata *)0xfe82)
+ 134          #define I2CSLCR         (*(unsigned char volatile xdata *)0xfe83)
+ 135          #define I2CSLST         (*(unsigned char volatile xdata *)0xfe84)
+ 136          #define I2CSLADR        (*(unsigned char volatile xdata *)0xfe85)
+ 137          #define I2CTXD          (*(unsigned char volatile xdata *)0xfe86)
+ 138          #define I2CRXD          (*(unsigned char volatile xdata *)0xfe87)
+ 139          #define I2CMSAUX        (*(unsigned char volatile xdata *)0xfe88)
+ 140          
+ 141          sbit SDA = P1^4;
+ 142          sbit SCL = P1^5;
+ 143          
+ 144          /***********************************************************/
+ 145          
+ 146          #define DIS_DOT     0x20
+ 147          #define DIS_BLACK   0x10
+ 148          #define DIS_        0x11
+ 149          
+ 150          #define SLAW    0xA2
+ 151          #define SLAR    0xA3
+ 152          
+ 153          
+ 154          /****************************** 用户定义宏 ***********************************/
+ 155          
+ 156          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 157          
+ 158          /*****************************************************************************/
+ 159          
+ 160          
+ 161          /*************  本地常量声明    **************/
+ 162          u8 code t_display[]={                       //标准字库
+ 163          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 164              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 165          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 166              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 167              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 168          
+ 169          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 170          
+ 171          
+ 172          /*************  本地变量声明    **************/
+ 173          
+ 174          u8  LED8[8];        //显示缓冲
+ 175          u8  display_index;  //显示位索引
+ 176          bit B_1ms;          //1ms标志
+ 177          
+ 178          u8 IO_KeyState, IO_KeyState1, IO_KeyHoldCnt;    //行列键盘变量
+ 179          u8  KeyHoldCnt; //键按下计时
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 4   
+
+ 180          u8  KeyCode;    //给用户使用的键码
+ 181          u8  cnt50ms;
+ 182          
+ 183          u8  hour,minute,second; //RTC变量
+ 184          u16 msecond;
+ 185          
+ 186          
+ 187          /*************  本地函数声明    **************/
+ 188          void    CalculateAdcKey(u16 adc);
+ 189          void    IO_KeyScan(void);   //50ms call
+ 190          void    WriteNbyte(u8 addr, u8 *p, u8 number);
+ 191          void    ReadNbyte( u8 addr, u8 *p, u8 number);
+ 192          void    DisplayRTC(void);
+ 193          void    ReadRTC(void);
+ 194          void    WriteRTC(void);
+ 195          
+ 196          
+ 197          /**********************************************/
+ 198          void main(void)
+ 199          {
+ 200   1          u8  i;
+ 201   1      
+ 202   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 203   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 204   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 205   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 206   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 207   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 208   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 209   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 210   1          
+ 211   1          display_index = 0;
+ 212   1          
+ 213   1          for(i=0; i<8; i++)  LED8[i] = 0x10; //上电消隐
+ 214   1          
+ 215   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+ 216   1          TH0 = (u8)(Timer0_Reload / 256);
+ 217   1          TL0 = (u8)(Timer0_Reload % 256);
+ 218   1          ET0 = 1;    //Timer0 interrupt enable
+ 219   1          TR0 = 1;    //Tiner0 run
+ 220   1      
+ 221   1          P_SW2 |= 0x80;
+ 222   1          I2CCFG = 0xe0;                  //使能I2C主机模式
+ 223   1          I2CMSST = 0x00;
+ 224   1      
+ 225   1          EA = 1;     //打开总中断
+ 226   1          
+ 227   1          ReadRTC();
+ 228   1          F0 = 0;
+ 229   1          if(second >= 60)    F0 = 1; //错误
+ 230   1          if(minute >= 60)    F0 = 1; //错误
+ 231   1          if(hour   >= 24)    F0 = 1; //错误
+ 232   1          if(F0)  //有错误, 默认12:00:00
+ 233   1          {
+ 234   2              second = 0;
+ 235   2              minute = 0;
+ 236   2              hour  = 12;
+ 237   2              WriteRTC();
+ 238   2          }
+ 239   1      
+ 240   1          DisplayRTC();
+ 241   1          LED8[2] = DIS_;
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 5   
+
+ 242   1          LED8[5] = DIS_;
+ 243   1      
+ 244   1          KeyHoldCnt = 0; //键按下计时
+ 245   1          KeyCode = 0;    //给用户使用的键码
+ 246   1      
+ 247   1          IO_KeyState = 0;
+ 248   1          IO_KeyState1 = 0;
+ 249   1          IO_KeyHoldCnt = 0;
+ 250   1          cnt50ms = 0;
+ 251   1      
+ 252   1          while(1)
+ 253   1          {
+ 254   2              if(B_1ms)   //1ms到
+ 255   2              {
+ 256   3                  B_1ms = 0;
+ 257   3                  if(++msecond >= 1000)   //1秒到
+ 258   3                  {
+ 259   4                      msecond = 0;
+ 260   4                      ReadRTC();
+ 261   4                      DisplayRTC();
+ 262   4                  }
+ 263   3      
+ 264   3                  if(++cnt50ms >= 50)     //50ms扫描一次行列键盘
+ 265   3                  {
+ 266   4                      cnt50ms = 0;
+ 267   4                      IO_KeyScan();
+ 268   4                  }
+ 269   3                  
+ 270   3                  if(KeyCode != 0)        //有键按下
+ 271   3                  {
+ 272   4                      if(KeyCode == 17)   //hour +1
+ 273   4                      {
+ 274   5                          if(++hour >= 24)    hour = 0;
+ 275   5                          WriteRTC();
+ 276   5                          DisplayRTC();
+ 277   5                      }
+ 278   4                      if(KeyCode == 18)   //hour -1
+ 279   4                      {
+ 280   5                          if(--hour >= 24)    hour = 23;
+ 281   5                          WriteRTC();
+ 282   5                          DisplayRTC();
+ 283   5                      }
+ 284   4                      if(KeyCode == 19)   //minute +1
+ 285   4                      {
+ 286   5                          second = 0;
+ 287   5                          if(++minute >= 60)  minute = 0;
+ 288   5                          WriteRTC();
+ 289   5                          DisplayRTC();
+ 290   5                      }
+ 291   4                      if(KeyCode == 20)   //minute -1
+ 292   4                      {
+ 293   5                          second = 0;
+ 294   5                          if(--minute >= 60)  minute = 59;
+ 295   5                          WriteRTC();
+ 296   5                          DisplayRTC();
+ 297   5                      }
+ 298   4      
+ 299   4                      KeyCode = 0;
+ 300   4                  }
+ 301   3      
+ 302   3              }
+ 303   2          }
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 6   
+
+ 304   1      } 
+ 305          
+ 306          /********************** 显示时钟函数 ************************/
+ 307          void    DisplayRTC(void)
+ 308          {
+ 309   1          if(hour >= 10)  LED8[0] = hour / 10;
+ 310   1          else            LED8[0] = DIS_BLACK;
+ 311   1          LED8[1] = hour % 10;
+ 312   1          LED8[2] = DIS_;
+ 313   1          LED8[3] = minute / 10;
+ 314   1          LED8[4] = minute % 10;
+ 315   1          LED8[6] = second / 10;
+ 316   1          LED8[7] = second % 10;
+ 317   1      }
+ 318          
+ 319          /********************** 读RTC函数 ************************/
+ 320          void    ReadRTC(void)
+ 321          {
+ 322   1          u8  tmp[3];
+ 323   1      
+ 324   1          ReadNbyte(2, tmp, 3);
+ 325   1          second = ((tmp[0] >> 4) & 0x07) * 10 + (tmp[0] & 0x0f);
+ 326   1          minute = ((tmp[1] >> 4) & 0x07) * 10 + (tmp[1] & 0x0f);
+ 327   1          hour   = ((tmp[2] >> 4) & 0x03) * 10 + (tmp[2] & 0x0f);
+ 328   1      }
+ 329          
+ 330          /********************** 写RTC函数 ************************/
+ 331          void    WriteRTC(void)
+ 332          {
+ 333   1          u8  tmp[3];
+ 334   1      
+ 335   1          tmp[0] = ((second / 10) << 4) + (second % 10);
+ 336   1          tmp[1] = ((minute / 10) << 4) + (minute % 10);
+ 337   1          tmp[2] = ((hour / 10) << 4) + (hour % 10);
+ 338   1          WriteNbyte(2, tmp, 3);
+ 339   1      }
+ 340          
+ 341          
+ 342          /*****************************************************
+ 343              行列键扫描程序
+ 344              使用XY查找4x4键的方法，只能单键，速度快
+ 345          
+ 346             Y     P04      P05      P06      P07
+ 347                    |        |        |        |
+ 348          X         |        |        |        |
+ 349          P00 ---- K00 ---- K01 ---- K02 ---- K03 ----
+ 350                    |        |        |        |
+ 351          P01 ---- K04 ---- K05 ---- K06 ---- K07 ----
+ 352                    |        |        |        |
+ 353          P02 ---- K08 ---- K09 ---- K10 ---- K11 ----
+ 354                    |        |        |        |
+ 355          P03 ---- K12 ---- K13 ---- K14 ---- K15 ----
+ 356                    |        |        |        |
+ 357          ******************************************************/
+ 358          
+ 359          
+ 360          u8 code T_KeyTable[16] = {0,1,2,0,3,0,0,0,4,0,0,0,0,0,0,0};
+ 361          
+ 362          void IO_KeyDelay(void)
+ 363          {
+ 364   1          u8 i;
+ 365   1          i = 60;
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 7   
+
+ 366   1          while(--i)  ;
+ 367   1      }
+ 368          
+ 369          void IO_KeyScan(void)    //50ms call
+ 370          {
+ 371   1          u8  j;
+ 372   1      
+ 373   1          j = IO_KeyState1;   //保存上一次状态
+ 374   1      
+ 375   1          P0 = 0xf0;  //X低，读Y
+ 376   1          IO_KeyDelay();
+ 377   1          IO_KeyState1 = P0 & 0xf0;
+ 378   1      
+ 379   1          P0 = 0x0f;  //Y低，读X
+ 380   1          IO_KeyDelay();
+ 381   1          IO_KeyState1 |= (P0 & 0x0f);
+ 382   1          IO_KeyState1 ^= 0xff;   //取反
+ 383   1          
+ 384   1          if(j == IO_KeyState1)   //连续两次读相等
+ 385   1          {
+ 386   2              j = IO_KeyState;
+ 387   2              IO_KeyState = IO_KeyState1;
+ 388   2              if(IO_KeyState != 0)    //有键按下
+ 389   2              {
+ 390   3                  F0 = 0;
+ 391   3                  if(j == 0)  F0 = 1; //第一次按下
+ 392   3                  else if(j == IO_KeyState)
+ 393   3                  {
+ 394   4                      if(++IO_KeyHoldCnt >= 20)   //1秒后重键
+ 395   4                      {
+ 396   5                          IO_KeyHoldCnt = 18;
+ 397   5                          F0 = 1;
+ 398   5                      }
+ 399   4                  }
+ 400   3                  if(F0)
+ 401   3                  {
+ 402   4                      j = T_KeyTable[IO_KeyState >> 4];
+ 403   4                      if((j != 0) && (T_KeyTable[IO_KeyState& 0x0f] != 0)) 
+ 404   4                          KeyCode = (j - 1) * 4 + T_KeyTable[IO_KeyState & 0x0f] + 16;    //计算键码，17~32
+ 405   4                  }
+ 406   3              }
+ 407   2              else    IO_KeyHoldCnt = 0;
+ 408   2          }
+ 409   1          P0 = 0xff;
+ 410   1      }
+ 411          
+ 412          
+ 413          /********************** 显示扫描函数 ************************/
+ 414          void DisplayScan(void)
+ 415          {   
+ 416   1          P7 = ~T_COM[7-display_index];
+ 417   1          P6 = ~t_display[LED8[display_index]];
+ 418   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 419   1      }
+ 420          
+ 421          
+ 422          /********************** Timer0 1ms中断函数 ************************/
+ 423          void timer0 (void) interrupt 1
+ 424          {
+ 425   1          DisplayScan();  //1ms扫描显示一位
+ 426   1          B_1ms = 1;      //1ms标志
+ 427   1      }
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 8   
+
+ 428          
+ 429          
+ 430          void Wait()
+ 431          {
+ 432   1          while (!(I2CMSST & 0x40));
+ 433   1          I2CMSST &= ~0x40;
+ 434   1      }
+ 435          
+ 436          void Start()
+ 437          {
+ 438   1          I2CMSCR = 0x01;                         //发送START命令
+ 439   1          Wait();
+ 440   1      }
+ 441          
+ 442          void SendData(char dat)
+ 443          {
+ 444   1          I2CTXD = dat;                           //写数据到数据缓冲区
+ 445   1          I2CMSCR = 0x02;                         //发送SEND命令
+ 446   1          Wait();
+ 447   1      }
+ 448          
+ 449          void RecvACK()
+ 450          {
+ 451   1          I2CMSCR = 0x03;                         //发送读ACK命令
+ 452   1          Wait();
+ 453   1      }
+ 454          
+ 455          char RecvData()
+ 456          {
+ 457   1          I2CMSCR = 0x04;                         //发送RECV命令
+ 458   1          Wait();
+ 459   1          return I2CRXD;
+ 460   1      }
+ 461          
+ 462          void SendACK()
+ 463          {
+ 464   1          I2CMSST = 0x00;                         //设置ACK信号
+ 465   1          I2CMSCR = 0x05;                         //发送ACK命令
+ 466   1          Wait();
+ 467   1      }
+ 468          
+ 469          void SendNAK()
+ 470          {
+ 471   1          I2CMSST = 0x01;                         //设置NAK信号
+ 472   1          I2CMSCR = 0x05;                         //发送ACK命令
+ 473   1          Wait();
+ 474   1      }
+ 475          
+ 476          void Stop()
+ 477          {
+ 478   1          I2CMSCR = 0x06;                         //发送STOP命令
+ 479   1          Wait();
+ 480   1      }
+ 481          
+ 482          void WriteNbyte(u8 addr, u8 *p, u8 number)  /*  WordAddress,First Data Address,Byte lenth   */
+ 483          {
+ 484   1          Start();                                //发送起始命令
+ 485   1          SendData(SLAW);                         //发送设备地址+写命令
+ 486   1          RecvACK();
+ 487   1          SendData(addr);                         //发送存储地址
+ 488   1          RecvACK();
+ 489   1          do
+C51 COMPILER V9.59.0.0   RTC                                                               06/19/2020 17:35:50 PAGE 9   
+
+ 490   1          {
+ 491   2              SendData(*p++);
+ 492   2              RecvACK();
+ 493   2          }
+ 494   1          while(--number);
+ 495   1          Stop();                                 //发送停止命令
+ 496   1      }
+ 497          
+ 498          void ReadNbyte(u8 addr, u8 *p, u8 number)   /*  WordAddress,First Data Address,Byte lenth   */
+ 499          {
+ 500   1          Start();                                //发送起始命令
+ 501   1          SendData(SLAW);                         //发送设备地址+写命令
+ 502   1          RecvACK();
+ 503   1          SendData(addr);                         //发送存储地址
+ 504   1          RecvACK();
+ 505   1          Start();                                //发送起始命令
+ 506   1          SendData(SLAR);                         //发送设备地址+读命令
+ 507   1          RecvACK();
+ 508   1          do
+ 509   1          {
+ 510   2              *p = RecvData();
+ 511   2              p++;
+ 512   2              if(number != 1) SendACK();          //send ACK
+ 513   2          }
+ 514   1          while(--number);
+ 515   1          SendNAK();                              //send no ACK 
+ 516   1          Stop();                                 //发送停止命令
+ 517   1      }
+ 518          /****************************/
+ 519          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    970    ----
+   CONSTANT SIZE    =     67    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     20      16
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

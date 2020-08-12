@@ -1,0 +1,310 @@
+C51 COMPILER V9.59.0.0   WAKE_UP                                                           08/11/2020 16:19:57 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE WAKE_UP
+OBJECT MODULE PLACED IN wake_up.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE wake_up.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          用STC的MCU的IO方式驱动8位数码管。
+  17          
+  18          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  19          
+  20          显示效果为: 上电后显示秒计数, 计数范围为0~255，显示在右边的3个数码管.
+  21          
+  22          显示5秒后, 睡眠. 按板上的SW17、SW18唤醒, 继续计秒显示. 5秒后再睡眠.
+  23          
+  24          如果MCU在准备睡眠时, SW17/SW18按着(INT0/INT1为低电平), 则MCU不睡眠, 直到INT0/INT1为高电平为止.
+  25          
+  26          INT2, INT3, INT4 实验板上没有引出测试按键，供需要时参考使用.
+  27          
+  28          ******************************************/
+  29          #include    "reg51.h"
+  30          #include    "intrins.h"
+  31          
+  32          #define MAIN_Fosc       24000000L   //定义主时钟
+  33          
+  34          
+  35          typedef     unsigned char   u8;
+  36          typedef     unsigned int    u16;
+  37          typedef     unsigned long   u32;
+  38          
+  39          sfr P4   = 0xC0;
+  40          sfr P5   = 0xC8;
+  41          sfr P6   = 0xE8;
+  42          sfr P7   = 0xF8;
+  43          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  44          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  45          sfr P0M1 = 0x93;
+  46          sfr P0M0 = 0x94;
+  47          sfr P2M1 = 0x95;
+  48          sfr P2M0 = 0x96;
+  49          sfr P3M1 = 0xB1;
+  50          sfr P3M0 = 0xB2;
+  51          sfr P4M1 = 0xB3;
+  52          sfr P4M0 = 0xB4;
+  53          sfr P5M1 = 0xC9;
+  54          sfr P5M0 = 0xCA;
+  55          sfr P6M1 = 0xCB;
+C51 COMPILER V9.59.0.0   WAKE_UP                                                           08/11/2020 16:19:57 PAGE 2   
+
+  56          sfr P6M0 = 0xCC;
+  57          sfr P7M1 = 0xE1;
+  58          sfr P7M0 = 0xE2;
+  59          
+  60          sbit P00 = P0^0;
+  61          sbit P01 = P0^1;
+  62          sbit P02 = P0^2;
+  63          sbit P03 = P0^3;
+  64          sbit P04 = P0^4;
+  65          sbit P05 = P0^5;
+  66          sbit P06 = P0^6;
+  67          sbit P07 = P0^7;
+  68          sbit P10 = P1^0;
+  69          sbit P11 = P1^1;
+  70          sbit P12 = P1^2;
+  71          sbit P13 = P1^3;
+  72          sbit P14 = P1^4;
+  73          sbit P15 = P1^5;
+  74          sbit P16 = P1^6;
+  75          sbit P17 = P1^7;
+  76          sbit P20 = P2^0;
+  77          sbit P21 = P2^1;
+  78          sbit P22 = P2^2;
+  79          sbit P23 = P2^3;
+  80          sbit P24 = P2^4;
+  81          sbit P25 = P2^5;
+  82          sbit P26 = P2^6;
+  83          sbit P27 = P2^7;
+  84          sbit P30 = P3^0;
+  85          sbit P31 = P3^1;
+  86          sbit P32 = P3^2;
+  87          sbit P33 = P3^3;
+  88          sbit P34 = P3^4;
+  89          sbit P35 = P3^5;
+  90          sbit P36 = P3^6;
+  91          sbit P37 = P3^7;
+  92          sbit P40 = P4^0;
+  93          sbit P41 = P4^1;
+  94          sbit P42 = P4^2;
+  95          sbit P43 = P4^3;
+  96          sbit P44 = P4^4;
+  97          sbit P45 = P4^5;
+  98          sbit P46 = P4^6;
+  99          sbit P47 = P4^7;
+ 100          sbit P50 = P5^0;
+ 101          sbit P51 = P5^1;
+ 102          sbit P52 = P5^2;
+ 103          sbit P53 = P5^3;
+ 104          sbit P54 = P5^4;
+ 105          sbit P55 = P5^5;
+ 106          sbit P56 = P5^6;
+ 107          sbit P57 = P5^7;
+ 108          
+ 109          sfr INTCLKO = 0x8F;
+ 110          #define EX2 0x10
+ 111          #define EX3 0x20
+ 112          #define EX4 0x40
+ 113          
+ 114          #define DIS_DOT     0x20
+ 115          #define DIS_BLACK   0x10
+ 116          #define DIS_        0x11
+ 117          
+C51 COMPILER V9.59.0.0   WAKE_UP                                                           08/11/2020 16:19:57 PAGE 3   
+
+ 118          /****************************** 用户定义宏 ***********************************/
+ 119          
+ 120          #define     Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 121          
+ 122          /*****************************************************************************/
+ 123          
+ 124          
+ 125          /*************  本地常量声明    **************/
+ 126          u8 code t_display[]={                       //标准字库
+ 127          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 128              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 129          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 130              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 131              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 132          
+ 133          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 134          
+ 135          
+ 136          
+ 137          /*************  本地变量声明    **************/
+ 138          
+ 139          u8  LED8[8];        //显示缓冲
+ 140          u8  display_index;  //显示位索引
+ 141          u16 msecond;        //1000ms计数
+ 142          
+ 143          u8  Test_cnt;   //测试用的秒计数变量
+ 144          u8  SleepDelay; //唤醒后再进入睡眠所延时的时间
+ 145          
+ 146          void    delay_ms(u8 ms);
+ 147          void    Display(void);
+ 148          void    DisplayScan(void);
+ 149          
+ 150          /********************** 主函数 ************************/
+ 151          void main(void)
+ 152          {
+ 153   1          u8  i;
+ 154   1          
+ 155   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 156   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 157   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 158   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 159   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 160   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 161   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 162   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 163   1      
+ 164   1          display_index = 0;
+ 165   1          for(i=0; i<8; i++)  LED8[i] = DIS_BLACK;    //全部消隐
+ 166   1          
+ 167   1          Test_cnt = 0;   //秒计数范围为0~255
+ 168   1          SleepDelay = 0;
+ 169   1          LED8[5] = 0;
+ 170   1          LED8[6] = 0;
+ 171   1          LED8[7] = 0;
+ 172   1          
+ 173   1          EA = 1;     //允许总中断
+ 174   1      
+ 175   1          while(1)
+ 176   1          {
+ 177   2              delay_ms(1);    //延时1ms
+ 178   2              DisplayScan();
+ 179   2              
+C51 COMPILER V9.59.0.0   WAKE_UP                                                           08/11/2020 16:19:57 PAGE 4   
+
+ 180   2              if(++msecond >= 1000)   //1秒到
+ 181   2              {
+ 182   3                  msecond = 0;        //清1000ms计数
+ 183   3                  Test_cnt++;         //秒计数+1
+ 184   3                  LED8[5] = Test_cnt / 100;
+ 185   3                  LED8[6] = (Test_cnt % 100) / 10;
+ 186   3                  LED8[7] = Test_cnt % 10;
+ 187   3      
+ 188   3                  if(++SleepDelay >= 5)   //5秒后睡眠
+ 189   3                  {
+ 190   4                      SleepDelay = 0;
+ 191   4      
+ 192   4                      if(INT0 && INT1)    //两个中断都是高电平时才进入睡眠，下降沿唤醒。
+ 193   4                      {
+ 194   5                          SleepDelay = 0;
+ 195   5                          P7 = 0xff;     //先关闭显示，省电
+ 196   5      
+ 197   5                          IE0  = 0;   //外中断0标志位
+ 198   5                          IE1  = 0;   //外中断1标志位
+ 199   5                          EX0 = 1;    //INT0 Enable
+ 200   5                          EX1 = 1;    //INT1 Enable
+ 201   5      
+ 202   5                          IT0 = 1;        //INT0 下降沿中断       
+ 203   5                      //  IT0 = 0;        //INT0 上升,下降沿中断  
+ 204   5                          IT1 = 1;        //INT1 下降沿中断       
+ 205   5                      //  IT1 = 0;        //INT1 上升,下降沿中断  
+ 206   5      
+ 207   5      //                  INTCLKO = EX2;  //使能 INT2 下降沿中断
+ 208   5      //                  INTCLKO |= EX3; //使能 INT3 下降沿中断
+ 209   5      //                  INTCLKO |= EX4; //使能 INT4 下降沿中断
+ 210   5                        
+ 211   5                          PCON |= 0x02;   //Sleep
+ 212   5                          _nop_();
+ 213   5                          _nop_();
+ 214   5                          _nop_();
+ 215   5                      }
+ 216   4                  }
+ 217   3              }
+ 218   2          }
+ 219   1      } 
+ 220          /**********************************************/
+ 221          
+ 222          //========================================================================
+ 223          // 函数: void  delay_ms(unsigned char ms)
+ 224          // 描述: 延时函数。
+ 225          // 参数: ms,要延时的ms数, 这里只支持1~255ms. 自动适应主时钟.
+ 226          // 返回: none.
+ 227          // 版本: VER1.0
+ 228          // 日期: 2013-4-1
+ 229          // 备注: 
+ 230          //========================================================================
+ 231          void  delay_ms(u8 ms)
+ 232          {
+ 233   1           u16 i;
+ 234   1           do{
+ 235   2                i = MAIN_Fosc / 13000;
+ 236   2                while(--i)    ;   //14T per loop
+ 237   2           }while(--ms);
+ 238   1      }
+ 239          
+ 240          /********************* INT0中断函数 *************************/
+ 241          void INT0_int (void) interrupt 0      //进中断时已经清除标志
+C51 COMPILER V9.59.0.0   WAKE_UP                                                           08/11/2020 16:19:57 PAGE 5   
+
+ 242          {
+ 243   1          EX0 = 0;    //INT0 Disable
+ 244   1          IE0 = 0;    //外中断0标志位
+ 245   1      }
+ 246          
+ 247          /********************* INT1中断函数 *************************/
+ 248          void INT1_int (void) interrupt 2      //进中断时已经清除标志
+ 249          {
+ 250   1          EX1 = 0;    //INT1 Disable
+ 251   1          IE1 = 0;    //外中断1标志位
+ 252   1      }
+ 253          
+ 254          /********************* INT2中断函数 *************************/
+ 255          void INT2_int (void) interrupt 10     //进中断时已经清除标志
+ 256          {
+ 257   1          INTCLKO &= ~EX2;    //INT2 Disable
+ 258   1      }
+ 259          
+ 260          /********************* INT3中断函数 *************************/
+ 261          void INT3_int (void) interrupt 11     //进中断时已经清除标志
+ 262          {
+ 263   1          INTCLKO &= ~EX3;    //INT3 Disable
+ 264   1      }
+ 265          
+ 266          /********************* INT4中断函数 *************************/
+ 267          void INT4_int (void) interrupt 16     //进中断时已经清除标志
+ 268          {
+ 269   1          INTCLKO &= ~EX4;    //INT4 Disable
+ 270   1      }
+ 271          
+ 272          /********************** 显示扫描函数 ************************/
+ 273          void DisplayScan(void)
+ 274          {   
+ 275   1          P7 = ~T_COM[7-display_index];
+ 276   1          P6 = ~t_display[LED8[display_index]];
+ 277   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 278   1      }
+ 279          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    271    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

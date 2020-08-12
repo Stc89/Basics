@@ -1,0 +1,285 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/12/2020  17:45:04  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE NTC.obj TO NTC RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  NTC.obj (NTC)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?IMUL)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?OFFXADD)
+
+
+LINK MAP OF MODULE:  NTC (NTC)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000BH     UNIT         ?DT?NTC
+            DATA    0013H     0008H     UNIT         _DATA_GROUP_
+                    001BH     0005H                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         ?BI?NTC
+                    0020H.1   0000H.7                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0186H     UNIT         ?PR?_GET_TEMPERATURE?NTC
+            CODE    0194H     0175H     UNIT         ?CO?NTC
+            CODE    0309H     0132H     UNIT         ?PR?MAIN?NTC
+            CODE    043BH     0073H     UNIT         ?C?LIB_CODE
+            CODE    04AEH     0037H     UNIT         ?PR?DISPLAYSCAN?NTC
+            CODE    04E5H     0025H     UNIT         ?PR?TIMER0?NTC
+            CODE    050AH     0020H     UNIT         ?PR?_GET_ADC12BITRESULT?NTC
+            CODE    052AH     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   NTC (NTC)
+
+
+SEGMENT                               DATA_GROUP 
+  +--> CALLED SEGMENT               START    LENGTH
+---------------------------------------------------
+?PR?TIMER0?NTC                      -----    -----
+  +--> ?PR?DISPLAYSCAN?NTC
+
+?PR?DISPLAYSCAN?NTC                 -----    -----
+  +--> ?CO?NTC
+
+*** NEW ROOT ***************************************************
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:45:04  PAGE 2
+
+
+
+?C_C51STARTUP                       -----    -----
+  +--> ?PR?MAIN?NTC
+
+?PR?MAIN?NTC                        0013H    0001H
+  +--> ?PR?_GET_ADC12BITRESULT?NTC
+  +--> ?PR?_GET_TEMPERATURE?NTC
+
+?PR?_GET_TEMPERATURE?NTC            0014H    0007H
+  +--> ?CO?NTC
+
+
+
+SYMBOL TABLE OF MODULE:  NTC (NTC)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        NTC
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  B:00A8H.7       PUBLIC        EA
+  D:00F8H         PUBLIC        P7
+  D:00BAH         PUBLIC        P_SW2
+  D:0008H         PUBLIC        LED8
+  C:01BFH         PUBLIC        T_COM
+  D:00BDH         PUBLIC        ADC_RES
+  D:00DEH         PUBLIC        ADCCFG
+  C:01C7H         PUBLIC        temp_table
+  C:0309H         PUBLIC        main
+  D:00BCH         PUBLIC        ADC_CONTR
+  B:0020H.0       PUBLIC        B_1ms
+  D:008EH         PUBLIC        AUXR
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  C:0194H         PUBLIC        t_display
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:45:04  PAGE 3
+
+
+  D:008AH         PUBLIC        TL0
+  C:04E5H         PUBLIC        timer0
+  B:0088H.4       PUBLIC        TR0
+  C:000EH         PUBLIC        _get_temperature
+  D:00BEH         PUBLIC        ADC_RESL
+  C:04AEH         PUBLIC        DisplayScan
+  D:0010H         PUBLIC        msecond
+  C:050AH         PUBLIC        _Get_ADC12bitResult
+  B:00D0H.5       PUBLIC        F0
+  D:0012H         PUBLIC        display_index
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  -------         DO            
+  D:0013H         SYMBOL        i
+  D:0002H         SYMBOL        j
+  -------         ENDDO         
+  C:0309H         LINE#         165
+  C:0309H         LINE#         166
+  C:0309H         LINE#         170
+  C:030EH         LINE#         171
+  C:0312H         LINE#         172
+  C:0316H         LINE#         173
+  C:031AH         LINE#         174
+  C:031EH         LINE#         175
+  C:0322H         LINE#         176
+  C:0326H         LINE#         177
+  C:032BH         LINE#         179
+  C:032DH         LINE#         180
+  C:0330H         LINE#         181
+  C:0336H         LINE#         182
+  C:0339H         LINE#         183
+  C:033CH         LINE#         184
+  C:033FH         LINE#         186
+  C:0342H         LINE#         187
+  C:0345H         LINE#         188
+  C:0348H         LINE#         189
+  C:034AH         LINE#         190
+  C:034CH         LINE#         191
+  C:034EH         LINE#         193
+  C:0367H         LINE#         195
+  C:0367H         LINE#         196
+  C:0367H         LINE#         197
+  C:036AH         LINE#         198
+  C:036AH         LINE#         199
+  C:036CH         LINE#         200
+  C:037DH         LINE#         201
+  C:037DH         LINE#         202
+  C:0382H         LINE#         218
+  C:038BH         LINE#         220
+  C:0394H         LINE#         221
+  C:0394H         LINE#         229
+  C:039BH         LINE#         231
+  C:03B0H         LINE#         232
+  C:03BBH         LINE#         233
+  C:03C8H         LINE#         234
+  C:03E2H         LINE#         235
+  C:03FFH         LINE#         236
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:45:04  PAGE 4
+
+
+  C:040CH         LINE#         237
+  C:0413H         LINE#         238
+  C:041CH         LINE#         239
+  C:041FH         LINE#         241
+  C:041FH         LINE#         242
+  -------         ENDPROC       MAIN
+  -------         PROC          _GET_ADC12BITRESULT
+  D:0007H         SYMBOL        channel
+  C:050AH         LINE#         257
+  C:050AH         LINE#         258
+  C:050AH         LINE#         259
+  C:050DH         LINE#         260
+  C:050FH         LINE#         262
+  C:0514H         LINE#         263
+  C:0515H         LINE#         264
+  C:0516H         LINE#         265
+  C:0517H         LINE#         266
+  C:0518H         LINE#         268
+  C:051EH         LINE#         269
+  C:0521H         LINE#         270
+  C:0529H         LINE#         271
+  -------         ENDPROC       _GET_ADC12BITRESULT
+  -------         PROC          _GET_TEMPERATURE
+  D:0014H         SYMBOL        adc
+  -------         DO            
+  D:0016H         SYMBOL        p
+  D:0018H         SYMBOL        i
+  D:0003H         SYMBOL        j
+  D:0006H         SYMBOL        k
+  D:001AH         SYMBOL        min
+  D:0007H         SYMBOL        max
+  -------         ENDDO         
+  C:000EH         LINE#         446
+  C:0012H         LINE#         447
+  C:0012H         LINE#         452
+  C:001EH         LINE#         453
+  C:0024H         LINE#         454
+  C:003BH         LINE#         455
+  C:0058H         LINE#         457
+  C:005BH         LINE#         458
+  C:005DH         LINE#         460
+  C:0068H         LINE#         461
+  C:0068H         LINE#         462
+  C:0072H         LINE#         463
+  C:008EH         LINE#         464
+  C:0090H         LINE#         465
+  C:0093H         LINE#         466
+  C:00AEH         LINE#         467
+  C:00C9H         LINE#         469
+  C:00C9H         LINE#         470
+  C:00D2H         LINE#         471
+  C:00D2H         LINE#         472
+  C:00D4H         LINE#         473
+  C:00FBH         LINE#         474
+  C:0115H         LINE#         475
+  C:0115H         LINE#         476
+  C:0117H         LINE#         477
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:45:04  PAGE 5
+
+
+  C:012EH         LINE#         478
+  C:016EH         LINE#         479
+  C:0174H         LINE#         480
+  C:0183H         LINE#         481
+  C:018FH         LINE#         482
+  C:018FH         LINE#         483
+  C:018FH         LINE#         484
+  C:018FH         LINE#         485
+  C:018FH         LINE#         486
+  C:0193H         LINE#         487
+  -------         ENDPROC       _GET_TEMPERATURE
+  -------         PROC          DISPLAYSCAN
+  C:04AEH         LINE#         490
+  C:04AEH         LINE#         491
+  C:04AEH         LINE#         492
+  C:04C7H         LINE#         493
+  C:04D4H         LINE#         494
+  C:04E4H         LINE#         495
+  -------         ENDPROC       DISPLAYSCAN
+  -------         PROC          TIMER0
+  C:04E5H         LINE#         499
+  C:04F6H         LINE#         501
+  C:04F9H         LINE#         502
+  C:04FBH         LINE#         503
+  -------         ENDPROC       TIMER0
+  -------         ENDMOD        NTC
+
+  -------         MODULE        ?C?IMUL
+  C:043BH         PUBLIC        ?C?IMUL
+  -------         ENDMOD        ?C?IMUL
+
+  -------         MODULE        ?C?UIDIV
+  C:044DH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+  -------         MODULE        ?C?OFFXADD
+  C:04A2H         PUBLIC        ?C?OFFXADD
+  -------         ENDMOD        ?C?OFFXADD
+
+Program Size: data=28.1 xdata=0 code=1326
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,342 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/12/2020  17:37:02  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE ADC_KeyScan.obj TO ADC_KeyScan RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  ADC_KeyScan.obj (ADC_KEYSCAN)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+
+
+LINK MAP OF MODULE:  ADC_KeyScan (ADC_KEYSCAN)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0015H     UNIT         ?DT?ADC_KEYSCAN
+                    001DH     0003H                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         ?BI?ADC_KEYSCAN
+                    0020H.1   0000H.7                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     014BH     UNIT         ?PR?MAIN?ADC_KEYSCAN
+            CODE    0159H     00B6H     UNIT         ?PR?_CALCULATEADCKEY?ADC_KEYSCAN
+            CODE    020FH     0041H     UNIT         ?PR?DISPLAYRTC?ADC_KEYSCAN
+            CODE    0250H     0037H     UNIT         ?PR?DISPLAYSCAN?ADC_KEYSCAN
+            CODE    0287H     0033H     UNIT         ?CO?ADC_KEYSCAN
+            CODE    02BAH     002FH     UNIT         ?PR?RTC?ADC_KEYSCAN
+            CODE    02E9H     0025H     UNIT         ?PR?TIMER0?ADC_KEYSCAN
+            CODE    030EH     0020H     UNIT         ?PR?_GET_ADC12BITRESULT?ADC_KEYSCAN
+            CODE    032EH     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   ADC_KeyScan (ADC_KEYSCAN)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?PR?TIMER0?ADC_KEYSCAN
+  +--> ?PR?DISPLAYSCAN?ADC_KEYSCAN
+
+?PR?DISPLAYSCAN?ADC_KEYSCAN
+  +--> ?CO?ADC_KEYSCAN
+
+*** NEW ROOT ***************************************************
+
+?C_C51STARTUP
+  +--> ?PR?MAIN?ADC_KEYSCAN
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:37:02  PAGE 2
+
+
+
+?PR?MAIN?ADC_KEYSCAN
+  +--> ?PR?DISPLAYRTC?ADC_KEYSCAN
+  +--> ?PR?RTC?ADC_KEYSCAN
+  +--> ?PR?_GET_ADC12BITRESULT?ADC_KEYSCAN
+  +--> ?PR?_CALCULATEADCKEY?ADC_KEYSCAN
+
+
+
+SYMBOL TABLE OF MODULE:  ADC_KeyScan (ADC_KEYSCAN)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ADC_KEYSCAN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0008H         PUBLIC        second
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+  D:0009H         PUBLIC        ADC_KeyHoldCnt
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  D:00E1H         PUBLIC        P7M1
+  D:00E8H         PUBLIC        P6
+  B:00A8H.7       PUBLIC        EA
+  D:00F8H         PUBLIC        P7
+  D:000AH         PUBLIC        cnt10ms
+  D:000BH         PUBLIC        ADC_KeyState1
+  D:000CH         PUBLIC        ADC_KeyState2
+  D:000DH         PUBLIC        ADC_KeyState3
+  D:00BAH         PUBLIC        P_SW2
+  D:000EH         PUBLIC        LED8
+  C:02B2H         PUBLIC        T_COM
+  D:00BDH         PUBLIC        ADC_RES
+  D:0016H         PUBLIC        minute
+  D:00DEH         PUBLIC        ADCCFG
+  C:000EH         PUBLIC        main
+  D:0017H         PUBLIC        KeyCode
+  D:00BCH         PUBLIC        ADC_CONTR
+  B:0020H.0       PUBLIC        B_1ms
+  D:0018H         PUBLIC        hour
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:37:02  PAGE 3
+
+
+  D:008EH         PUBLIC        AUXR
+  C:020FH         PUBLIC        DisplayRTC
+  C:0159H         PUBLIC        _CalculateAdcKey
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  C:0287H         PUBLIC        t_display
+  D:008AH         PUBLIC        TL0
+  C:02E9H         PUBLIC        timer0
+  B:0088H.4       PUBLIC        TR0
+  D:0019H         PUBLIC        ADC_KeyState
+  D:00BEH         PUBLIC        ADC_RESL
+  C:0250H         PUBLIC        DisplayScan
+  C:02BAH         PUBLIC        RTC
+  D:001AH         PUBLIC        msecond
+  C:030EH         PUBLIC        _Get_ADC12bitResult
+  D:001CH         PUBLIC        display_index
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  D:0006H         SYMBOL        j
+  -------         ENDDO         
+  C:000EH         LINE#         173
+  C:000EH         LINE#         174
+  C:000EH         LINE#         178
+  C:0013H         LINE#         179
+  C:0018H         LINE#         180
+  C:001CH         LINE#         181
+  C:0020H         LINE#         182
+  C:0024H         LINE#         183
+  C:0028H         LINE#         184
+  C:002CH         LINE#         185
+  C:0030H         LINE#         187
+  C:0032H         LINE#         189
+  C:0035H         LINE#         190
+  C:003BH         LINE#         191
+  C:003EH         LINE#         192
+  C:0041H         LINE#         193
+  C:0044H         LINE#         195
+  C:0047H         LINE#         196
+  C:004AH         LINE#         197
+  C:004DH         LINE#         198
+  C:004FH         LINE#         199
+  C:0051H         LINE#         200
+  C:0053H         LINE#         202
+  C:0068H         LINE#         204
+  C:006BH         LINE#         205
+  C:006EH         LINE#         206
+  C:0070H         LINE#         207
+  C:0073H         LINE#         209
+  C:0076H         LINE#         210
+  C:0078H         LINE#         211
+  C:007AH         LINE#         212
+  C:007CH         LINE#         213
+  C:007EH         LINE#         214
+  C:0080H         LINE#         215
+  C:0082H         LINE#         217
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:37:02  PAGE 4
+
+
+  C:0082H         LINE#         218
+  C:0082H         LINE#         219
+  C:0085H         LINE#         220
+  C:0085H         LINE#         221
+  C:0087H         LINE#         222
+  C:0098H         LINE#         223
+  C:0098H         LINE#         224
+  C:009DH         LINE#         225
+  C:00A0H         LINE#         226
+  C:00A3H         LINE#         227
+  C:00A3H         LINE#         228
+  C:00B0H         LINE#         230
+  C:00BDH         LINE#         231
+  C:00BDH         LINE#         232
+  C:00C0H         LINE#         233
+  C:00C4H         LINE#         234
+  C:00CDH         LINE#         236
+  C:00CDH         LINE#         238
+  C:00DBH         LINE#         239
+  C:00DBH         LINE#         240
+  C:00E3H         LINE#         241
+  C:00ECH         LINE#         243
+  C:00F1H         LINE#         244
+  C:00F1H         LINE#         245
+  C:0101H         LINE#         246
+  C:0104H         LINE#         247
+  C:0104H         LINE#         248
+  C:010AH         LINE#         249
+  C:010AH         LINE#         250
+  C:011AH         LINE#         251
+  C:011DH         LINE#         252
+  C:011DH         LINE#         253
+  C:0123H         LINE#         254
+  C:0123H         LINE#         255
+  C:0125H         LINE#         256
+  C:0135H         LINE#         257
+  C:0138H         LINE#         258
+  C:0138H         LINE#         259
+  C:013EH         LINE#         260
+  C:013EH         LINE#         261
+  C:0140H         LINE#         262
+  C:0150H         LINE#         263
+  C:0153H         LINE#         264
+  C:0153H         LINE#         265
+  C:0156H         LINE#         266
+  C:0156H         LINE#         267
+  C:0156H         LINE#         268
+  -------         ENDPROC       MAIN
+  -------         PROC          DISPLAYRTC
+  C:020FH         LINE#         274
+  C:020FH         LINE#         275
+  C:020FH         LINE#         276
+  C:0224H         LINE#         277
+  C:0227H         LINE#         278
+  C:0230H         LINE#         279
+  C:0238H         LINE#         280
+  C:0241H         LINE#         281
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:37:02  PAGE 5
+
+
+  C:024FH         LINE#         282
+  -------         ENDPROC       DISPLAYRTC
+  -------         PROC          RTC
+  C:02BAH         LINE#         285
+  C:02BAH         LINE#         286
+  C:02BAH         LINE#         287
+  C:02C7H         LINE#         288
+  C:02C7H         LINE#         289
+  C:02CAH         LINE#         290
+  C:02D6H         LINE#         291
+  C:02D6H         LINE#         292
+  C:02D9H         LINE#         293
+  C:02E8H         LINE#         294
+  C:02E8H         LINE#         295
+  C:02E8H         LINE#         296
+  -------         ENDPROC       RTC
+  -------         PROC          _GET_ADC12BITRESULT
+  D:0007H         SYMBOL        channel
+  C:030EH         LINE#         306
+  C:030EH         LINE#         307
+  C:030EH         LINE#         308
+  C:0311H         LINE#         309
+  C:0313H         LINE#         311
+  C:0318H         LINE#         312
+  C:0319H         LINE#         313
+  C:031AH         LINE#         314
+  C:031BH         LINE#         315
+  C:031CH         LINE#         317
+  C:0322H         LINE#         318
+  C:0325H         LINE#         319
+  C:032DH         LINE#         320
+  -------         ENDPROC       _GET_ADC12BITRESULT
+  -------         PROC          _CALCULATEADCKEY
+  D:0006H         SYMBOL        adc
+  -------         DO            
+  D:0003H         SYMBOL        i
+  D:0004H         SYMBOL        j
+  -------         ENDDO         
+  C:0159H         LINE#         332
+  C:0159H         LINE#         333
+  C:0159H         LINE#         337
+  C:0162H         LINE#         338
+  C:0162H         LINE#         339
+  C:0165H         LINE#         340
+  C:0167H         LINE#         341
+  C:0167H         LINE#         342
+  C:016BH         LINE#         343
+  C:0177H         LINE#         344
+  C:0177H         LINE#         345
+  C:019CH         LINE#         346
+  C:01A3H         LINE#         347
+  C:01A6H         LINE#         348
+  C:01A9H         LINE#         349
+  C:01ACH         LINE#         350
+  C:01BAH         LINE#         352
+  C:01BAH         LINE#         353
+  C:01BCH         LINE#         354
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  17:37:02  PAGE 6
+
+
+  C:01E9H         LINE#         356
+  C:01E9H         LINE#         357
+  C:01EDH         LINE#         358
+  C:01EDH         LINE#         359
+  C:01EFH         LINE#         360
+  C:01F1H         LINE#         361
+  C:01F3H         LINE#         362
+  C:01F3H         LINE#         363
+  C:01F8H         LINE#         364
+  C:01F8H         LINE#         365
+  C:0205H         LINE#         366
+  C:0205H         LINE#         367
+  C:0208H         LINE#         368
+  C:020AH         LINE#         369
+  C:020AH         LINE#         370
+  C:020BH         LINE#         371
+  C:020EH         LINE#         372
+  C:020EH         LINE#         373
+  C:020EH         LINE#         374
+  -------         ENDPROC       _CALCULATEADCKEY
+  -------         PROC          DISPLAYSCAN
+  C:0250H         LINE#         378
+  C:0250H         LINE#         379
+  C:0250H         LINE#         380
+  C:0269H         LINE#         381
+  C:0276H         LINE#         382
+  C:0286H         LINE#         383
+  -------         ENDPROC       DISPLAYSCAN
+  -------         PROC          TIMER0
+  C:02E9H         LINE#         387
+  C:02FAH         LINE#         389
+  C:02FDH         LINE#         390
+  C:02FFH         LINE#         391
+  -------         ENDPROC       TIMER0
+  -------         ENDMOD        ADC_KEYSCAN
+
+Program Size: data=30.1 xdata=0 code=818
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

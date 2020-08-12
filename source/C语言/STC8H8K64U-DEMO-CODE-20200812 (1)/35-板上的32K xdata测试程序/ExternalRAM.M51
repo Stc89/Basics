@@ -1,0 +1,397 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/28/2020  18:04:47  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE ExternalRAM.obj TO ExternalRAM RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  ExternalRAM.obj (EXTERNALRAM)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SLCMP)
+
+
+LINK MAP OF MODULE:  ExternalRAM (EXTERNALRAM)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0007H     UNIT         _DATA_GROUP_
+            DATA    000FH     0003H     UNIT         ?DT?EXTERNALRAM
+                    0012H     000EH                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         ?BI?EXTERNALRAM
+                    0020H.1   0000H.7                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *  X D A T A   M E M O R Y  * * * * * * *
+            XDATA   0000H     0040H     UNIT         ?XD?EXTERNALRAM
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     001AH     UNIT         ?PR?_SETTIMER2BAUDRAYE?EXTERNALRAM
+                    001DH     0006H                  *** GAP ***
+            CODE    0023H     0003H     ABSOLUTE     
+            CODE    0026H     80F8H     UNIT         ?CO?EXTERNALRAM
+            CODE    811EH     019AH     UNIT         ?PR?TESTXRAM?EXTERNALRAM
+            CODE    82B8H     0084H     UNIT         ?C?LIB_CODE
+            CODE    833CH     0083H     UNIT         ?PR?TXERRORADDRESS?EXTERNALRAM
+            CODE    83BFH     0077H     UNIT         ?PR?MAIN?EXTERNALRAM
+            CODE    8436H     0065H     UNIT         ?PR?XDATA_TEST?EXTERNALRAM
+            CODE    849BH     0043H     UNIT         ?PR?_UART1_CONFIG?EXTERNALRAM
+            CODE    84DEH     003EH     UNIT         ?PR?UART1_INT?EXTERNALRAM
+            CODE    851CH     0015H     UNIT         ?PR?_UART1_TXBYTE?EXTERNALRAM
+            CODE    8531H     0013H     UNIT         ?PR?_PRINTSTRING1?EXTERNALRAM
+            CODE    8544H     0010H     UNIT         ?PR?_DELAY_MS?EXTERNALRAM
+            CODE    8554H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   ExternalRAM (EXTERNALRAM)
+
+
+SEGMENT                                      DATA_GROUP 
+  +--> CALLED SEGMENT                      START    LENGTH
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 2
+
+
+----------------------------------------------------------
+?C_C51STARTUP                              -----    -----
+  +--> ?PR?MAIN?EXTERNALRAM
+
+?PR?MAIN?EXTERNALRAM                       -----    -----
+  +--> ?PR?_DELAY_MS?EXTERNALRAM
+  +--> ?PR?_UART1_CONFIG?EXTERNALRAM
+  +--> ?CO?EXTERNALRAM
+  +--> ?PR?_PRINTSTRING1?EXTERNALRAM
+  +--> ?PR?XDATA_TEST?EXTERNALRAM
+
+?PR?_UART1_CONFIG?EXTERNALRAM              -----    -----
+  +--> ?PR?_SETTIMER2BAUDRAYE?EXTERNALRAM
+
+?PR?_PRINTSTRING1?EXTERNALRAM              -----    -----
+  +--> ?PR?_UART1_TXBYTE?EXTERNALRAM
+
+?PR?XDATA_TEST?EXTERNALRAM                 0008H    0001H
+  +--> ?CO?EXTERNALRAM
+  +--> ?PR?_PRINTSTRING1?EXTERNALRAM
+  +--> ?PR?TESTXRAM?EXTERNALRAM
+  +--> ?PR?TXERRORADDRESS?EXTERNALRAM
+
+?PR?TESTXRAM?EXTERNALRAM                   0009H    0006H
+  +--> ?CO?EXTERNALRAM
+
+?PR?TXERRORADDRESS?EXTERNALRAM             0009H    0002H
+  +--> ?CO?EXTERNALRAM
+  +--> ?PR?_PRINTSTRING1?EXTERNALRAM
+  +--> ?PR?_UART1_TXBYTE?EXTERNALRAM
+
+
+
+SYMBOL TABLE OF MODULE:  ExternalRAM (EXTERNALRAM)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        EXTERNALRAM
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0093H         PUBLIC        P0M1
+  D:0092H         PUBLIC        P1M0
+  D:0096H         PUBLIC        P2M0
+  D:0091H         PUBLIC        P1M1
+  D:0080H         PUBLIC        P0
+  D:00B2H         PUBLIC        P3M0
+  D:0095H         PUBLIC        P2M1
+  D:0090H         PUBLIC        P1
+  D:00B4H         PUBLIC        P4M0
+  D:00B1H         PUBLIC        P3M1
+  D:00A0H         PUBLIC        P2
+  D:00CAH         PUBLIC        P5M0
+  D:00B3H         PUBLIC        P4M1
+  D:00B0H         PUBLIC        P3
+  D:00CCH         PUBLIC        P6M0
+  D:00C9H         PUBLIC        P5M1
+  D:00C0H         PUBLIC        P4
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 3
+
+
+  D:00E2H         PUBLIC        P7M0
+  D:00CBH         PUBLIC        P6M1
+  D:00C8H         PUBLIC        P5
+  B:0020H.0       PUBLIC        B_TX1_Busy
+  D:00E1H         PUBLIC        P7M1
+  B:00A8H.7       PUBLIC        EA
+  D:000FH         PUBLIC        RX1_TimeOut
+  D:00A2H         PUBLIC        P_SW1
+  C:0003H         PUBLIC        _SetTimer2Baudraye
+  B:00A8H.4       PUBLIC        ES
+  X:0000H         PUBLIC        RX1_Buffer
+  B:0098H.0       PUBLIC        RI
+  C:84DEH         PUBLIC        UART1_int
+  B:0098H.1       PUBLIC        TI
+  C:833CH         PUBLIC        TxErrorAddress
+  C:83BFH         PUBLIC        main
+  D:0099H         PUBLIC        SBUF
+  C:8529H         PUBLIC        _UART1_TxByte
+  D:0098H         PUBLIC        SCON
+  B:00C0H.1       PUBLIC        P41
+  D:0089H         PUBLIC        TMOD
+  C:8531H         PUBLIC        _PrintString1
+  D:00A1H         PUBLIC        BUS_SPEED
+  D:00AFH         PUBLIC        IE2
+  D:008EH         PUBLIC        AUXR
+  C:849BH         PUBLIC        _UART1_config
+  B:00A8H.3       PUBLIC        ET1
+  D:008DH         PUBLIC        TH1
+  D:00D6H         PUBLIC        TH2
+  D:008BH         PUBLIC        TL1
+  D:00D7H         PUBLIC        TL2
+  C:8544H         PUBLIC        _delay_ms
+  B:0088H.6       PUBLIC        TR1
+  C:811EH         PUBLIC        TestXRAM
+  D:0010H         PUBLIC        RX1_Cnt
+  C:011EH         PUBLIC        hz
+  D:0011H         PUBLIC        TX1_Cnt
+  B:0098H.4       PUBLIC        REN
+  D:008FH         PUBLIC        INT_CLKO
+  C:8436H         PUBLIC        Xdata_Test
+  D:0094H         PUBLIC        P0M0
+  -------         PROC          MAIN
+  C:83BFH         LINE#         2210
+  C:83BFH         LINE#         2211
+  C:83BFH         LINE#         2212
+  C:83C4H         LINE#         2213
+  C:83C8H         LINE#         2214
+  C:83CCH         LINE#         2215
+  C:83D0H         LINE#         2216
+  C:83D4H         LINE#         2217
+  C:83D8H         LINE#         2218
+  C:83DCH         LINE#         2219
+  C:83E0H         LINE#         2221
+  C:83E5H         LINE#         2222
+  C:83EAH         LINE#         2223
+  C:83ECH         LINE#         2224
+  C:83EEH         LINE#         2226
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 4
+
+
+  C:83F7H         LINE#         2227
+  C:8400H         LINE#         2229
+  C:8403H         LINE#         2230
+  C:8406H         LINE#         2233
+  C:8406H         LINE#         2234
+  C:8406H         LINE#         2235
+  C:840BH         LINE#         2236
+  C:8416H         LINE#         2237
+  C:8416H         LINE#         2238
+  C:841CH         LINE#         2239
+  C:841CH         LINE#         2240
+  C:8429H         LINE#         2241
+  C:8429H         LINE#         2242
+  C:8431H         LINE#         2243
+  C:8431H         LINE#         2244
+  C:8434H         LINE#         2245
+  C:8434H         LINE#         2246
+  C:8434H         LINE#         2247
+  -------         ENDPROC       MAIN
+  -------         PROC          _DELAY_MS
+  D:0007H         SYMBOL        ms
+  -------         DO            
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:8544H         LINE#         2259
+  C:8544H         LINE#         2260
+  C:8544H         LINE#         2262
+  C:8544H         LINE#         2263
+  C:8548H         LINE#         2264
+  C:8551H         LINE#         2265
+  C:8553H         LINE#         2266
+  -------         ENDPROC       _DELAY_MS
+  -------         PROC          TESTXRAM
+  -------         DO            
+  D:0009H         SYMBOL        ptc
+  D:000BH         SYMBOL        ptx
+  D:0004H         SYMBOL        i
+  D:000DH         SYMBOL        j
+  -------         ENDDO         
+  C:811EH         LINE#         2270
+  C:811EH         LINE#         2271
+  C:811EH         LINE#         2276
+  C:813DH         LINE#         2277
+  C:8161H         LINE#         2279
+  C:8180H         LINE#         2280
+  C:81A4H         LINE#         2282
+  C:81A7H         LINE#         2283
+  C:81B2H         LINE#         2284
+  C:81B2H         LINE#         2285
+  C:81BAH         LINE#         2286
+  C:81C2H         LINE#         2287
+  C:81C9H         LINE#         2288
+  C:81CEH         LINE#         2289
+  C:81D8H         LINE#         2290
+  C:81DBH         LINE#         2291
+  C:81E6H         LINE#         2292
+  C:81E6H         LINE#         2293
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 5
+
+
+  C:81F2H         LINE#         2294
+  C:81FAH         LINE#         2295
+  C:820EH         LINE#         2296
+  C:821BH         LINE#         2297
+  C:8220H         LINE#         2298
+  C:822AH         LINE#         2300
+  C:822FH         LINE#         2301
+  C:826CH         LINE#         2302
+  C:8271H         LINE#         2303
+  C:8287H         LINE#         2304
+  C:8287H         LINE#         2305
+  C:82A3H         LINE#         2306
+  C:82ABH         LINE#         2307
+  C:82B5H         LINE#         2309
+  C:82B7H         LINE#         2310
+  -------         ENDPROC       TESTXRAM
+  -------         PROC          TXERRORADDRESS
+  -------         DO            
+  D:0009H         SYMBOL        i
+  -------         ENDDO         
+  C:833CH         LINE#         2314
+  C:833CH         LINE#         2315
+  C:833CH         LINE#         2317
+  C:8342H         LINE#         2318
+  C:834BH         LINE#         2319
+  C:8370H         LINE#         2320
+  C:838AH         LINE#         2321
+  C:839EH         LINE#         2322
+  C:83A3H         LINE#         2323
+  C:83B5H         LINE#         2324
+  C:83BAH         LINE#         2325
+  -------         ENDPROC       TXERRORADDRESS
+  -------         PROC          XDATA_TEST
+  -------         DO            
+  D:0008H         SYMBOL        i
+  -------         ENDDO         
+  C:8436H         LINE#         2329
+  C:8436H         LINE#         2330
+  C:8436H         LINE#         2332
+  C:8444H         LINE#         2333
+  C:8444H         LINE#         2334
+  C:844DH         LINE#         2335
+  C:8452H         LINE#         2336
+  C:845EH         LINE#         2337
+  C:846CH         LINE#         2338
+  C:847AH         LINE#         2339
+  C:8488H         LINE#         2340
+  C:849AH         LINE#         2341
+  C:849AH         LINE#         2342
+  -------         ENDPROC       XDATA_TEST
+  C:8522H         SYMBOL        L?0092
+  -------         PROC          L?0091
+  -------         ENDPROC       L?0091
+  C:8522H         SYMBOL        L?0092
+  -------         PROC          _UART1_TXBYTE
+  D:0007H         SYMBOL        dat
+  C:8529H         LINE#         2352
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 6
+
+
+  C:8529H         LINE#         2353
+  C:8529H         LINE#         2354
+  C:852BH         LINE#         2355
+  C:852DH         LINE#         2356
+  C:8530H         LINE#         2357
+  -------         ENDPROC       _UART1_TXBYTE
+  -------         PROC          _PRINTSTRING1
+  D:0001H         SYMBOL        puts
+  C:8531H         LINE#         2368
+  C:8531H         LINE#         2369
+  C:8531H         LINE#         2370
+  C:8543H         LINE#         2371
+  -------         ENDPROC       _PRINTSTRING1
+  -------         PROC          _SETTIMER2BAUDRAYE
+  D:0004H         SYMBOL        dat
+  C:0003H         LINE#         2382
+  C:0007H         LINE#         2383
+  C:0007H         LINE#         2384
+  C:000AH         LINE#         2385
+  C:000DH         LINE#         2386
+  C:0010H         LINE#         2387
+  C:0012H         LINE#         2388
+  C:0016H         LINE#         2389
+  C:0019H         LINE#         2390
+  C:001CH         LINE#         2391
+  -------         ENDPROC       _SETTIMER2BAUDRAYE
+  -------         PROC          _UART1_CONFIG
+  D:0007H         SYMBOL        brt
+  C:849BH         LINE#         2402
+  C:849BH         LINE#         2403
+  C:849BH         LINE#         2405
+  C:84A0H         LINE#         2406
+  C:84A0H         LINE#         2407
+  C:84A3H         LINE#         2408
+  C:84AAH         LINE#         2409
+  C:84ACH         LINE#         2413
+  C:84ACH         LINE#         2414
+  C:84AEH         LINE#         2415
+  C:84B1H         LINE#         2416
+  C:84B4H         LINE#         2417
+  C:84B7H         LINE#         2418
+  C:84BAH         LINE#         2419
+  C:84BDH         LINE#         2420
+  C:84C0H         LINE#         2421
+  C:84C2H         LINE#         2422
+  C:84C5H         LINE#         2423
+  C:84C7H         LINE#         2424
+  C:84C7H         LINE#         2427
+  C:84CFH         LINE#         2429
+  C:84D1H         LINE#         2430
+  C:84D3H         LINE#         2431
+  C:84D6H         LINE#         2432
+  C:84D6H         LINE#         2434
+  C:84D8H         LINE#         2435
+  C:84DBH         LINE#         2436
+  C:84DDH         LINE#         2437
+  -------         ENDPROC       _UART1_CONFIG
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/28/2020  18:04:47  PAGE 7
+
+
+  -------         PROC          UART1_INT
+  C:84DEH         LINE#         2449
+  C:84E6H         LINE#         2451
+  C:84E9H         LINE#         2452
+  C:84E9H         LINE#         2453
+  C:84EBH         LINE#         2454
+  C:84F9H         LINE#         2455
+  C:8507H         LINE#         2456
+  C:8509H         LINE#         2457
+  C:850CH         LINE#         2458
+  C:850CH         LINE#         2460
+  C:850FH         LINE#         2461
+  C:850FH         LINE#         2462
+  C:8511H         LINE#         2463
+  C:8513H         LINE#         2464
+  C:8513H         LINE#         2465
+  -------         ENDPROC       UART1_INT
+  -------         ENDMOD        EXTERNALRAM
+
+  -------         MODULE        ?C?CLDPTR
+  C:82B8H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?UIDIV
+  C:82D1H         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+  -------         MODULE        ?C?SLCMP
+  C:8326H         PUBLIC        ?C?SLCMP
+  -------         ENDMOD        ?C?SLCMP
+
+Program Size: data=19.1 xdata=64 code=34138
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

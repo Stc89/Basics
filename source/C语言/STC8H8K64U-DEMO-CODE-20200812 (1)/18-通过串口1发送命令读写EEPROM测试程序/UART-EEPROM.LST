@@ -1,0 +1,638 @@
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE UART_EEPROM
+OBJECT MODULE PLACED IN UART-EEPROM.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE UART-EEPROM.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          通过串口对STC内部自带的EEPROM(FLASH)进行读写测试。
+  17          
+  18          对FLASH做扇区擦除、写入、读出的操作，命令指定地址。
+  19          
+  20          默认波特率:  115200,8,N,1. 
+  21          默认主时钟:  22.1184MHz.
+  22          
+  23          串口命令设置: (命令字母不区分大小写)
+  24              W 0x0040 1234567890  --> 对0x0040地址写入字符1234567890.
+  25              R 0x0040 10          --> 对0x0040地址读出10个字节数据. 
+  26          
+  27          注意：下载时，下载界面"硬件选项"中设置用户EEPROM大小，
+  28          
+  29          并确保串口命令中的地址在EEPROM设置的大小范围之内。
+  30          
+  31          ******************************************/
+  32          
+  33          #include    "reg51.h"
+  34          #include    "intrins.h"
+  35          
+  36          #define     MAIN_Fosc       22118400L   //定义主时钟（精确计算115200波特率）
+  37          
+  38          typedef     unsigned char   u8;
+  39          typedef     unsigned int    u16;
+  40          typedef     unsigned long   u32;
+  41          
+  42          sfr TH2  = 0xD6;
+  43          sfr TL2  = 0xD7;
+  44          sfr IE2   = 0xAF;
+  45          sfr INT_CLKO = 0x8F;
+  46          sfr AUXR = 0x8E;
+  47          sfr AUXR1 = 0xA2;
+  48          sfr P_SW1 = 0xA2;
+  49          sfr P_SW2 = 0xBA;
+  50          
+  51          sfr IAP_DATA  = 0xC2;
+  52          sfr IAP_ADDRH = 0xC3;
+  53          sfr IAP_ADDRL = 0xC4;
+  54          sfr IAP_CMD   = 0xC5;
+  55          sfr IAP_TRIG  = 0xC6;
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 2   
+
+  56          sfr IAP_CONTR = 0xC7;
+  57          sfr IAP_TPS   = 0xF5;
+  58          
+  59          sfr P4   = 0xC0;
+  60          sfr P5   = 0xC8;
+  61          sfr P6   = 0xE8;
+  62          sfr P7   = 0xF8;
+  63          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  64          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  65          sfr P0M1 = 0x93;
+  66          sfr P0M0 = 0x94;
+  67          sfr P2M1 = 0x95;
+  68          sfr P2M0 = 0x96;
+  69          sfr P3M1 = 0xB1;
+  70          sfr P3M0 = 0xB2;
+  71          sfr P4M1 = 0xB3;
+  72          sfr P4M0 = 0xB4;
+  73          sfr P5M1 = 0xC9;
+  74          sfr P5M0 = 0xCA;
+  75          sfr P6M1 = 0xCB;
+  76          sfr P6M0 = 0xCC;
+  77          sfr P7M1 = 0xE1;
+  78          sfr P7M0 = 0xE2;
+  79          
+  80          sbit P00 = P0^0;
+  81          sbit P01 = P0^1;
+  82          sbit P02 = P0^2;
+  83          sbit P03 = P0^3;
+  84          sbit P04 = P0^4;
+  85          sbit P05 = P0^5;
+  86          sbit P06 = P0^6;
+  87          sbit P07 = P0^7;
+  88          sbit P10 = P1^0;
+  89          sbit P11 = P1^1;
+  90          sbit P12 = P1^2;
+  91          sbit P13 = P1^3;
+  92          sbit P14 = P1^4;
+  93          sbit P15 = P1^5;
+  94          sbit P16 = P1^6;
+  95          sbit P17 = P1^7;
+  96          sbit P20 = P2^0;
+  97          sbit P21 = P2^1;
+  98          sbit P22 = P2^2;
+  99          sbit P23 = P2^3;
+ 100          sbit P24 = P2^4;
+ 101          sbit P25 = P2^5;
+ 102          sbit P26 = P2^6;
+ 103          sbit P27 = P2^7;
+ 104          sbit P30 = P3^0;
+ 105          sbit P31 = P3^1;
+ 106          sbit P32 = P3^2;
+ 107          sbit P33 = P3^3;
+ 108          sbit P34 = P3^4;
+ 109          sbit P35 = P3^5;
+ 110          sbit P36 = P3^6;
+ 111          sbit P37 = P3^7;
+ 112          sbit P40 = P4^0;
+ 113          sbit P41 = P4^1;
+ 114          sbit P42 = P4^2;
+ 115          sbit P43 = P4^3;
+ 116          sbit P44 = P4^4;
+ 117          sbit P45 = P4^5;
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 3   
+
+ 118          sbit P46 = P4^6;
+ 119          sbit P47 = P4^7;
+ 120          sbit P50 = P5^0;
+ 121          sbit P51 = P5^1;
+ 122          sbit P52 = P5^2;
+ 123          sbit P53 = P5^3;
+ 124          sbit P54 = P5^4;
+ 125          sbit P55 = P5^5;
+ 126          sbit P56 = P5^6;
+ 127          sbit P57 = P5^7;
+ 128          
+ 129          
+ 130          #define     Baudrate1           115200L
+ 131          #define     Tmp_Length          100      //读写EEPROM缓冲长度
+ 132          
+ 133          #define     UART1_BUF_LENGTH    (Tmp_Length+9)  //串口缓冲长度
+ 134          
+ 135          u8  RX1_TimeOut;
+ 136          u8  TX1_Cnt;    //发送计数
+ 137          u8  RX1_Cnt;    //接收计数
+ 138          bit B_TX1_Busy; //发送忙标志
+ 139          
+ 140          u8  xdata   RX1_Buffer[UART1_BUF_LENGTH];   //接收缓冲
+ 141          u8  xdata   tmp[Tmp_Length];        //EEPROM操作缓冲
+ 142          
+ 143          
+ 144          void    UART1_config(u8 brt);   // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 145          void    PrintString1(u8 *puts);
+ 146          void    UART1_TxByte(u8 dat);
+ 147          void    delay_ms(u8 ms);
+ 148          u8      CheckData(u8 dat);
+ 149          u16     GetAddress(void);
+ 150          u8      GetDataLength(void);
+ 151          void    EEPROM_SectorErase(u16 EE_address);
+ 152          void    EEPROM_read_n(u16 EE_address,u8 *DataAddress,u8 length);
+ 153          u8      EEPROM_write_n(u16 EE_address,u8 *DataAddress,u8 length);
+ 154          
+ 155          
+ 156          /********************* 主函数 *************************/
+ 157          void main(void)
+ 158          {
+ 159   1          u8  i,j;
+ 160   1          u16 addr;
+ 161   1          u8  status;
+ 162   1      
+ 163   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 164   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 165   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 166   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 167   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 168   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 169   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 170   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 171   1      
+ 172   1          UART1_config(1);    // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 173   1          EA = 1; //允许总中断
+ 174   1      
+ 175   1          PrintString1("STC8H8K64U系列单片机EEPROM测试程序，串口命令设置如下:\r\n");    //SUART1发送一个字符串
+ 176   1          PrintString1("W 0x0040 1234567890  --> 对0x0040地址写入字符1234567890.\r\n");   //SUART1发送一个字符串
+ 177   1          PrintString1("R 0x0040 10          --> 对0x0040地址读出10个字节内容.\r\n"); //SUART1发送一个字符串
+ 178   1      
+ 179   1          while(1)
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 4   
+
+ 180   1          {
+ 181   2              delay_ms(1);
+ 182   2              if(RX1_TimeOut > 0)     //超时计数
+ 183   2              {
+ 184   3                  if(--RX1_TimeOut == 0)
+ 185   3                  {
+ 186   4                    for(i=0; i<RX1_Cnt; i++)    UART1_TxByte(RX1_Buffer[i]);    //把收到的数据原样返回,用于测试
+ 187   4      
+ 188   4                      status = 0xff;  //状态给一个非0值
+ 189   4                      if((RX1_Cnt >= 10) && (RX1_Buffer[1] == ' ') && (RX1_Buffer[8] == ' ')) //最短命令为10个字
+             -节
+ 190   4                      {
+ 191   5                          for(i=0; i<8; i++)
+ 192   5                          {
+ 193   6                              if((RX1_Buffer[i] >= 'a') && (RX1_Buffer[i] <= 'z'))    RX1_Buffer[i] = RX1_Buffer
+             -[i] - 'a' + 'A';  //小写转大写
+ 194   6                          }
+ 195   5                          addr = GetAddress();
+ 196   5                          if(addr < 63488)    //限制在0~123扇区
+ 197   5                          {
+ 198   6                              if(RX1_Buffer[0] == 'W')    //写入N个字节
+ 199   6                              {
+ 200   7                                  j = RX1_Cnt - 9;
+ 201   7                                  if(j > Tmp_Length)  j = Tmp_Length; //越界检测
+ 202   7                                  EEPROM_SectorErase(addr);           //擦除扇区
+ 203   7                                  i = EEPROM_write_n(addr,&RX1_Buffer[9],j);      //写N个字节
+ 204   7                                  if(i == 0)
+ 205   7                                  {
+ 206   8                                      PrintString1("已写入");
+ 207   8                                      if(j >= 100)    {UART1_TxByte(j/100+'0');   j = j % 100;}
+ 208   8                                      if(j >= 10)     {UART1_TxByte(j/10+'0');    j = j % 10;}
+ 209   8                                      UART1_TxByte(j%10+'0');
+ 210   8                                      PrintString1("字节！\r\n");
+ 211   8                                  }
+ 212   7                                  else    PrintString1("写入错误！\r\n");
+ 213   7                                  status = 0; //命令正确
+ 214   7                              }
+ 215   6      
+ 216   6                              else if(RX1_Buffer[0] == 'R')   //PC请求返回N字节EEPROM数据
+ 217   6                              {
+ 218   7                                  j = GetDataLength();
+ 219   7                                  if(j > Tmp_Length)  j = Tmp_Length; //越界检测
+ 220   7                                  if(j > 0)
+ 221   7                                  {
+ 222   8                                      PrintString1("读出");
+ 223   8                                      UART1_TxByte(j/10+'0');
+ 224   8                                      UART1_TxByte(j%10+'0');
+ 225   8                                      PrintString1("个字节内容如下：\r\n");
+ 226   8                                      EEPROM_read_n(addr,tmp,j);
+ 227   8                                      for(i=0; i<j; i++)  UART1_TxByte(tmp[i]);
+ 228   8                                      UART1_TxByte(0x0d);
+ 229   8                                      UART1_TxByte(0x0a);
+ 230   8                                      status = 0; //命令正确
+ 231   8                                  }
+ 232   7                              }
+ 233   6                          }
+ 234   5                      }
+ 235   4                      if(status != 0) PrintString1("命令错误！\r\n");
+ 236   4                      RX1_Cnt  = 0;   //清除字节数
+ 237   4                  }
+ 238   3              }
+ 239   2          }
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 5   
+
+ 240   1      }
+ 241          //========================================================================
+ 242          
+ 243          
+ 244          //========================================================================
+ 245          // 函数: void delay_ms(unsigned char ms)
+ 246          // 描述: 延时函数。
+ 247          // 参数: ms,要延时的ms数, 这里只支持1~255ms. 自动适应主时钟.
+ 248          // 返回: none.
+ 249          // 版本: VER1.0
+ 250          // 日期: 2013-4-1
+ 251          // 备注: 
+ 252          //========================================================================
+ 253          void delay_ms(u8 ms)
+ 254          {
+ 255   1           unsigned int i;
+ 256   1           do{
+ 257   2                i = MAIN_Fosc / 14000;
+ 258   2                while(--i)    ;   //14T per loop
+ 259   2           }while(--ms);
+ 260   1      }
+ 261          
+ 262          //========================================================================
+ 263          // 函数: u8 CheckData(u8 dat)
+ 264          // 描述: 将字符"0~9,A~F或a~f"转成十六进制.
+ 265          // 参数: dat: 要检测的字符.
+ 266          // 返回: 0x00~0x0F为正确. 0xFF为错误.
+ 267          // 版本: V1.0, 2012-10-22
+ 268          //========================================================================
+ 269          u8 CheckData(u8 dat)
+ 270          {
+ 271   1          if((dat >= '0') && (dat <= '9'))        return (dat-'0');
+ 272   1          if((dat >= 'A') && (dat <= 'F'))        return (dat-'A'+10);
+ 273   1          return 0xff;
+ 274   1      }
+ 275          
+ 276          //========================================================================
+ 277          // 函数: u16    GetAddress(void)
+ 278          // 描述: 计算各种输入方式的地址.
+ 279          // 参数: 无.
+ 280          // 返回: 16位EEPROM地址.
+ 281          // 版本: V1.0, 2013-6-6
+ 282          //========================================================================
+ 283          u16 GetAddress(void)
+ 284          {
+ 285   1          u16 address;
+ 286   1          u8  i,j;
+ 287   1          
+ 288   1          address = 0;
+ 289   1          if((RX1_Buffer[2] == '0') && (RX1_Buffer[3] == 'X'))
+ 290   1          {
+ 291   2              for(i=4; i<8; i++)
+ 292   2              {
+ 293   3                  j = CheckData(RX1_Buffer[i]);
+ 294   3                  if(j >= 0x10)   return 65535;   //error
+ 295   3                  address = (address << 4) + j;
+ 296   3              }
+ 297   2              return (address);
+ 298   2          }
+ 299   1          return  65535;  //error
+ 300   1      }
+ 301          
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 6   
+
+ 302          /**************** 获取要读出数据的字节数 ****************************/
+ 303          u8 GetDataLength(void)
+ 304          {
+ 305   1          u8  i;
+ 306   1          u8  length;
+ 307   1          
+ 308   1          length = 0;
+ 309   1          for(i=9; i<RX1_Cnt; i++)
+ 310   1          {
+ 311   2              if(CheckData(RX1_Buffer[i]) >= 10)  break;
+ 312   2              length = length * 10 + CheckData(RX1_Buffer[i]);
+ 313   2          }
+ 314   1          return (length);
+ 315   1      }
+ 316          
+ 317          
+ 318          //========================================================================
+ 319          // 函数: void PrintString1(u8 *puts)
+ 320          // 描述: 串口1发送字符串函数。
+ 321          // 参数: puts:  字符串指针.
+ 322          // 返回: none.
+ 323          // 版本: VER1.0
+ 324          // 日期: 2014-11-28
+ 325          // 备注: 
+ 326          //========================================================================
+ 327          void PrintString1(u8 *puts) //发送一个字符串
+ 328          {
+ 329   1          for (; *puts != 0;  puts++) UART1_TxByte(*puts);    //遇到停止符0结束
+ 330   1      }
+ 331          
+ 332          //========================================================================
+ 333          // 函数: void SetTimer2Baudraye(u16 dat)
+ 334          // 描述: 设置Timer2做波特率发生器。
+ 335          // 参数: dat: Timer2的重装值.
+ 336          // 返回: none.
+ 337          // 版本: VER1.0
+ 338          // 日期: 2014-11-28
+ 339          // 备注: 
+ 340          //========================================================================
+ 341          void SetTimer2Baudraye(u16 dat)  // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 342          {
+ 343   1          AUXR &= ~(1<<4);    //Timer stop
+ 344   1          AUXR &= ~(1<<3);    //Timer2 set As Timer
+ 345   1          AUXR |=  (1<<2);    //Timer2 set as 1T mode
+ 346   1          TH2 = dat / 256;
+ 347   1          TL2 = dat % 256;
+ 348   1          IE2  &= ~(1<<2);    //禁止中断
+ 349   1          AUXR |=  (1<<4);    //Timer run enable
+ 350   1      }
+ 351          
+ 352          //========================================================================
+ 353          // 函数: void UART1_config(u8 brt)
+ 354          // 描述: UART1初始化函数。
+ 355          // 参数: brt: 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 356          // 返回: none.
+ 357          // 版本: VER1.0
+ 358          // 日期: 2014-11-28
+ 359          // 备注: 
+ 360          //========================================================================
+ 361          void UART1_config(u8 brt)    // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 362          {
+ 363   1          /*********** 波特率使用定时器2 *****************/
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 7   
+
+ 364   1          if(brt == 2)
+ 365   1          {
+ 366   2              AUXR |= 0x01;       //S1 BRT Use Timer2;
+ 367   2              SetTimer2Baudraye(65536UL - (MAIN_Fosc / 4) / Baudrate1);
+ 368   2          }
+ 369   1          /*********** 波特率使用定时器1 *****************/
+ 370   1          else
+ 371   1          {
+ 372   2              TR1 = 0;
+ 373   2              AUXR &= ~0x01;      //S1 BRT Use Timer1;
+ 374   2              AUXR |=  (1<<6);    //Timer1 set as 1T mode
+ 375   2              TMOD &= ~(1<<6);    //Timer1 set As Timer
+ 376   2              TMOD &= ~0x30;      //Timer1_16bitAutoReload;
+ 377   2              TH1 = (u8)((65536UL - (MAIN_Fosc / 4) / Baudrate1) / 256);
+ 378   2              TL1 = (u8)((65536UL - (MAIN_Fosc / 4) / Baudrate1) % 256);
+ 379   2              ET1 = 0;    //禁止中断
+ 380   2              INT_CLKO &= ~0x02;  //不输出时钟
+ 381   2              TR1  = 1;
+ 382   2          }
+ 383   1          /*************************************************/
+ 384   1      
+ 385   1          SCON = (SCON & 0x3f) | 0x40;    //UART1模式, 0x00: 同步移位输出, 0x40: 8位数据,可变波特率, 0x80: 9位数
+             -据,固定波特率, 0xc0: 9位数据,可变波特率
+ 386   1      //  PS  = 1;    //高优先级中断
+ 387   1          ES  = 1;    //允许中断
+ 388   1          REN = 1;    //允许接收
+ 389   1          P_SW1 &= 0x3f;
+ 390   1          P_SW1 |= 0x00;      //UART1 switch to, 0x00: P3.0 P3.1, 0x40: P3.6 P3.7, 0x80: P1.6 P1.7 (必须使用内部
+             -时钟)
+ 391   1      //  PCON2 |=  (1<<4);   //内部短路RXD与TXD, 做中继, ENABLE,DISABLE
+ 392   1      
+ 393   1          B_TX1_Busy = 0;
+ 394   1          TX1_Cnt = 0;
+ 395   1          RX1_Cnt = 0;
+ 396   1          RX1_TimeOut = 0;
+ 397   1      }
+ 398          
+ 399          
+ 400          //========================================================================
+ 401          // 函数: void UART1_TxByte(u8 dat)
+ 402          // 描述: 发送一个字节.
+ 403          // 参数: 无.
+ 404          // 返回: 无.
+ 405          // 版本: V1.0, 2014-6-30
+ 406          //========================================================================
+ 407          void UART1_TxByte(u8 dat)
+ 408          {
+ 409   1          SBUF = dat;
+ 410   1          B_TX1_Busy = 1;
+ 411   1          while(B_TX1_Busy);
+ 412   1      }
+ 413          
+ 414          
+ 415          //========================================================================
+ 416          // 函数: void UART1_int (void) interrupt UART1_VECTOR
+ 417          // 描述: UART1中断函数。
+ 418          // 参数: nine.
+ 419          // 返回: none.
+ 420          // 版本: VER1.0
+ 421          // 日期: 2014-11-28
+ 422          // 备注: 
+ 423          //========================================================================
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 8   
+
+ 424          void UART1_int (void) interrupt 4
+ 425          {
+ 426   1          if(RI)
+ 427   1          {
+ 428   2              RI = 0;
+ 429   2              if(RX1_Cnt >= UART1_BUF_LENGTH) RX1_Cnt = 0;
+ 430   2              RX1_Buffer[RX1_Cnt] = SBUF;
+ 431   2              RX1_Cnt++;
+ 432   2              RX1_TimeOut = 5;
+ 433   2          }
+ 434   1      
+ 435   1          if(TI)
+ 436   1          {
+ 437   2              TI = 0;
+ 438   2              B_TX1_Busy = 0;
+ 439   2          }
+ 440   1      }
+ 441          
+ 442          
+ 443          #define     IAP_STANDBY()   IAP_CMD = 0     //IAP空闲命令（禁止）
+ 444          #define     IAP_READ()      IAP_CMD = 1     //IAP读出命令
+ 445          #define     IAP_WRITE()     IAP_CMD = 2     //IAP写入命令
+ 446          #define     IAP_ERASE()     IAP_CMD = 3     //IAP擦除命令
+ 447          
+ 448          #define     IAP_ENABLE()    IAP_CONTR = IAP_EN; IAP_TPS = MAIN_Fosc / 1000000
+ 449          #define     IAP_DISABLE()   IAP_CONTR = 0; IAP_CMD = 0; IAP_TRIG = 0; IAP_ADDRH = 0xff; IAP_ADDRL = 0xff
+ 450          
+ 451          #define IAP_EN          (1<<7)
+ 452          #define IAP_SWBS        (1<<6)
+ 453          #define IAP_SWRST       (1<<5)
+ 454          #define IAP_CMD_FAIL    (1<<4)
+ 455          
+ 456          
+ 457          //========================================================================
+ 458          // 函数: void DisableEEPROM(void)
+ 459          // 描述: 禁止EEPROM.
+ 460          // 参数: none.
+ 461          // 返回: none.
+ 462          // 版本: V1.0, 2014-6-30
+ 463          //========================================================================
+ 464          void DisableEEPROM(void)        //禁止访问EEPROM
+ 465          {
+ 466   1          IAP_CONTR = 0;          //关闭 IAP 功能
+ 467   1          IAP_CMD = 0;            //清除命令寄存器
+ 468   1          IAP_TRIG = 0;           //清除触发寄存器
+ 469   1          IAP_ADDRH = 0xff;       //将地址设置到非 IAP 区域
+ 470   1          IAP_ADDRL = 0xff;
+ 471   1      }
+ 472          
+ 473          //========================================================================
+ 474          // 函数: void EEPROM_Trig(void)
+ 475          // 描述: 触发EEPROM操作.
+ 476          // 参数: none.
+ 477          // 返回: none.
+ 478          // 版本: V1.0, 2014-6-30
+ 479          //========================================================================
+ 480          void EEPROM_Trig(void)
+ 481          {
+ 482   1          F0 = EA;    //保存全局中断
+ 483   1          EA = 0;     //禁止中断, 避免触发命令无效
+ 484   1          IAP_TRIG = 0x5A;
+ 485   1          IAP_TRIG = 0xA5;                    //先送5AH，再送A5H到IAP触发寄存器，每次都需要如此
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 9   
+
+ 486   1                                              //送完A5H后，IAP命令立即被触发启动
+ 487   1                                              //CPU等待IAP完成后，才会继续执行程序。
+ 488   1          _nop_();
+ 489   1          _nop_();
+ 490   1          EA = F0;    //恢复全局中断
+ 491   1      }
+ 492          
+ 493          //========================================================================
+ 494          // 函数: void EEPROM_SectorErase(u16 EE_address)
+ 495          // 描述: 擦除一个扇区.
+ 496          // 参数: EE_address:  要擦除的EEPROM的扇区中的一个字节地址.
+ 497          // 返回: none.
+ 498          // 版本: V1.0, 2014-6-30
+ 499          //========================================================================
+ 500          void EEPROM_SectorErase(u16 EE_address)
+ 501          {
+ 502   1          IAP_ENABLE();                       //设置等待时间，允许IAP操作，送一次就够
+ 503   1          IAP_ERASE();                        //宏调用, 送扇区擦除命令，命令不需改变时，不需重新送命令
+ 504   1                                              //只有扇区擦除，没有字节擦除，512字节/扇区。
+ 505   1                                              //扇区中任意一个字节地址都是扇区地址。
+ 506   1          IAP_ADDRH = EE_address / 256;       //送扇区地址高字节（地址需要改变时才需重新送地址）
+ 507   1          IAP_ADDRL = EE_address % 256;       //送扇区地址低字节
+ 508   1          EEPROM_Trig();                      //触发EEPROM操作
+ 509   1          DisableEEPROM();                    //禁止EEPROM操作
+ 510   1      }
+ 511          
+ 512          //========================================================================
+ 513          // 函数: void EEPROM_read_n(u16 EE_address,u8 *DataAddress,u8 lenth)
+ 514          // 描述: 读N个字节函数.
+ 515          // 参数: EE_address:  要读出的EEPROM的首地址.
+ 516          //       DataAddress: 要读出数据的指针.
+ 517          //       length:      要读出的长度
+ 518          // 返回: 0: 写入正确.  1: 写入长度为0错误.  2: 写入数据错误.
+ 519          // 版本: V1.0, 2014-6-30
+ 520          //========================================================================
+ 521          void EEPROM_read_n(u16 EE_address,u8 *DataAddress,u8 length)
+ 522          {
+ 523   1          IAP_ENABLE();                           //设置等待时间，允许IAP操作，送一次就够
+ 524   1          IAP_READ();                             //送字节读命令，命令不需改变时，不需重新送命令
+ 525   1          do
+ 526   1          {
+ 527   2              IAP_ADDRH = EE_address / 256;       //送地址高字节（地址需要改变时才需重新送地址）
+ 528   2              IAP_ADDRL = EE_address % 256;       //送地址低字节
+ 529   2              EEPROM_Trig();                      //触发EEPROM操作
+ 530   2              *DataAddress = IAP_DATA;            //读出的数据送往
+ 531   2              EE_address++;
+ 532   2              DataAddress++;
+ 533   2          }while(--length);
+ 534   1      
+ 535   1          DisableEEPROM();
+ 536   1      }
+ 537          
+ 538          
+ 539          //========================================================================
+ 540          // 函数: u8 EEPROM_write_n(u16 EE_address,u8 *DataAddress,u8 length)
+ 541          // 描述: 写N个字节函数.
+ 542          // 参数: EE_address:  要写入的EEPROM的首地址.
+ 543          //       DataAddress: 要写入数据的指针.
+ 544          //       length:      要写入的长度
+ 545          // 返回: 0: 写入正确.  1: 写入长度为0错误.  2: 写入数据错误.
+ 546          // 版本: V1.0, 2014-6-30
+ 547          //========================================================================
+C51 COMPILER V9.59.0.0   UART_EEPROM                                                       07/24/2020 10:49:47 PAGE 10  
+
+ 548          u8 EEPROM_write_n(u16 EE_address,u8 *DataAddress,u8 length)
+ 549          {
+ 550   1          u8  i;
+ 551   1          u16 j;
+ 552   1          u8  *p;
+ 553   1          
+ 554   1          if(length == 0) return 1;   //长度为0错误
+ 555   1      
+ 556   1          IAP_ENABLE();                       //设置等待时间，允许IAP操作，送一次就够
+ 557   1          i = length;
+ 558   1          j = EE_address;
+ 559   1          p = DataAddress;
+ 560   1          IAP_WRITE();                            //宏调用, 送字节写命令
+ 561   1          do
+ 562   1          {
+ 563   2              IAP_ADDRH = EE_address / 256;       //送地址高字节（地址需要改变时才需重新送地址）
+ 564   2              IAP_ADDRL = EE_address % 256;       //送地址低字节
+ 565   2              IAP_DATA  = *DataAddress;           //送数据到IAP_DATA，只有数据改变时才需重新送
+ 566   2              EEPROM_Trig();                      //触发EEPROM操作
+ 567   2              EE_address++;                       //下一个地址
+ 568   2              DataAddress++;                      //下一个数据
+ 569   2          }while(--length);                       //直到结束
+ 570   1      
+ 571   1          EE_address = j;
+ 572   1          length = i;
+ 573   1          DataAddress = p;
+ 574   1          i = 0;
+ 575   1          IAP_READ();                             //读N个字节并比较
+ 576   1          do
+ 577   1          {
+ 578   2              IAP_ADDRH = EE_address / 256;       //送地址高字节（地址需要改变时才需重新送地址）
+ 579   2              IAP_ADDRL = EE_address % 256;       //送地址低字节
+ 580   2              EEPROM_Trig();                      //触发EEPROM操作
+ 581   2              if(*DataAddress != IAP_DATA)        //读出的数据与源数据比较
+ 582   2              {
+ 583   3                  i = 2;
+ 584   3                  break;
+ 585   3              }
+ 586   2              EE_address++;
+ 587   2              DataAddress++;
+ 588   2          }while(--length);
+ 589   1      
+ 590   1          DisableEEPROM();
+ 591   1          return i;
+ 592   1      }
+ 593          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1150    ----
+   CONSTANT SIZE    =    238    ----
+   XDATA SIZE       =    209    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3      26
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,15 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\Administrator\Desktop\STC8最小系统资料包\例程\05.EEPROM TEST\IO-LED.uvproj
+Project File Date:  05/27/2020
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling main.c...
+linking...
+Program Size: data=53.2 xdata=0 code=1510
+creating hex file from ".\list\IO-LED"...
+".\list\IO-LED" - 0 Error(s), 0 Warning(s).

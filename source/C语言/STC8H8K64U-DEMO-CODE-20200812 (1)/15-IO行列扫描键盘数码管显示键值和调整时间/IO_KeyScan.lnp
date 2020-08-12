@@ -1,0 +1,3 @@
+"IO_KeyScan.obj" 
+TO "IO_KeyScan" 
+RAMSIZE(256) 

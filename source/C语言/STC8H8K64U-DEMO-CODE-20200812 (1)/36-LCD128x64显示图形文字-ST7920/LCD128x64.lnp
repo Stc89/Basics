@@ -1,0 +1,3 @@
+"LCD128x64.obj" 
+TO "LCD128x64" 
+RAMSIZE(256) 

@@ -1,0 +1,462 @@
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE POWNDOWNSAVE
+OBJECT MODULE PLACED IN PownDownSave.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE PownDownSave.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 -----------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序        */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          用STC的MCU的IO方式驱动8位数码管。
+  17          
+  18          使用Timer0的16位自动重装来产生1ms节拍,程序运行于这个节拍下,用户修改MCU主时钟频率时,自动定时于1ms.
+  19          
+  20          用户可以在"用户定义宏"中修改掉电保存的EEPROM地址。
+  21          
+  22          显示效果为: 上电后显示秒计数, 计数范围为0~10000，显示在右边的5个数码管。
+  23          
+  24          当掉电后，MCU进入低压中断，对秒计数进行保存。MCU上电时读出秒计数继续显示。
+  25          
+  26          用户可以在"用户定义宏"中选择滤波电容大还是小。
+  27          大的电容(比如1000uF)，则掉电后保持的时间长，可以在低压中断中擦除后(需要20多ms时间)然后写入。
+  28          小的电容，则掉电后保持的时间短, 则必须在主程序初始化时先擦除.
+  29          
+  30          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  31          注意：下载时，下载界面"硬件选项"中下面的项要固定如下设置:
+  32          
+  33          不勾选  允许低压复位(禁止低压中断)。
+  34          
+  35          设置用户EEPROM大小，并确保"用户定义宏"中设定的地址在EEPROM设置的大小范围之内。
+  36          
+  37          选择时钟 24MHZ (用户可自行修改频率)。
+  38          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  39          
+  40          ******************************************/
+  41          
+  42          #include    "reg51.h"
+  43          #include    "intrins.h"
+  44          
+  45          #define     MAIN_Fosc       24000000L   //定义主时钟
+  46          
+  47          #define     Timer0_16bitAutoReload()    TMOD &= ~0x03                   //16位自动重装
+  48          #define     Timer0_16bit()              TMOD  = (TMOD & ~0x03) | 0x01   //16位
+  49          #define     Timer0_8bitAutoReload()     TMOD  = (TMOD & ~0x03) | 0x02   //8位自动重装
+  50          #define     Timer0_16bitAutoRL_NoMask() TMOD |=  0x03       //16位自动重装不可屏蔽中断
+  51          #define     Timer0_AsCounterP32()       TMOD |=  4      //时器0用做计数器
+  52          #define     Timer0_AsTimer()            TMOD &= ~4      //时器0用做定时器
+  53          #define     Timer0_ExtControlP34()      TMOD |=  4      //时器0由外部INT0高电平允许定时计数
+  54          #define     Timer0_Run()                TR0 = 1             //允许定时器0计数
+  55          #define     Timer0_Stop()               TR0 = 0             //禁止定时器0计数
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 2   
+
+  56          #define     Timer0_InterruptEnable()    ET0 = 1             //允许Timer1中断.
+  57          #define     Timer0_InterruptDisable()   ET0 = 0             //禁止Timer1中断.
+  58          #define     Timer0_1T()                 AUXR |=  (1<<7) //Timer0 clodk = fo
+  59          #define     Timer0_12T()                AUXR &= ~(1<<7) //Timer0 clodk = fo/12  12分频, default
+  60          #define     Timer0_Load(n)      TH0 = (n) / 256,    TL0 = (n) % 256
+  61          
+  62          typedef     unsigned char   u8;
+  63          typedef     unsigned int    u16;
+  64          typedef     unsigned long   u32;
+  65          
+  66          sfr TH2  = 0xD6;
+  67          sfr TL2  = 0xD7;
+  68          sfr IE2   = 0xAF;
+  69          sfr INT_CLKO = 0x8F;
+  70          sfr AUXR = 0x8E;
+  71          sfr AUXR1 = 0xA2;
+  72          sfr P_SW1 = 0xA2;
+  73          sfr P_SW2 = 0xBA;
+  74          
+  75          sfr IAP_DATA  = 0xC2;
+  76          sfr IAP_ADDRH = 0xC3;
+  77          sfr IAP_ADDRL = 0xC4;
+  78          sfr IAP_CMD   = 0xC5;
+  79          sfr IAP_TRIG  = 0xC6;
+  80          sfr IAP_CONTR = 0xC7;
+  81          sfr IAP_TPS   = 0xF5;
+  82          
+  83          sfr ADCCFG = 0xde;
+  84          
+  85          sfr P4   = 0xC0;
+  86          sfr P5   = 0xC8;
+  87          sfr P6   = 0xE8;
+  88          sfr P7   = 0xF8;
+  89          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  90          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  91          sfr P0M1 = 0x93;
+  92          sfr P0M0 = 0x94;
+  93          sfr P2M1 = 0x95;
+  94          sfr P2M0 = 0x96;
+  95          sfr P3M1 = 0xB1;
+  96          sfr P3M0 = 0xB2;
+  97          sfr P4M1 = 0xB3;
+  98          sfr P4M0 = 0xB4;
+  99          sfr P5M1 = 0xC9;
+ 100          sfr P5M0 = 0xCA;
+ 101          sfr P6M1 = 0xCB;
+ 102          sfr P6M0 = 0xCC;
+ 103          sfr P7M1 = 0xE1;
+ 104          sfr P7M0 = 0xE2;
+ 105          
+ 106          sbit P00 = P0^0;
+ 107          sbit P01 = P0^1;
+ 108          sbit P02 = P0^2;
+ 109          sbit P03 = P0^3;
+ 110          sbit P04 = P0^4;
+ 111          sbit P05 = P0^5;
+ 112          sbit P06 = P0^6;
+ 113          sbit P07 = P0^7;
+ 114          sbit P10 = P1^0;
+ 115          sbit P11 = P1^1;
+ 116          sbit P12 = P1^2;
+ 117          sbit P13 = P1^3;
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 3   
+
+ 118          sbit P14 = P1^4;
+ 119          sbit P15 = P1^5;
+ 120          sbit P16 = P1^6;
+ 121          sbit P17 = P1^7;
+ 122          sbit P20 = P2^0;
+ 123          sbit P21 = P2^1;
+ 124          sbit P22 = P2^2;
+ 125          sbit P23 = P2^3;
+ 126          sbit P24 = P2^4;
+ 127          sbit P25 = P2^5;
+ 128          sbit P26 = P2^6;
+ 129          sbit P27 = P2^7;
+ 130          sbit P30 = P3^0;
+ 131          sbit P31 = P3^1;
+ 132          sbit P32 = P3^2;
+ 133          sbit P33 = P3^3;
+ 134          sbit P34 = P3^4;
+ 135          sbit P35 = P3^5;
+ 136          sbit P36 = P3^6;
+ 137          sbit P37 = P3^7;
+ 138          sbit P40 = P4^0;
+ 139          sbit P41 = P4^1;
+ 140          sbit P42 = P4^2;
+ 141          sbit P43 = P4^3;
+ 142          sbit P44 = P4^4;
+ 143          sbit P45 = P4^5;
+ 144          sbit P46 = P4^6;
+ 145          sbit P47 = P4^7;
+ 146          sbit P50 = P5^0;
+ 147          sbit P51 = P5^1;
+ 148          sbit P52 = P5^2;
+ 149          sbit P53 = P5^3;
+ 150          sbit P54 = P5^4;
+ 151          sbit P55 = P5^5;
+ 152          sbit P56 = P5^6;
+ 153          sbit P57 = P5^7;
+ 154          
+ 155          sbit ELVD = IE^6;   //低压监测中断允许位
+ 156          sbit PLVD   = IP^6;
+ 157          
+ 158          #define DIS_DOT     0x20
+ 159          #define DIS_BLACK   0x10
+ 160          #define DIS_        0x11
+ 161          
+ 162          /****************************** 用户定义宏 ***********************************/
+ 163          
+ 164          #define     LargeCapacitor  0   //0: 滤波电容比较小,  1: 滤波电容比较大
+ 165          
+ 166          #define     EE_ADDRESS  0x0000  //保存的EEPROM起始地址
+ 167          
+ 168          #define     Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 169          
+ 170          #define     Tip_Delay   (MAIN_Fosc / 1000000)
+ 171          
+ 172          /*****************************************************************************/
+ 173          
+ 174          
+ 175          /*************  本地常量声明    **************/
+ 176          u8 code t_display[]={                       //标准字库
+ 177          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 178              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 179          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 4   
+
+ 180              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 181              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 182          
+ 183          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 184          
+ 185          
+ 186          u8  LED8[8];        //显示缓冲
+ 187          u8  display_index;  //显示位索引
+ 188          bit B_1ms;          //1ms标志
+ 189          u16 msecond;
+ 190          
+ 191          u16 Test_cnt;   //测试用的秒计数变量
+ 192          u8  tmp[2];     //通用数组
+ 193          
+ 194          
+ 195          void    Display(void);
+ 196          void    DisableEEPROM(void);
+ 197          void    EEPROM_read_n(u16 EE_address,u8 *DataAddress,u16 number);
+ 198          void    EEPROM_write_n(u16 EE_address,u8 *DataAddress,u16 number);
+ 199          void    EEPROM_SectorErase(u16 EE_address);
+ 200          
+ 201          /********************** 主函数 ************************/
+ 202          void main(void)
+ 203          {
+ 204   1          u8  i;
+ 205   1          
+ 206   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 207   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 208   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 209   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 210   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 211   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 212   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 213   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 214   1      
+ 215   1          display_index = 0;
+ 216   1          for(i=0; i<8; i++)  LED8[i] = DIS_BLACK;    //全部消隐
+ 217   1          
+ 218   1          Timer0_1T();
+ 219   1          Timer0_AsTimer();
+ 220   1          Timer0_16bitAutoReload();
+ 221   1          Timer0_Load(Timer0_Reload);
+ 222   1          Timer0_InterruptEnable();
+ 223   1          Timer0_Run();
+ 224   1          EA = 1;     //打开总中断
+ 225   1          
+ 226   1          for(msecond=0; msecond < 200; ) //延时200ms
+ 227   1          {
+ 228   2              if(B_1ms)   //1ms到
+ 229   2              {
+ 230   3                  B_1ms = 0;
+ 231   3                  msecond ++;
+ 232   3              }
+ 233   2          }
+ 234   1      
+ 235   1          EEPROM_read_n(EE_ADDRESS,tmp,2);        //读出2字节
+ 236   1          Test_cnt = ((u16)tmp[0] << 8) + tmp[1]; //秒计数
+ 237   1          if(Test_cnt > 10000)    Test_cnt = 0;   //秒计数范围为0~10000
+ 238   1          
+ 239   1          #if (LargeCapacitor == 0)   //滤波电容比较小，电容保持时间比较短，则先擦除
+ 240   1              EEPROM_SectorErase(EE_ADDRESS); //擦除一个扇区
+ 241   1          #endif
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 5   
+
+ 242   1          
+ 243   1          Display();      //显示秒计数
+ 244   1          
+ 245   1          PCON = PCON & ~(1<<5);  //低压检测标志清0
+ 246   1          ELVD = 1;   //低压监测中断允许
+ 247   1          PLVD = 1;   //低压中断 优先级高
+ 248   1      
+ 249   1          while(1)
+ 250   1          {
+ 251   2              if(B_1ms)   //1ms到
+ 252   2              {
+ 253   3                  B_1ms = 0;
+ 254   3                  if(++msecond >= 1000)   //1秒到
+ 255   3                  {
+ 256   4                      msecond = 0;        //清1000ms计数
+ 257   4                      Test_cnt++;         //秒计数+1
+ 258   4                      if(Test_cnt > 10000)    Test_cnt = 0;   //秒计数范围为0~10000
+ 259   4                      Display();          //显示秒计数
+ 260   4                  }
+ 261   3              }
+ 262   2          }
+ 263   1      } 
+ 264          /**********************************************/
+ 265          
+ 266          /********************** 低压中断函数 ************************/
+ 267          void LVD_Routine(void) interrupt 6
+ 268          {
+ 269   1          u8  i;
+ 270   1      
+ 271   1          P7 = 0xff;     //先关闭显示，省电
+ 272   1          
+ 273   1          #if (LargeCapacitor > 0)    //滤波电容比较大，电容保持时间比较长(50ms以上)，则在中断里擦除
+                      EEPROM_SectorErase(EE_ADDRESS); //擦除一个扇区
+                  #endif
+ 276   1      
+ 277   1          tmp[0] = (u8)(Test_cnt >> 8);
+ 278   1          tmp[1] = (u8)Test_cnt;
+ 279   1          EEPROM_write_n(EE_ADDRESS,tmp,2);
+ 280   1      
+ 281   1          while(PCON & (1<<5))            //检测是否仍然低电压
+ 282   1          {
+ 283   2              PCON = PCON & ~(1<<5);      //低压检测标志清0
+ 284   2              for(i=0; i<100; i++)    ;   //延时一下
+ 285   2          }
+ 286   1      }
+ 287          
+ 288          /********************** 显示计数函数 ************************/
+ 289          void Display(void)
+ 290          {
+ 291   1          u8  i;
+ 292   1          
+ 293   1          LED8[3] = Test_cnt / 10000;
+ 294   1          LED8[4] = (Test_cnt % 10000) / 1000;
+ 295   1          LED8[5] = (Test_cnt % 1000) / 100;
+ 296   1          LED8[6] = (Test_cnt % 100) / 10;
+ 297   1          LED8[7] = Test_cnt % 10;
+ 298   1          
+ 299   1          for(i=3; i<7; i++)  //消无效0
+ 300   1          {
+ 301   2              if(LED8[i] > 0) break;
+ 302   2              LED8[i] = DIS_BLACK;
+ 303   2          }
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 6   
+
+ 304   1      }
+ 305          
+ 306          //========================================================================
+ 307          // 函数: void   ISP_Disable(void)
+ 308          // 描述: 禁止访问ISP/IAP.
+ 309          // 参数: non.
+ 310          // 返回: non.
+ 311          // 版本: V1.0, 2012-10-22
+ 312          //========================================================================
+ 313          void DisableEEPROM(void)
+ 314          {
+ 315   1          IAP_CONTR = 0;          //关闭 IAP 功能
+ 316   1          IAP_CMD = 0;            //清除命令寄存器
+ 317   1          IAP_TRIG = 0;           //清除触发寄存器
+ 318   1          IAP_ADDRH = 0x80;       //将地址设置到非 IAP 区域
+ 319   1          IAP_ADDRL = 0;
+ 320   1      }
+ 321          
+ 322          //========================================================================
+ 323          // 函数: void EEPROM_read_n(u16 EE_address,u8 *DataAddress,u16 number)
+ 324          // 描述: 从指定EEPROM首地址读出n个字节放指定的缓冲.
+ 325          // 参数: EE_address:  读出EEPROM的首地址.
+ 326          //       DataAddress: 读出数据放缓冲的首地址.
+ 327          //       number:      读出的字节长度.
+ 328          // 返回: non.
+ 329          // 版本: V1.0, 2012-10-22
+ 330          //========================================================================
+ 331          void EEPROM_read_n(u16 EE_address,u8 *DataAddress,u16 number)
+ 332          {
+ 333   1          EA = 0;     //禁止中断
+ 334   1      
+ 335   1          IAP_CONTR = 0x80; //使能 IAP
+ 336   1          IAP_TPS = Tip_Delay; //设置擦除等待参数 24MHz
+ 337   1          IAP_CMD = 1;  //设置 IAP 读命令
+ 338   1          do
+ 339   1          {
+ 340   2              IAP_ADDRH = EE_address / 256; //设置 IAP 地址高字节
+ 341   2              IAP_ADDRL = EE_address % 256; //设置 IAP 地址低字节
+ 342   2              IAP_TRIG = 0x5a; //写触发命令(0x5a)
+ 343   2              IAP_TRIG = 0xa5; //写触发命令(0xa5)
+ 344   2              _nop_();
+ 345   2              *DataAddress = IAP_DATA; //读 IAP 数据
+ 346   2              EE_address++;
+ 347   2              DataAddress++;
+ 348   2          }while(--number);
+ 349   1          DisableEEPROM();
+ 350   1          EA = 1;     //重新允许中断
+ 351   1      }
+ 352          
+ 353          
+ 354          /******************** 扇区擦除函数 *****************/
+ 355          //========================================================================
+ 356          // 函数: void EEPROM_SectorErase(u16 EE_address)
+ 357          // 描述: 把指定地址的EEPROM扇区擦除.
+ 358          // 参数: EE_address:  要擦除的扇区EEPROM的地址.
+ 359          // 返回: non.
+ 360          // 版本: V1.0, 2013-5-10
+ 361          //========================================================================
+ 362          void EEPROM_SectorErase(u16 EE_address)
+ 363          {
+ 364   1          EA = 0;     //禁止中断
+ 365   1      
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 7   
+
+ 366   1          IAP_CONTR = 0x80; //使能 IAP
+ 367   1          IAP_TPS = Tip_Delay;     //设置擦除等待参数 24MHz
+ 368   1          IAP_CMD = 3;      //设置 IAP 擦除命令
+ 369   1          IAP_ADDRH = EE_address / 256; //设置 IAP 地址高字节
+ 370   1          IAP_ADDRL = EE_address % 256; //设置 IAP 地址低字节
+ 371   1          IAP_TRIG = 0x5a; //写触发命令(0x5a)
+ 372   1          IAP_TRIG = 0xa5; //写触发命令(0xa5)
+ 373   1          _nop_();
+ 374   1          DisableEEPROM();
+ 375   1          EA = 1;     //重新允许中断
+ 376   1      }
+ 377          
+ 378          //========================================================================
+ 379          // 函数: void EEPROM_write_n(u16 EE_address,u8 *DataAddress,u16 number)
+ 380          // 描述: 把缓冲的n个字节写入指定首地址的EEPROM.
+ 381          // 参数: EE_address:  写入EEPROM的首地址.
+ 382          //       DataAddress: 写入源数据的缓冲的首地址.
+ 383          //       number:      写入的字节长度.
+ 384          // 返回: non.
+ 385          // 版本: V1.0, 2012-10-22
+ 386          //========================================================================
+ 387          void EEPROM_write_n(u16 EE_address,u8 *DataAddress,u16 number)
+ 388          {
+ 389   1          EA = 0;     //禁止中断
+ 390   1      
+ 391   1          IAP_CONTR = 0x80; //使能 IAP
+ 392   1          IAP_TPS = Tip_Delay; //设置擦除等待参数 24MHz
+ 393   1          IAP_CMD = 2;  //设置 IAP 写命令
+ 394   1          do
+ 395   1          {
+ 396   2              IAP_ADDRH = EE_address / 256; //设置 IAP 地址高字节
+ 397   2              IAP_ADDRL = EE_address % 256; //设置 IAP 地址低字节
+ 398   2              IAP_DATA = *DataAddress; //写 IAP 数据
+ 399   2              IAP_TRIG = 0x5a; //写触发命令(0x5a)
+ 400   2              IAP_TRIG = 0xa5; //写触发命令(0xa5)
+ 401   2              _nop_();
+ 402   2              EE_address++;
+ 403   2              DataAddress++;
+ 404   2          }while(--number);
+ 405   1      
+ 406   1          DisableEEPROM();
+ 407   1          EA = 1;     //重新允许中断
+ 408   1      }
+ 409          
+ 410          
+ 411          /********************** 显示扫描函数 ************************/
+ 412          void DisplayScan(void)
+ 413          {   
+ 414   1          P7 = ~T_COM[7-display_index];
+ 415   1          P6 = ~t_display[LED8[display_index]];
+ 416   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 417   1      }
+ 418          
+ 419          
+ 420          /********************** Timer0 1ms中断函数 ************************/
+ 421          void timer0 (void) interrupt 1
+ 422          {
+ 423   1          DisplayScan();  //1ms扫描显示一位
+ 424   1          B_1ms = 1;      //1ms标志
+ 425   1      }
+
+
+C51 COMPILER V9.59.0.0   POWNDOWNSAVE                                                      07/24/2020 10:54:03 PAGE 8   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    742    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     15      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

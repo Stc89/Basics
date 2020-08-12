@@ -1,0 +1,3 @@
+"MCLK.obj" 
+TO "MCLK" 
+RAMSIZE(256) 

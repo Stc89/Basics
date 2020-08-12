@@ -1,0 +1,805 @@
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE SPI_PM25LV040
+OBJECT MODULE PLACED IN SPI-PM25LV040.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE SPI-PM25LV040.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          /*************  功能说明    **************
+  14          
+  15          通过串口对PM25LV040进行读写测试。
+  16          
+  17          对FLASH做扇区擦除、写入、读出的操作，命令指定地址。
+  18          
+  19          默认波特率:  115200,8,N,1. 可以在"串口初始化函数"里修改.
+  20          
+  21          串口命令设置: (字母不区分大小写)
+  22              E 0x001234              --> 扇区擦除，指定十六进制地址.
+  23              W 0x001234 1234567890   --> 写入操作，指定十六进制地址，后面为写入内容.
+  24              R 0x001234 16           --> 读出操作，指定十六进制地址，后面为读出字节数. 
+  25              C                       --> 如果检测不到PM25LV040, 发送C强制允许操作.
+  26          
+  27          注意：为了通用，程序不识别地址是否有效，用户自己根据具体的型号来决定。
+  28          
+  29          下载时, 选择时钟 22.1184MHz (用户可自行修改频率).
+  30          
+  31          ******************************************/
+  32          
+  33          #include    "reg51.h"
+  34          #include    "intrins.h"
+  35          
+  36          #define     MAIN_Fosc       22118400L   //定义主时钟（精确计算115200波特率）
+  37          
+  38          typedef     unsigned char   u8;
+  39          typedef     unsigned int    u16;
+  40          typedef     unsigned long   u32;
+  41          
+  42          sfr TH2  = 0xD6;
+  43          sfr TL2  = 0xD7;
+  44          sfr IE2   = 0xAF;
+  45          sfr INT_CLKO = 0x8F;
+  46          sfr AUXR = 0x8E;
+  47          sfr AUXR1 = 0xA2;
+  48          sfr P_SW1 = 0xA2;
+  49          sfr P_SW2 = 0xBA;
+  50          sfr S2CON = 0x9A;
+  51          sfr S2BUF = 0x9B;
+  52          
+  53          sfr SPSTAT = 0xCD;  //
+  54          sfr SPCTL  = 0xCE;  //
+  55          sfr SPDAT  = 0xCF;  //
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 2   
+
+  56          #define SPIF    0x80        //SPI传输完成标志。写入1清0。
+  57          #define WCOL    0x40        //SPI写冲突标志。写入1清0。
+  58          
+  59          sfr P4   = 0xC0;
+  60          sfr P5   = 0xC8;
+  61          sfr P6   = 0xE8;
+  62          sfr P7   = 0xF8;
+  63          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  64          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  65          sfr P0M1 = 0x93;
+  66          sfr P0M0 = 0x94;
+  67          sfr P2M1 = 0x95;
+  68          sfr P2M0 = 0x96;
+  69          sfr P3M1 = 0xB1;
+  70          sfr P3M0 = 0xB2;
+  71          sfr P4M1 = 0xB3;
+  72          sfr P4M0 = 0xB4;
+  73          sfr P5M1 = 0xC9;
+  74          sfr P5M0 = 0xCA;
+  75          sfr P6M1 = 0xCB;
+  76          sfr P6M0 = 0xCC;
+  77          sfr P7M1 = 0xE1;
+  78          sfr P7M0 = 0xE2;
+  79          
+  80          sbit P00 = P0^0;
+  81          sbit P01 = P0^1;
+  82          sbit P02 = P0^2;
+  83          sbit P03 = P0^3;
+  84          sbit P04 = P0^4;
+  85          sbit P05 = P0^5;
+  86          sbit P06 = P0^6;
+  87          sbit P07 = P0^7;
+  88          sbit P10 = P1^0;
+  89          sbit P11 = P1^1;
+  90          sbit P12 = P1^2;
+  91          sbit P13 = P1^3;
+  92          sbit P14 = P1^4;
+  93          sbit P15 = P1^5;
+  94          sbit P16 = P1^6;
+  95          sbit P17 = P1^7;
+  96          sbit P20 = P2^0;
+  97          sbit P21 = P2^1;
+  98          sbit P22 = P2^2;
+  99          sbit P23 = P2^3;
+ 100          sbit P24 = P2^4;
+ 101          sbit P25 = P2^5;
+ 102          sbit P26 = P2^6;
+ 103          sbit P27 = P2^7;
+ 104          sbit P30 = P3^0;
+ 105          sbit P31 = P3^1;
+ 106          sbit P32 = P3^2;
+ 107          sbit P33 = P3^3;
+ 108          sbit P34 = P3^4;
+ 109          sbit P35 = P3^5;
+ 110          sbit P36 = P3^6;
+ 111          sbit P37 = P3^7;
+ 112          sbit P40 = P4^0;
+ 113          sbit P41 = P4^1;
+ 114          sbit P42 = P4^2;
+ 115          sbit P43 = P4^3;
+ 116          sbit P44 = P4^4;
+ 117          sbit P45 = P4^5;
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 3   
+
+ 118          sbit P46 = P4^6;
+ 119          sbit P47 = P4^7;
+ 120          sbit P50 = P5^0;
+ 121          sbit P51 = P5^1;
+ 122          sbit P52 = P5^2;
+ 123          sbit P53 = P5^3;
+ 124          sbit P54 = P5^4;
+ 125          sbit P55 = P5^5;
+ 126          sbit P56 = P5^6;
+ 127          sbit P57 = P5^7;
+ 128          
+ 129          
+ 130          #define     Baudrate1           115200L
+ 131          #define     EE_BUF_LENGTH       50          //
+ 132          
+ 133          
+ 134          /*************  本地常量声明    **************/
+ 135          
+ 136          /*************  本地变量声明    **************/
+ 137          u8  xdata   tmp[EE_BUF_LENGTH];
+ 138          u8  sst_byte;
+ 139          u32 Flash_addr;
+ 140          
+ 141          /*************  FLASH相关变量声明   **************/
+ 142          sbit    P_PM25LV040_CE  = P2^2;     //PIN1
+ 143          sbit    P_PM25LV040_SO  = P2^4;     //PIN2
+ 144          sbit    P_PM25LV040_SI  = P2^3;     //PIN5
+ 145          sbit    P_PM25LV040_SCK = P2^5;     //PIN6
+ 146          
+ 147          bit B_FlashOK;                                //Flash状态
+ 148          u8  PM25LV040_ID, PM25LV040_ID1, PM25LV040_ID2;
+ 149          
+ 150          #define     UART1_BUF_LENGTH    (EE_BUF_LENGTH+9)   //串口缓冲长度
+ 151          
+ 152          u8  RX1_TimeOut;
+ 153          u8  TX1_Cnt;    //发送计数
+ 154          u8  RX1_Cnt;    //接收计数
+ 155          bit B_TX1_Busy; //发送忙标志
+ 156          
+ 157          u8  xdata   RX1_Buffer[UART1_BUF_LENGTH];   //接收缓冲
+ 158          
+ 159          
+ 160          void    delay_ms(u8 ms);
+ 161          void    RX1_Check(void);
+ 162          void    UART1_config(u8 brt);   // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 163          void    PrintString1(u8 *puts);
+ 164          void    UART1_TxByte(u8 dat);
+ 165          
+ 166          void    SPI_init(void);
+ 167          void    FlashCheckID(void);
+ 168          u8      CheckFlashBusy(void);
+ 169          void    FlashWriteEnable(void);
+ 170          void    FlashChipErase(void);
+ 171          void    FlashSectorErase(u32 addr);
+ 172          void    SPI_Read_Nbytes( u32 addr, u8 *buffer, u16 size);
+ 173          u8      SPI_Read_Compare(u32 addr, u8 *buffer, u16 size);
+ 174          void    SPI_Write_Nbytes(u32 addr, u8 *buffer,  u8 size);
+ 175          
+ 176          
+ 177          u8  Hex2Ascii(u8 dat)
+ 178          {
+ 179   1          dat &= 0x0f;
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 4   
+
+ 180   1          if(dat < 10)    return (dat+'0');
+ 181   1          return (dat-10+'A');
+ 182   1      }
+ 183          
+ 184          /******************** 主函数 **************************/
+ 185          void main(void)
+ 186          {
+ 187   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 188   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 189   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 190   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 191   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 192   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 193   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 194   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 195   1      
+ 196   1          delay_ms(10);
+ 197   1          UART1_config(1);    // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 198   1          EA = 1;     //允许总中断
+ 199   1      
+ 200   1          PrintString1("命令设置:\r\n");
+ 201   1          PrintString1("E 0x001234            --> 扇区擦除  十六进制地址\r\n");
+ 202   1          PrintString1("W 0x001234 1234567890 --> 写入操作  十六进制地址  写入内容\r\n");
+ 203   1          PrintString1("R 0x001234 10         --> 读出操作  十六进制地址  读出字节数\r\n");
+ 204   1          PrintString1("C                     --> 如果检测不到PM25LV040, 发送C强制允许操作.\r\n\r\n");
+ 205   1      
+ 206   1          SPI_init();
+ 207   1          FlashCheckID();
+ 208   1          FlashCheckID();
+ 209   1          
+ 210   1          if(!B_FlashOK)  PrintString1("未检测到PM25LV040!\r\n");
+ 211   1          else            
+ 212   1          {
+ 213   2              PrintString1("检测到PM25LV040!\r\n");
+ 214   2              PrintString1("制造商ID1 = 0x");
+ 215   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID1 >> 4));
+ 216   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID1));
+ 217   2              PrintString1("\r\n      ID2 = 0x");
+ 218   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID2 >> 4));
+ 219   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID2));
+ 220   2              PrintString1("\r\n   设备ID = 0x");
+ 221   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID >> 4));
+ 222   2              UART1_TxByte(Hex2Ascii(PM25LV040_ID));
+ 223   2              PrintString1("\r\n");
+ 224   2          }
+ 225   1      
+ 226   1          while (1)
+ 227   1          {
+ 228   2              delay_ms(1);
+ 229   2                      
+ 230   2              if(RX1_TimeOut > 0)
+ 231   2              {
+ 232   3                  if(--RX1_TimeOut == 0)  //超时,则串口接收结束
+ 233   3                  {
+ 234   4                      if(RX1_Cnt > 0)
+ 235   4                      {
+ 236   5                          RX1_Check();    //串口1处理数据
+ 237   5                      }
+ 238   4                      RX1_Cnt = 0;
+ 239   4                  }
+ 240   3              }
+ 241   2          }
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 5   
+
+ 242   1      }
+ 243          
+ 244          
+ 245          //========================================================================
+ 246          // 函数: void  delay_ms(unsigned char ms)
+ 247          // 描述: 延时函数。
+ 248          // 参数: ms,要延时的ms数, 这里只支持1~255ms. 自动适应主时钟.
+ 249          // 返回: none.
+ 250          // 版本: VER1.0
+ 251          // 日期: 2013-4-1
+ 252          // 备注: 
+ 253          //========================================================================
+ 254          void delay_ms(u8 ms)
+ 255          {
+ 256   1          u16 i;
+ 257   1          do{
+ 258   2              i = MAIN_Fosc / 13000;
+ 259   2              while(--i)    ;   //14T per loop
+ 260   2          }while(--ms);
+ 261   1      }
+ 262          
+ 263          
+ 264          /**************** ASCII码转BIN ****************************/
+ 265          u8  CheckData(u8 dat)
+ 266          {
+ 267   1          if((dat >= '0') && (dat <= '9'))        return (dat-'0');
+ 268   1          if((dat >= 'A') && (dat <= 'F'))        return (dat-'A'+10);
+ 269   1          return 0xff;
+ 270   1      }
+ 271          
+ 272          /**************** 获取写入地址 ****************************/
+ 273          u32 GetAddress(void)
+ 274          {
+ 275   1          u32 address;
+ 276   1          u8  i,j;
+ 277   1          
+ 278   1          address = 0;
+ 279   1          if((RX1_Buffer[2] == '0') && (RX1_Buffer[3] == 'X'))
+ 280   1          {
+ 281   2              for(i=4; i<10; i++)
+ 282   2              {
+ 283   3                  j = CheckData(RX1_Buffer[i]);
+ 284   3                  if(j >= 0x10)   return 0x80000000;  //error
+ 285   3                  address = (address << 4) + j;
+ 286   3              }
+ 287   2              return (address);
+ 288   2          }
+ 289   1          return  0x80000000; //error
+ 290   1      }
+ 291          
+ 292          /**************** 获取要读出数据的字节数 ****************************/
+ 293          u8  GetDataLength(void)
+ 294          {
+ 295   1          u8  i;
+ 296   1          u8  length;
+ 297   1          
+ 298   1          length = 0;
+ 299   1          for(i=11; i<RX1_Cnt; i++)
+ 300   1          {
+ 301   2              if(CheckData(RX1_Buffer[i]) >= 10)  break;
+ 302   2              length = length * 10 + CheckData(RX1_Buffer[i]);
+ 303   2          }
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 6   
+
+ 304   1          return (length);
+ 305   1      }
+ 306          
+ 307          
+ 308          /**************** 串口1处理函数 ****************************/
+ 309          
+ 310          void RX1_Check(void)
+ 311          {
+ 312   1          u8  i,j;
+ 313   1      
+ 314   1          if((RX1_Cnt == 1) && (RX1_Buffer[0] == 'C'))    //发送C强制允许操作
+ 315   1          {
+ 316   2              B_FlashOK = 1;
+ 317   2              PrintString1("强制允许操作FLASH!\r\n");
+ 318   2          }
+ 319   1      
+ 320   1          if(!B_FlashOK)
+ 321   1          {
+ 322   2              PrintString1("PM25LV040不存在, 不能操作FLASH!\r\n");
+ 323   2              return;
+ 324   2          }
+ 325   1          
+ 326   1          F0 = 0;
+ 327   1          if((RX1_Cnt >= 10) && (RX1_Buffer[1] == ' '))   //最短命令为10个字节
+ 328   1          {
+ 329   2              for(i=0; i<10; i++)
+ 330   2              {
+ 331   3                  if((RX1_Buffer[i] >= 'a') && (RX1_Buffer[i] <= 'z'))    RX1_Buffer[i] = RX1_Buffer[i] - 'a' + 
+             -'A';//小写转大写
+ 332   3              }
+ 333   2              Flash_addr = GetAddress();
+ 334   2              if(Flash_addr < 0x80000000)
+ 335   2              {
+ 336   3                  if(RX1_Buffer[0] == 'E')    //擦除
+ 337   3                  {
+ 338   4                      FlashSectorErase(Flash_addr);
+ 339   4                      PrintString1("已擦除一个扇区数据!\r\n");
+ 340   4                      F0 = 1;
+ 341   4                  }
+ 342   3      
+ 343   3                  else if((RX1_Buffer[0] == 'W') && (RX1_Cnt >= 12) && (RX1_Buffer[10] == ' '))   //写入N个字节
+ 344   3                  {
+ 345   4                      j = RX1_Cnt - 11;
+ 346   4                      for(i=0; i<j; i++)  tmp[i] = 0xff;      //检测要写入的空间是否为空
+ 347   4                      i = SPI_Read_Compare(Flash_addr,tmp,j);
+ 348   4                      if(i > 0)
+ 349   4                      {
+ 350   5                          PrintString1("要写入的地址为非空,不能写入,请先擦除!\r\n");
+ 351   5                      }
+ 352   4                      else
+ 353   4                      {
+ 354   5                          P27 = 0;
+ 355   5                          SPI_Write_Nbytes(Flash_addr,&RX1_Buffer[11],j);     //写N个字节 
+ 356   5                          P27 = 1;
+ 357   5                          i = SPI_Read_Compare(Flash_addr,&RX1_Buffer[11],j); //比较写入的数据
+ 358   5                          if(i == 0)
+ 359   5                          {
+ 360   6                              PrintString1("已写入");
+ 361   6                              if(j >= 100)    {UART1_TxByte(j/100+'0');   j = j % 100;}
+ 362   6                              if(j >= 10)     {UART1_TxByte(j/10+'0');    j = j % 10;}
+ 363   6                              UART1_TxByte(j%10+'0');
+ 364   6                              PrintString1("字节数据!\r\n");
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 7   
+
+ 365   6                          }
+ 366   5                          else        PrintString1("写入错误!\r\n");
+ 367   5                      }
+ 368   4                      F0 = 1;
+ 369   4                  }
+ 370   3                  else if((RX1_Buffer[0] == 'R') && (RX1_Cnt >= 12) && (RX1_Buffer[10] == ' '))   //读出N个字节
+ 371   3                  {
+ 372   4                      j = GetDataLength();
+ 373   4                      if((j > 0) && (j < EE_BUF_LENGTH))
+ 374   4                      {
+ 375   5                          P27 = 0;
+ 376   5                          SPI_Read_Nbytes(Flash_addr,tmp,j);
+ 377   5                          P27 = 1;
+ 378   5                          PrintString1("读出");
+ 379   5                          if(j>=100)  UART1_TxByte(j/100+'0');
+ 380   5                          UART1_TxByte(j%100/10+'0');
+ 381   5                          UART1_TxByte(j%10+'0');
+ 382   5                          PrintString1("个字节数据如下：\r\n");
+ 383   5                          for(i=0; i<j; i++)  UART1_TxByte(tmp[i]);
+ 384   5                          UART1_TxByte(0x0d);
+ 385   5                          UART1_TxByte(0x0a);
+ 386   5                          F0 = 1;
+ 387   5                      }
+ 388   4                  }
+ 389   3              }
+ 390   2          }
+ 391   1          if(!F0) PrintString1("命令错误!\r\n");
+ 392   1      }
+ 393          
+ 394          
+ 395          //========================================================================
+ 396          // 函数: void UART1_TxByte(u8 dat)
+ 397          // 描述: 发送一个字节.
+ 398          // 参数: 无.
+ 399          // 返回: 无.
+ 400          // 版本: V1.0, 2014-6-30
+ 401          //========================================================================
+ 402          
+ 403          void UART1_TxByte(u8 dat)
+ 404          {
+ 405   1          SBUF = dat;
+ 406   1          B_TX1_Busy = 1;
+ 407   1          while(B_TX1_Busy);
+ 408   1      }
+ 409          
+ 410          //========================================================================
+ 411          // 函数: void PrintString1(u8 *puts)
+ 412          // 描述: 串口1发送字符串函数。
+ 413          // 参数: puts:  字符串指针.
+ 414          // 返回: none.
+ 415          // 版本: VER1.0
+ 416          // 日期: 2014-11-28
+ 417          // 备注: 
+ 418          //========================================================================
+ 419          void PrintString1(u8 *puts) //发送一个字符串
+ 420          {
+ 421   1          for (; *puts != 0;  puts++) UART1_TxByte(*puts);    //遇到停止符0结束
+ 422   1      }
+ 423          
+ 424          //========================================================================
+ 425          // 函数: SetTimer2Baudraye(u16 dat)
+ 426          // 描述: 设置Timer2做波特率发生器。
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 8   
+
+ 427          // 参数: dat: Timer2的重装值.
+ 428          // 返回: none.
+ 429          // 版本: VER1.0
+ 430          // 日期: 2014-11-28
+ 431          // 备注: 
+ 432          //========================================================================
+ 433          void SetTimer2Baudraye(u16 dat)  // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 434          {
+ 435   1          AUXR &= ~(1<<4);    //Timer stop
+ 436   1          AUXR &= ~(1<<3);    //Timer2 set As Timer
+ 437   1          AUXR |=  (1<<2);    //Timer2 set as 1T mode
+ 438   1          TH2 = dat / 256;
+ 439   1          TL2 = dat % 256;
+ 440   1          IE2  &= ~(1<<2);    //禁止中断
+ 441   1          AUXR |=  (1<<4);    //Timer run enable
+ 442   1      }
+ 443          
+ 444          //========================================================================
+ 445          // 函数: void UART1_config(u8 brt)
+ 446          // 描述: UART1初始化函数。
+ 447          // 参数: brt: 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 448          // 返回: none.
+ 449          // 版本: VER1.0
+ 450          // 日期: 2014-11-28
+ 451          // 备注: 
+ 452          //========================================================================
+ 453          void UART1_config(u8 brt)    // 选择波特率, 2: 使用Timer2做波特率, 其它值: 使用Timer1做波特率.
+ 454          {
+ 455   1          /*********** 波特率使用定时器2 *****************/
+ 456   1          if(brt == 2)
+ 457   1          {
+ 458   2              AUXR |= 0x01;       //S1 BRT Use Timer2;
+ 459   2              SetTimer2Baudraye(65536UL - (MAIN_Fosc / 4) / Baudrate1);
+ 460   2          }
+ 461   1      
+ 462   1          /*********** 波特率使用定时器1 *****************/
+ 463   1          else
+ 464   1          {
+ 465   2              TR1 = 0;
+ 466   2              AUXR &= ~0x01;      //S1 BRT Use Timer1;
+ 467   2              AUXR |=  (1<<6);    //Timer1 set as 1T mode
+ 468   2              TMOD &= ~(1<<6);    //Timer1 set As Timer
+ 469   2              TMOD &= ~0x30;      //Timer1_16bitAutoReload;
+ 470   2              TH1 = (u8)((65536UL - (MAIN_Fosc / 4) / Baudrate1) / 256);
+ 471   2              TL1 = (u8)((65536UL - (MAIN_Fosc / 4) / Baudrate1) % 256);
+ 472   2              ET1 = 0;    //禁止中断
+ 473   2              INT_CLKO &= ~0x02;  //不输出时钟
+ 474   2              TR1  = 1;
+ 475   2          }
+ 476   1          /*************************************************/
+ 477   1      
+ 478   1          SCON = (SCON & 0x3f) | 0x40;    //UART1模式, 0x00: 同步移位输出, 0x40: 8位数据,可变波特率, 0x80: 9位数
+             -据,固定波特率, 0xc0: 9位数据,可变波特率
+ 479   1      //  PS  = 1;    //高优先级中断
+ 480   1          ES  = 1;    //允许中断
+ 481   1          REN = 1;    //允许接收
+ 482   1          P_SW1 &= 0x3f;
+ 483   1          P_SW1 |= 0x00;      //UART1 switch to, 0x00: P3.0 P3.1, 0x40: P3.6 P3.7, 0x80: P1.6 P1.7, 0xC0: P4.3 P
+             -4.4
+ 484   1      
+ 485   1          B_TX1_Busy = 0;
+ 486   1          TX1_Cnt = 0;
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 9   
+
+ 487   1          RX1_Cnt = 0;
+ 488   1      }
+ 489          
+ 490          //========================================================================
+ 491          // 函数: void UART1_int (void) interrupt UART1_VECTOR
+ 492          // 描述: UART1中断函数。
+ 493          // 参数: nine.
+ 494          // 返回: none.
+ 495          // 版本: VER1.0
+ 496          // 日期: 2014-11-28
+ 497          // 备注: 
+ 498          //========================================================================
+ 499          void UART1_int (void) interrupt 4
+ 500          {
+ 501   1          if(RI)
+ 502   1          {
+ 503   2              RI = 0;
+ 504   2              if(RX1_Cnt >= UART1_BUF_LENGTH) RX1_Cnt = 0;
+ 505   2              RX1_Buffer[RX1_Cnt] = SBUF;
+ 506   2              RX1_Cnt++;
+ 507   2              RX1_TimeOut = 5;
+ 508   2          }
+ 509   1      
+ 510   1          if(TI)
+ 511   1          {
+ 512   2              TI = 0;
+ 513   2              B_TX1_Busy = 0;
+ 514   2          }
+ 515   1      }
+ 516          
+ 517          /******************* FLASH相关程序 ************************/
+ 518          #define SFC_WREN        0x06        //串行Flash命令集
+ 519          #define SFC_WRDI        0x04
+ 520          #define SFC_RDSR        0x05
+ 521          #define SFC_WRSR        0x01
+ 522          #define SFC_READ        0x03
+ 523          #define SFC_FASTREAD    0x0B
+ 524          #define SFC_RDID        0xAB
+ 525          #define SFC_PAGEPROG    0x02
+ 526          #define SFC_RDCR        0xA1
+ 527          #define SFC_WRCR        0xF1
+ 528          #define SFC_SECTORER    0xD7
+ 529          #define SFC_BLOCKER     0xD8
+ 530          #define SFC_CHIPER      0xC7
+ 531          
+ 532          #define SPI_CE_High()   P_PM25LV040_CE  = 1     // set CE high
+ 533          #define SPI_CE_Low()    P_PM25LV040_CE  = 0     // clear CE low
+ 534          #define SPI_Hold()      P_SPI_Hold      = 0     // clear Hold pin
+ 535          #define SPI_UnHold()    P_SPI_Hold      = 1     // set Hold pin
+ 536          #define SPI_WP()        P_SPI_WP        = 0     // clear WP pin
+ 537          #define SPI_UnWP()      P_SPI_WP        = 1     // set WP pin
+ 538          
+ 539          /************************************************************************/
+ 540          void SPI_init(void)
+ 541          {
+ 542   1          SPCTL |=  (1 << 7); //忽略 SS 引脚功能，使用 MSTR 确定器件是主机还是从机
+ 543   1          SPCTL |=  (1 << 6); //使能 SPI 功能
+ 544   1          SPCTL &= ~(1 << 5); //先发送/接收数据的高位（ MSB）
+ 545   1          SPCTL |=  (1 << 4); //设置主机模式
+ 546   1          SPCTL &= ~(1 << 3); //SCLK 空闲时为低电平，SCLK 的前时钟沿为上升沿，后时钟沿为下降沿
+ 547   1          SPCTL &= ~(1 << 2); //数据 SS 管脚为低电平驱动第一位数据并在 SCLK 的后时钟沿改变数据
+ 548   1          SPCTL = (SPCTL & ~3) | 0;   //SPI 时钟频率选择, 0: 4T, 1: 8T,  2: 16T,  3: 32T
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 10  
+
+ 549   1          AUXR1 = (AUXR1 & ~(3<<2)) | (1<<2);     //IO口切换. 0: P1.2/P5.4 P1.3 P1.4 P1.5, 1: P2.2 P2.3 P2.4 P2.
+             -5, 2: P5.4 P4.0 P4.1 P4.3, 3: P3.5 P3.4 P3.3 P3.2
+ 550   1      
+ 551   1          P_PM25LV040_SCK = 0;    // set clock to low initial state
+ 552   1          P_PM25LV040_SI = 1;
+ 553   1          SPSTAT = SPIF + WCOL;   //清0 SPIF和WCOL标志
+ 554   1      }
+ 555          
+ 556          /************************************************************************/
+ 557          void SPI_WriteByte(u8 out)
+ 558          {
+ 559   1          SPDAT = out;
+ 560   1          while((SPSTAT & SPIF) == 0) ;
+ 561   1          SPSTAT = SPIF + WCOL;   //清0 SPIF和WCOL标志
+ 562   1      }
+ 563          
+ 564          /************************************************************************/
+ 565          u8 SPI_ReadByte(void)
+ 566          {
+ 567   1          SPDAT = 0xff;
+ 568   1          while((SPSTAT & SPIF) == 0) ;
+ 569   1          SPSTAT = SPIF + WCOL;   //清0 SPIF和WCOL标志
+ 570   1          return (SPDAT);
+ 571   1      }
+ 572          
+ 573          /************************************************
+ 574          检测Flash是否准备就绪
+ 575          入口参数: 无
+ 576          出口参数:
+ 577              0 : 没有检测到正确的Flash
+ 578              1 : Flash准备就绪
+ 579          ************************************************/
+ 580          void FlashCheckID(void)
+ 581          {
+ 582   1          SPI_CE_Low();
+ 583   1          SPI_WriteByte(SFC_RDID);        //发送读取ID命令
+ 584   1          SPI_WriteByte(0x00);            //空读3个字节
+ 585   1          SPI_WriteByte(0x00);
+ 586   1          SPI_WriteByte(0x00);
+ 587   1          PM25LV040_ID1 = SPI_ReadByte();         //读取制造商ID1
+ 588   1          PM25LV040_ID  = SPI_ReadByte();         //读取设备ID
+ 589   1          PM25LV040_ID2 = SPI_ReadByte();         //读取制造商ID2
+ 590   1          SPI_CE_High();
+ 591   1      
+ 592   1          if((PM25LV040_ID1 == 0x9d) && (PM25LV040_ID2 == 0x7f))  B_FlashOK = 1;  //检测是否为PM25LVxx系列的Flas
+             -h
+ 593   1          else                                                    B_FlashOK = 0;
+ 594   1      }
+ 595          
+ 596          /************************************************
+ 597          检测Flash的忙状态
+ 598          入口参数: 无
+ 599          出口参数:
+ 600              0 : Flash处于空闲状态
+ 601              1 : Flash处于忙状态
+ 602          ************************************************/
+ 603          u8 CheckFlashBusy(void)
+ 604          {
+ 605   1          u8  dat;
+ 606   1      
+ 607   1          SPI_CE_Low();
+ 608   1          SPI_WriteByte(SFC_RDSR);        //发送读取状态命令
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 11  
+
+ 609   1          dat = SPI_ReadByte();           //读取状态
+ 610   1          SPI_CE_High();
+ 611   1      
+ 612   1          return (dat);                   //状态值的Bit0即为忙标志
+ 613   1      }
+ 614          
+ 615          /************************************************
+ 616          使能Flash写命令
+ 617          入口参数: 无
+ 618          出口参数: 无
+ 619          ************************************************/
+ 620          void FlashWriteEnable(void)
+ 621          {
+ 622   1          while(CheckFlashBusy() > 0);    //Flash忙检测
+ 623   1          SPI_CE_Low();
+ 624   1          SPI_WriteByte(SFC_WREN);        //发送写使能命令
+ 625   1          SPI_CE_High();
+ 626   1      }
+ 627          
+ 628          /************************************************
+ 629          擦除整片Flash
+ 630          入口参数: 无
+ 631          出口参数: 无
+ 632          ************************************************/
+ 633          /*
+ 634          void FlashChipErase(void)
+ 635          {
+ 636              if(B_FlashOK)
+ 637              {
+ 638                  FlashWriteEnable();             //使能Flash写命令
+ 639                  SPI_CE_Low();
+ 640                  SPI_WriteByte(SFC_CHIPER);      //发送片擦除命令
+ 641                  SPI_CE_High();
+ 642              }
+ 643          }
+ 644          */
+ 645          
+ 646          /************************************************
+ 647          擦除扇区, 一个扇区4KB
+ 648          入口参数: 无
+ 649          出口参数: 无
+ 650          ************************************************/
+ 651          void FlashSectorErase(u32 addr)
+ 652          {
+ 653   1          if(B_FlashOK)
+ 654   1          {
+ 655   2              FlashWriteEnable();             //使能Flash写命令
+ 656   2              SPI_CE_Low();
+ 657   2              SPI_WriteByte(SFC_SECTORER);    //发送扇区擦除命令
+ 658   2              SPI_WriteByte(((u8 *)&addr)[1]);           //设置起始地址
+ 659   2              SPI_WriteByte(((u8 *)&addr)[2]);
+ 660   2              SPI_WriteByte(((u8 *)&addr)[3]);
+ 661   2              SPI_CE_High();
+ 662   2          }
+ 663   1      }
+ 664          
+ 665          /************************************************
+ 666          从Flash中读取数据
+ 667          入口参数:
+ 668              addr   : 地址参数
+ 669              buffer : 缓冲从Flash中读取的数据
+ 670              size   : 数据块大小
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 12  
+
+ 671          出口参数:
+ 672              无
+ 673          ************************************************/
+ 674          void SPI_Read_Nbytes(u32 addr, u8 *buffer, u16 size)
+ 675          {
+ 676   1          if(size == 0)   return;
+ 677   1          if(!B_FlashOK)  return;
+ 678   1          while(CheckFlashBusy() > 0);        //Flash忙检测
+ 679   1      
+ 680   1          SPI_CE_Low();                       //enable device
+ 681   1          SPI_WriteByte(SFC_READ);            //read command
+ 682   1      
+ 683   1          SPI_WriteByte(((u8 *)&addr)[1]);    //设置起始地址
+ 684   1          SPI_WriteByte(((u8 *)&addr)[2]);
+ 685   1          SPI_WriteByte(((u8 *)&addr)[3]);
+ 686   1      
+ 687   1          do{
+ 688   2              *buffer = SPI_ReadByte();       //receive byte and store at buffer
+ 689   2              buffer++;
+ 690   2          }while(--size);                     //read until no_bytes is reached
+ 691   1          SPI_CE_High();                      //disable device
+ 692   1      }
+ 693          
+ 694          /************************************************************************
+ 695          读出n个字节,跟指定的数据进行比较, 错误返回1,正确返回0
+ 696          ************************************************************************/
+ 697          u8 SPI_Read_Compare(u32 addr, u8 *buffer, u16 size)
+ 698          {
+ 699   1          u8  j;
+ 700   1          if(size == 0)   return 2;
+ 701   1          if(!B_FlashOK)  return 2;
+ 702   1          while(CheckFlashBusy() > 0);            //Flash忙检测
+ 703   1      
+ 704   1          j = 0;
+ 705   1          SPI_CE_Low();                           //enable device
+ 706   1          SPI_WriteByte(SFC_READ);                //read command
+ 707   1          SPI_WriteByte(((u8 *)&addr)[1]);        //设置起始地址
+ 708   1          SPI_WriteByte(((u8 *)&addr)[2]);
+ 709   1          SPI_WriteByte(((u8 *)&addr)[3]);
+ 710   1          do
+ 711   1          {
+ 712   2              if(*buffer != SPI_ReadByte())       //receive byte and store at buffer
+ 713   2              {
+ 714   3                  j = 1;
+ 715   3                  break;
+ 716   3              }
+ 717   2              buffer++;
+ 718   2          }while(--size);         //read until no_bytes is reached
+ 719   1          SPI_CE_High();          //disable device
+ 720   1          return j;
+ 721   1      }
+ 722          
+ 723          
+ 724          /************************************************
+ 725          写数据到Flash中
+ 726          入口参数:
+ 727              addr   : 地址参数
+ 728              buffer : 缓冲需要写入Flash的数据
+ 729              size   : 数据块大小
+ 730          出口参数: 无
+ 731          ************************************************/
+ 732          void SPI_Write_Nbytes(u32 addr, u8 *buffer, u8 size)
+C51 COMPILER V9.59.0.0   SPI_PM25LV040                                                     08/11/2020 15:56:32 PAGE 13  
+
+ 733          {
+ 734   1          if(size == 0)   return;
+ 735   1          if(!B_FlashOK)  return;
+ 736   1          while(CheckFlashBusy() > 0);        //Flash忙检测
+ 737   1      
+ 738   1      
+ 739   1          FlashWriteEnable();                 //使能Flash写命令
+ 740   1      
+ 741   1          SPI_CE_Low();                       // enable device
+ 742   1          SPI_WriteByte(SFC_PAGEPROG);        // 发送页编程命令
+ 743   1          SPI_WriteByte(((u8 *)&addr)[1]);    //设置起始地址
+ 744   1          SPI_WriteByte(((u8 *)&addr)[2]);
+ 745   1          SPI_WriteByte(((u8 *)&addr)[3]);
+ 746   1          do{
+ 747   2              SPI_WriteByte(*buffer++);       //连续页内写
+ 748   2              addr++;
+ 749   2              if ((addr & 0xff) == 0) break;
+ 750   2          }while(--size);
+ 751   1          SPI_CE_High();                      // disable device
+ 752   1      }
+ 753          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1818    ----
+   CONSTANT SIZE    =    535    ----
+   XDATA SIZE       =    109    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11      38
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

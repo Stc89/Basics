@@ -1,0 +1,410 @@
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE DS18B20
+OBJECT MODULE PLACED IN DS18B20.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE DS18B20.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          
+  14          /*************  本程序功能说明  **************
+  15          
+  16          通过一个IO口获取一线制温度传感器 DS18B20 温度值.
+  17          
+  18          使用Timer0的16位自动重装来产生1ms节拍,程序运行于这个节拍下, 用户修改MCU主时钟频率时,自动定时于1ms.
+  19          
+  20          用STC的MCU的IO方式驱动8位数码管，通过数码管显示测量的温度值.
+  21          
+  22          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  23          
+  24          ******************************************/
+  25          
+  26          #include    "reg51.h"
+  27          #include    "intrins.h"
+  28          
+  29          #define     MAIN_Fosc       24000000L   //定义主时钟
+  30          
+  31          typedef     unsigned char   u8;
+  32          typedef     unsigned int    u16;
+  33          typedef     unsigned long   u32;
+  34          
+  35          sfr AUXR = 0x8E;
+  36          sfr P4   = 0xC0;
+  37          sfr P5   = 0xC8;
+  38          sfr P6   = 0xE8;
+  39          sfr P7   = 0xF8;
+  40          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  41          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  42          sfr P0M1 = 0x93;
+  43          sfr P0M0 = 0x94;
+  44          sfr P2M1 = 0x95;
+  45          sfr P2M0 = 0x96;
+  46          sfr P3M1 = 0xB1;
+  47          sfr P3M0 = 0xB2;
+  48          sfr P4M1 = 0xB3;
+  49          sfr P4M0 = 0xB4;
+  50          sfr P5M1 = 0xC9;
+  51          sfr P5M0 = 0xCA;
+  52          sfr P6M1 = 0xCB;
+  53          sfr P6M0 = 0xCC;
+  54          sfr P7M1 = 0xE1;
+  55          sfr P7M0 = 0xE2;
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 2   
+
+  56          
+  57          sbit P00 = P0^0;
+  58          sbit P01 = P0^1;
+  59          sbit P02 = P0^2;
+  60          sbit P03 = P0^3;
+  61          sbit P04 = P0^4;
+  62          sbit P05 = P0^5;
+  63          sbit P06 = P0^6;
+  64          sbit P07 = P0^7;
+  65          sbit P10 = P1^0;
+  66          sbit P11 = P1^1;
+  67          sbit P12 = P1^2;
+  68          sbit P13 = P1^3;
+  69          sbit P14 = P1^4;
+  70          sbit P15 = P1^5;
+  71          sbit P16 = P1^6;
+  72          sbit P17 = P1^7;
+  73          sbit P20 = P2^0;
+  74          sbit P21 = P2^1;
+  75          sbit P22 = P2^2;
+  76          sbit P23 = P2^3;
+  77          sbit P24 = P2^4;
+  78          sbit P25 = P2^5;
+  79          sbit P26 = P2^6;
+  80          sbit P27 = P2^7;
+  81          sbit P30 = P3^0;
+  82          sbit P31 = P3^1;
+  83          sbit P32 = P3^2;
+  84          sbit P33 = P3^3;
+  85          sbit P34 = P3^4;
+  86          sbit P35 = P3^5;
+  87          sbit P36 = P3^6;
+  88          sbit P37 = P3^7;
+  89          sbit P40 = P4^0;
+  90          sbit P41 = P4^1;
+  91          sbit P42 = P4^2;
+  92          sbit P43 = P4^3;
+  93          sbit P44 = P4^4;
+  94          sbit P45 = P4^5;
+  95          sbit P46 = P4^6;
+  96          sbit P47 = P4^7;
+  97          sbit P50 = P5^0;
+  98          sbit P51 = P5^1;
+  99          sbit P52 = P5^2;
+ 100          sbit P53 = P5^3;
+ 101          sbit P54 = P5^4;
+ 102          sbit P55 = P5^5;
+ 103          sbit P56 = P5^6;
+ 104          sbit P57 = P5^7;
+ 105          
+ 106          /***********************************************************/
+ 107          
+ 108          sbit DQ = P3^3;                   //DS18B20的数据口
+ 109          
+ 110          #define DIS_DOT     0x20
+ 111          #define DIS_BLACK   0x10
+ 112          #define DIS_        0x11
+ 113          
+ 114          #define Timer0_Reload   (65536UL -(MAIN_Fosc / 1000))       //Timer 0 中断频率, 1000次/秒
+ 115          
+ 116          #if (MAIN_Fosc >= 40000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 3   
+
+             -_();_nop_()
+              #elif (MAIN_Fosc >= 36000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_()
+              #elif (MAIN_Fosc >= 30000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_()
+              #elif (MAIN_Fosc >= 24000000L)
+ 123              #define   NOP()    _nop_();_nop_();_nop_();_nop_();_nop_();_nop_()
+ 124          #elif (MAIN_Fosc >= 20000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_();_nop_();_nop_()
+              #elif (MAIN_Fosc >= 18000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_();_nop_()
+              #elif (MAIN_Fosc >= 12000000L)
+                  #define   NOP()    _nop_();_nop_();_nop_()
+              #elif (MAIN_Fosc >= 6000000L)
+                  #define   NOP()    _nop_();_nop_()
+              #else
+                  #define   NOP()    _nop_()
+              #endif
+ 135          
+ 136          /*************  本地常量声明    **************/
+ 137          u8 code t_display[]={                       //标准字库
+ 138          //   0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+ 139              0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71,
+ 140          //black  -     H    J    K    L    N    o   P    U     t    G    Q    r   M    y
+ 141              0x00,0x40,0x76,0x1E,0x70,0x38,0x37,0x5C,0x73,0x3E,0x78,0x3d,0x67,0x50,0x37,0x6e,
+ 142              0xBF,0x86,0xDB,0xCF,0xE6,0xED,0xFD,0x87,0xFF,0xEF,0x46};    //0. 1. 2. 3. 4. 5. 6. 7. 8. 9. -1
+ 143          
+ 144          u8 code T_COM[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};      //位码
+ 145          
+ 146          /***************  本地变量声明  ****************/
+ 147          
+ 148          u8  LED8[8];        //显示缓冲
+ 149          u8  display_index;  //显示位索引
+ 150          bit B_1ms;          //1ms标志
+ 151          u16 msecond;
+ 152          u8 MinusFlag;       //负数标志，0：正数，1：负数
+ 153          
+ 154          /**********************************************/
+ 155          void DS18B20_Reset();
+ 156          void DS18B20_WriteByte(u8 dat);
+ 157          u8 DS18B20_ReadByte();
+ 158          
+ 159          void delay_us(u8 us);
+ 160          u16 ReadTemperature();
+ 161          void DisplayTemperature(u16 temp);
+ 162          /**********************************************/
+ 163          void main()
+ 164          {
+ 165   1          u8  i;
+ 166   1          u16 Temp;
+ 167   1      
+ 168   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 169   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 170   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+ 171   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 172   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 173   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 174   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 175   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 176   1        
+ 177   1          display_index = 0;
+ 178   1          AUXR = 0x80;    //Timer0 set as 1T, 16 bits timer auto-reload, 
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 4   
+
+ 179   1          TH0 = (u8)(Timer0_Reload / 256);
+ 180   1          TL0 = (u8)(Timer0_Reload % 256);
+ 181   1          ET0 = 1;    //Timer0 interrupt enable
+ 182   1          TR0 = 1;    //Tiner0 run
+ 183   1          EA = 1;     //打开总中断
+ 184   1          
+ 185   1          for(i=0; i<8; i++)  LED8[i] = 0x10; //上电消隐
+ 186   1      
+ 187   1          while (1)
+ 188   1          {
+ 189   2              if(B_1ms)   //1ms到
+ 190   2              {
+ 191   3                  B_1ms = 0;
+ 192   3                  if(++msecond >= 300)    //300ms到
+ 193   3                  {
+ 194   4                      msecond = 0;
+ 195   4                      Temp = ReadTemperature();
+ 196   4                      DisplayTemperature(Temp);
+ 197   4                  }
+ 198   3              }
+ 199   2          }
+ 200   1      }
+ 201          
+ 202          //========================================================================
+ 203          // 函数: u16 ReadTemperature()
+ 204          // 描述: 读取温度函数。
+ 205          // 参数: none.
+ 206          // 返回: 温度值.
+ 207          // 版本: VER1.0
+ 208          // 日期: 2020-7-30
+ 209          // 备注: 
+ 210          //========================================================================
+ 211          u16 ReadTemperature()
+ 212          {
+ 213   1          u16 TempH, TempL, Temperature;
+ 214   1        
+ 215   1          DS18B20_Reset();                //设备复位
+ 216   1          DS18B20_WriteByte(0xCC);        //跳过ROM命令
+ 217   1          DS18B20_WriteByte(0x44);        //开始转换命令
+ 218   1          while (!DQ);                    //等待转换完成
+ 219   1      
+ 220   1          DS18B20_Reset();                //设备复位
+ 221   1          DS18B20_WriteByte(0xCC);        //跳过ROM命令
+ 222   1          DS18B20_WriteByte(0xBE);        //读暂存存储器命令
+ 223   1          TempL = DS18B20_ReadByte();     //读温度低字节
+ 224   1          TempH = DS18B20_ReadByte();     //读温度高字节
+ 225   1        
+ 226   1          if(TempH & 0xf8)    //判断是否位负数
+ 227   1          {
+ 228   2              MinusFlag = 1;  //设置负数标志
+ 229   2              Temperature = (TempH<<8) | TempL;
+ 230   2              Temperature = ~Temperature + 1;
+ 231   2              Temperature *= 0.625;       //0.0625 * 10，保留1位小数点
+ 232   2          }
+ 233   1          else
+ 234   1          {
+ 235   2              MinusFlag = 0;  //清除负数标志
+ 236   2              Temperature = (((TempH<<8) | TempL) * 0.625); //0.0625 * 10，保留1位小数点
+ 237   2          }
+ 238   1      
+ 239   1          return Temperature;
+ 240   1      }
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 5   
+
+ 241          
+ 242          //========================================================================
+ 243          // 函数: void DisplayTemperature(u16 temp)
+ 244          // 描述: 显示温度函数。
+ 245          // 参数: none.
+ 246          // 返回: 温度值.
+ 247          // 版本: VER1.0
+ 248          // 日期: 2020-7-30
+ 249          // 备注: 
+ 250          //========================================================================
+ 251          void DisplayTemperature(u16 temp)
+ 252          {
+ 253   1          if(MinusFlag)
+ 254   1          {
+ 255   2              if(temp > 999)
+ 256   2              {
+ 257   3                  LED8[3] = DIS_;
+ 258   3                  LED8[4] = temp / 1000;
+ 259   3              }
+ 260   2              else
+ 261   2              {
+ 262   3                  LED8[3] = DIS_BLACK;
+ 263   3                  LED8[4] = DIS_;
+ 264   3              }
+ 265   2          }
+ 266   1          else
+ 267   1          {
+ 268   2              LED8[3] = DIS_BLACK;
+ 269   2              if(temp > 999)
+ 270   2              {
+ 271   3                  LED8[4] = temp / 1000;
+ 272   3              }
+ 273   2              else
+ 274   2              {
+ 275   3                  LED8[4] = DIS_BLACK;
+ 276   3              }
+ 277   2          }
+ 278   1          LED8[5] = (temp % 1000) / 100;
+ 279   1          LED8[6] = ((temp % 100) / 10) + DIS_DOT;
+ 280   1          LED8[7] = temp % 10;
+ 281   1      }
+ 282          
+ 283          //========================================================================
+ 284          // 函数: void  delay_us(u8 us)
+ 285          // 描述: 延时函数。
+ 286          // 参数: us,要延时的us数, 这里只支持1~255us. 
+ 287          // 返回: none.
+ 288          // 版本: VER1.0
+ 289          // 日期: 2013-4-1
+ 290          // 备注: 
+ 291          //========================================================================
+ 292          void delay_us(u8 us)
+ 293          {
+ 294   1          do{
+ 295   2              NOP();
+ 296   2              NOP();
+ 297   2          }while(--us);
+ 298   1      }
+ 299          
+ 300          /**************************************
+ 301          复位DS18B20,并检测设备是否存在
+ 302          **************************************/
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 6   
+
+ 303          void DS18B20_Reset()
+ 304          {
+ 305   1          CY = 1;
+ 306   1          while (CY)
+ 307   1          {
+ 308   2              DQ = 0;                     //送出低电平复位信号
+ 309   2              delay_us(240);              //延时至少480us
+ 310   2              delay_us(240);
+ 311   2              DQ = 1;                     //释放数据线
+ 312   2              delay_us(60);               //等待60us
+ 313   2              CY = DQ;                    //检测存在脉冲
+ 314   2              delay_us(240);              //等待设备释放数据线
+ 315   2              delay_us(180);
+ 316   2          }
+ 317   1      }
+ 318          
+ 319          /**************************************
+ 320          从DS18B20读1字节数据
+ 321          **************************************/
+ 322          u8 DS18B20_ReadByte()
+ 323          {
+ 324   1          u8 i;
+ 325   1          u8 dat = 0;
+ 326   1      
+ 327   1          for (i=0; i<8; i++)             //8位计数器
+ 328   1          {
+ 329   2              dat >>= 1;
+ 330   2              DQ = 0;                     //开始时间片
+ 331   2              delay_us(1);                //延时等待
+ 332   2              DQ = 1;                     //准备接收
+ 333   2              delay_us(1);                //接收延时
+ 334   2              if (DQ) dat |= 0x80;        //读取数据
+ 335   2              delay_us(60);               //等待时间片结束
+ 336   2          }
+ 337   1      
+ 338   1          return dat;
+ 339   1      }
+ 340          
+ 341          /**************************************
+ 342          向DS18B20写1字节数据
+ 343          **************************************/
+ 344          void DS18B20_WriteByte(u8 dat)
+ 345          {
+ 346   1          char i;
+ 347   1      
+ 348   1          for (i=0; i<8; i++)             //8位计数器
+ 349   1          {
+ 350   2              DQ = 0;                     //开始时间片
+ 351   2              delay_us(1);                //延时等待
+ 352   2              dat >>= 1;                  //送出数据
+ 353   2              DQ = CY;
+ 354   2              delay_us(60);               //等待时间片结束
+ 355   2              DQ = 1;                     //恢复数据线
+ 356   2              delay_us(1);                //恢复延时
+ 357   2          }
+ 358   1      }
+ 359          
+ 360          /********************** 显示扫描函数 ************************/
+ 361          void DisplayScan(void)
+ 362          {   
+ 363   1          P7 = ~T_COM[7-display_index];
+ 364   1          P6 = ~t_display[LED8[display_index]];
+C51 COMPILER V9.59.0.0   DS18B20                                                           08/11/2020 16:43:35 PAGE 7   
+
+ 365   1          if(++display_index >= 8)    display_index = 0;  //8位结束回0
+ 366   1      }
+ 367          
+ 368          /********************** Timer0 1ms中断函数 ************************/
+ 369          void timer0 (void) interrupt 1
+ 370          {
+ 371   1          DisplayScan();  //1ms扫描显示一位
+ 372   1          B_1ms = 1;      //1ms标志
+ 373   1      }
+ 374          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    602    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
