@@ -1,0 +1,19 @@
+*************************************************************
+FileName = PCB1.GBR
+AutoAperture = True
+*************************************************************
+Generating : Drill Drawing
+      File : PCB1.GD1
+
+    Adding Layer      : Mechanical 1
+
+    Adding Layer      : Drill Drawing
+
+    Adding Drill Pair : Top Layer-Bottom Layer
+
+
+Used DCodes :
+    D10
+    D11
+*************************************************************
+
