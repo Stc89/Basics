@@ -25,3 +25,9 @@
 
 ![渲染图](https://raw.githubusercontent.com/weiqifa0/pic/master/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20200813202412.jpg)
 
+# 防止失联微信公众号
+
+下面是我的微信技术公众号，大家如果在学习中遇到什么问题，欢迎来公众号一起讨论技术。
+
+![欢迎关注我的微信公众号](https://raw.githubusercontent.com/weiqifa0/pic/master/image-20200814205642044.png)
+
