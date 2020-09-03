@@ -1,0 +1,9 @@
+Removed Pin From Net: NetName=RXT Pin=CH1-2
+Removed Pin From Net: NetName=TXD Pin=CH1-3
+Removed Pin From Net: NetName=LED4 Pin=D4-2
+Removed Pin From Net: NetName=GND Pin=S2-1
+Added Pin To Net: NetName=TXD Pin=CH1-2
+Added Pin To Net: NetName=RXT Pin=CH1-3
+Added Pin To Net: NetName=GND Pin=D4-2
+Added Pin To Net: NetName=P5.4 Pin=S2-1
+Added Room: Name=main

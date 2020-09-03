@@ -1,0 +1,18 @@
+".\Output\STARTUP.obj",
+".\Output\OS_CPU_C.obj",
+".\Output\OS_CPU_A.obj",
+".\Output\OS_CORE.obj",
+".\Output\OS_FLAG.obj",
+".\Output\OS_MBOX.obj",
+".\Output\OS_MEM.obj",
+".\Output\OS_MUTEX.obj",
+".\Output\OS_Q.obj",
+".\Output\OS_SEM.obj",
+".\Output\OS_TASK.obj",
+".\Output\OS_TIME.obj",
+".\Output\serial.obj",
+".\Output\system.obj",
+".\Output\main.obj" 
+TO ".\Output\uCOS_51" 
+PRINT(".\Listing\uCOS_51.m51") RAMSIZE(256) 
+XDATA( 0X0000-0XFFFE )

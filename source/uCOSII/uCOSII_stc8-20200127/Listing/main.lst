@@ -1,0 +1,225 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              01/22/2020 20:57:57 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Output\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE APP\main.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) DEBUG OB
+                    -JECTEXTEND PRINT(.\Listing\main.lst) OBJECT(.\Output\main.obj)
+
+line level    source
+
+   1          /*
+   2          *********************************************************************************************************
+   3          *                                                uC/OS-II
+   4          *                                          The Real-Time Kernel
+   5          *
+   6          *                          (c) Copyright 1992-2002, Jean J. Labrosse, Weston, FL
+   7          *                                           All Rights Reserved
+   8          *
+   9          *
+  10          *                                           uCOS_51 for MCS-51
+  11          *
+  12          * File : main.c
+  13          * Created by : QQ 591881218
+  14          *********************************************************************************************************
+  15          */
+  16          
+  17          #include "..\..\ucos-ii\inc\includes.h"
+  18          
+  19          // ---------------------------------
+  20          
+  21          #define APPSTARTPRIO    TASK_START_PRIO 
+  22          #define UARTRCVPRIO             APPSTARTPRIO + 2
+  23          #define UARTSENDPRIO    UARTRCVPRIO + 2
+  24          #define POWERLEDPRIO    OS_LOWEST_PRIO - 2
+  25          
+  26          #define OK                              0
+  27          #define ACK                             1
+  28          #define ENTER                   0x0D
+  29          
+  30          // --------------------------------- 
+  31          
+  32          sbit WorkLedCtrl=P6^0;
+  33          
+  34          OS_EVENT *UartMbox;
+  35          OS_EVENT *AckMbox;
+  36          
+  37          OS_STK AppStartStk[TASK_STK_SIZE];
+  38          OS_STK PowerLedStk[TASK_STK_SIZE];
+  39          OS_STK UartRcvStk[TASK_STK_SIZE];
+  40          OS_STK UartSendStk[TASK_STK_SIZE];
+  41          
+  42          // ---------------------------------
+  43          
+  44          void AppStart(void *p_arg) large reentrant;
+  45          void PowerLed(void *p_arg) large reentrant; 
+  46          void UartRcv(void *p_arg) large reentrant;
+  47          void UartSend(void *p_arg)      large reentrant;
+  48          
+  49          // ---------------------------------
+  50          
+  51          int main(void)
+  52          {
+  53   1              InitSystem();
+  54   1      
+C51 COMPILER V9.60.0.0   MAIN                                                              01/22/2020 20:57:57 PAGE 2   
+
+  55   1              OSTaskCreate(AppStart, (void *)0, AppStartStk, APPSTARTPRIO);
+  56   1      
+  57   1              OSStart();
+  58   1      
+  59   1              return OK;
+  60   1      }
+  61          
+  62          /*
+  63          ********************************************************************************************************* 
+  64          *                                             系统开始任务
+  65          *
+  66          * 描述       : 开定时器T0中断，创建消息邮箱以及所有其他的任务，然后自我删除。
+  67          *
+  68          * 参数       : p_arg
+  69          *
+  70          * 注意       : 系统启动后第一时间开定时器中断，否则系统其它任务无法得到执行。                                           
+  71          *********************************************************************************************************
+  72          */
+  73          void AppStart(void *p_arg) large reentrant
+  74          {
+  75   1              p_arg=p_arg;
+  76   1              ET0=1; /* 谨记：系统启动后第一时间开定时器中断 */
+  77   1      
+  78   1              UartMbox=OSMboxCreate((void *)0);
+  79   1              AckMbox=OSMboxCreate((void *)0);
+  80   1      
+  81   1              LogoDisp();
+  82   1              PrintStr("You can input by the terminal!\n\n\n");
+  83   1              
+  84   1              OSTaskCreate(PowerLed, (void *)0, PowerLedStk, POWERLEDPRIO);
+  85   1              OSTaskCreate(UartRcv, (void *)0, UartRcvStk, UARTRCVPRIO);
+  86   1              OSTaskCreate(UartSend, (void *)0, UartSendStk, UARTSENDPRIO);
+  87   1      
+  88   1              OSTaskDel(OS_PRIO_SELF);        
+  89   1      }
+  90          
+  91          /*
+  92          ********************************************************************************************************* 
+  93          *                                             工作状态指示任务
+  94          *
+  95          * 描述       : CPU正常工作时，每秒钟闪烁5次，不工作时不闪烁，控制端口P3.4。
+  96          *
+  97          * 参数       : p_arg
+  98          *
+  99          * 注意       : 一个时钟节拍为0.02s，建议优先级设为最低，高于系统空闲任务和系统统计任务。强烈引起您的重视：
+ 100          *                          ..\ucos_51\ucos-ii\src\ucos_ii.h     
+ 101          *                                       OS_EXT  DF_IDATA  volatile  INT32U  OSIdleCtr; 
+ 102          *                          "OSIdleCtr" 变量务必设置为 "idata" 存储类型，否则任务运行节拍变慢。                                          
+ 103          *********************************************************************************************************
+ 104          */
+ 105          void PowerLed(void *p_arg) large reentrant
+ 106          {
+ 107   1      #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
+                  OS_CPU_SR  cpu_sr;
+              #endif
+ 110   1      
+ 111   1              p_arg=p_arg;
+ 112   1              
+ 113   1              for(;;)
+ 114   1              {
+ 115   2                      OS_ENTER_CRITICAL();
+ 116   2                      WorkLedCtrl=!WorkLedCtrl; /* 保护临界资源 */
+C51 COMPILER V9.60.0.0   MAIN                                                              01/22/2020 20:57:57 PAGE 3   
+
+ 117   2                      OS_EXIT_CRITICAL();
+ 118   2      
+ 119   2                      OSTimeDlyHMSM(0,0,0,200);
+ 120   2              }
+ 121   1      }
+ 122          
+ 123          
+ 124          
+ 125          /*
+ 126          ********************************************************************************************************* 
+ 127          *                                             串口收发任务
+ 128          *
+ 129          * 描述       : UartRcv任务负责从键盘接收，通过消息邮箱发送给UartSend任务处理并在终端打印。
+ 130          *
+ 131          * 参数       : p_arg
+ 132          *
+ 133          * 注意       : 多任务的并发执行，须妥善处理对临界资源的访问以及多任务之间的通信。                               
+             -        
+ 134          *********************************************************************************************************
+ 135          */
+ 136          // ------------------------------------------------------------------------------------------------------
+ 137          void UartRcv(void *p_arg) large reentrant
+ 138          {
+ 139   1              INT8U Rxbuf;
+ 140   1              INT8U err;
+ 141   1      
+ 142   1              p_arg=p_arg;
+ 143   1                      
+ 144   1              for(;;)
+ 145   1              {
+ 146   2                      if(Getch(&Rxbuf)) 
+ 147   2                      {
+ 148   3                              OSMboxPost(UartMbox, (void *)&Rxbuf);
+ 149   3                              OSMboxPend(AckMbox, 0, &err);
+ 150   3                      }       
+ 151   2                      
+ 152   2                      OSTimeDlyHMSM(0,0,0,100);
+ 153   2              }       
+ 154   1      }
+ 155          
+ 156          void UartSend(void *p_arg) large reentrant
+ 157          {
+ 158   1              INT8U *Txbuf;
+ 159   1              INT8U err;
+ 160   1              INT16U count=0; 
+ 161   1      
+ 162   1              p_arg=p_arg;
+ 163   1      
+ 164   1              for(;;)
+ 165   1              {
+ 166   2                      Txbuf=(INT8U *)OSMboxPend(UartMbox,0,&err);
+ 167   2      
+ 168   2                      if(OS_ERR_NONE==err)
+ 169   2                      {       
+ 170   3                              PrintChar(*Txbuf);
+ 171   3      
+ 172   3                              count++;
+ 173   3                              
+ 174   3                              if((ENTER == *Txbuf) || (0xFFFF == count)) count=1; 
+ 175   3                      
+ 176   3                              if(!(count%69))
+ 177   3                              { 
+C51 COMPILER V9.60.0.0   MAIN                                                              01/22/2020 20:57:57 PAGE 4   
+
+ 178   4                                      PrintStr("\n");
+ 179   4                              }       
+ 180   3                      }
+ 181   2                      else 
+ 182   2                      {
+ 183   3                              PrintStr("\n\nMboxRcv err!\n\n\n");
+ 184   3                      }
+ 185   2      
+ 186   2                      OSMboxPost(AckMbox,(void *)ACK);
+ 187   2              }
+ 188   1      }
+ 189          // ------------------------------------------------------------------------------------------------------
+ 190          
+ 191          
+*** WARNING C294 IN LINE 121 OF APP\main.c: unreachable code
+*** WARNING C294 IN LINE 154 OF APP\main.c: unreachable code
+*** WARNING C294 IN LINE 188 OF APP\main.c: unreachable code
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    880    ----
+   CONSTANT SIZE    =     54    ----
+   XDATA SIZE       =   2054    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  0 ERROR(S)

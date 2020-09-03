@@ -1,0 +1,190 @@
+C51 COMPILER V9.60.0.0   SERIAL                                                            01/22/2020 20:57:57 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SERIAL
+OBJECT MODULE PLACED IN .\Output\serial.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE BSP\serial.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) DEBUG 
+                    -OBJECTEXTEND PRINT(.\Listing\serial.lst) OBJECT(.\Output\serial.obj)
+
+line level    source
+
+   1          /*
+   2          *********************************************************************************************************
+   3          *                                                uC/OS-II
+   4          *                                          The Real-Time Kernel
+   5          *
+   6          *                          (c) Copyright 1992-2002, Jean J. Labrosse, Weston, FL
+   7          *                                           All Rights Reserved
+   8          *
+   9          *
+  10          *                                           uCOS_51 for MCS-51
+  11          *
+  12          * File : serial.c
+  13          * From : yang yi
+  14          * Last modified by : QQ 591881218
+  15          *********************************************************************************************************
+  16          */
+  17          
+  18          #ifndef  OS_MASTER_FILE
+  19          #include "..\..\ucos-ii\inc\includes.h"
+  20          #endif
+  21          
+  22          unsigned char TxBuf[LenTxBuf],RxBuf[LenRxBuf];
+  23          unsigned char *inTxBuf,*outTxBuf,*inRxBuf,*outRxBuf;
+  24          bit TIflag=1;
+  25          
+  26          void InitSerial(void) large reentrant // 串口初始化
+  27          {
+  28   1              SCON=0x50;
+  29   1          TMOD= 0x00;
+  30   1          TL1=-(24000000UL / 115200 /4);
+  31   1              TH1=(-(24000000UL / 115200 /4)) >> 8; 
+  32   1              AUXR = 0x40;
+  33   1              TR1=1;
+  34   1      }
+  35          
+  36          void InitSerialBuffer(void) large reentrant // 串口缓冲区初始化
+  37          {
+  38   1              inTxBuf=TxBuf;outTxBuf=TxBuf;
+  39   1              inRxBuf=RxBuf;outRxBuf=RxBuf;
+  40   1              ES=1;
+  41   1      }
+  42          
+  43          void Serial(void) large reentrant       // 串口中断服务子程序，中断在汇编中实现，去掉interrupt 4 
+  44          {  
+  45   1              unsigned char *t;
+  46   1              
+  47   1              /* 循环缓冲区 */
+  48   1              if(TI){
+  49   2                      TI=0;
+  50   2                      if(inTxBuf==outTxBuf) {TIflag=1;return;} // TxBuf Empty
+  51   2                      SBUF=*outTxBuf;outTxBuf++;
+  52   2                      if(outTxBuf==TxBuf+LenTxBuf) outTxBuf=TxBuf;    
+  53   2              }
+  54   1              if(RI){
+C51 COMPILER V9.60.0.0   SERIAL                                                            01/22/2020 20:57:57 PAGE 2   
+
+  55   2                      RI=0;
+  56   2                      t=inRxBuf;t++;
+  57   2                      if(t==RxBuf+LenRxBuf) t=RxBuf;
+  58   2                      if(t==outRxBuf) return; // RxBuf Full
+  59   2                      *inRxBuf=SBUF;
+  60   2                      inRxBuf=t;
+  61   2              }
+  62   1      }
+  63          
+  64          bit Getch(unsigned char *ch) large reentrant // 从串口缓冲区读1字节数据
+  65          {
+  66   1      #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
+                  OS_CPU_SR  cpu_sr;
+              #endif
+  69   1              
+  70   1              OS_ENTER_CRITICAL();/* 进入临界区 */      
+  71   1              if(inRxBuf==outRxBuf) {OS_EXIT_CRITICAL();/* 退出临界区 */return 0;} // RxBuf Empty
+  72   1              *ch=*outRxBuf;outRxBuf++;
+  73   1              if(outRxBuf==RxBuf+LenRxBuf) outRxBuf=RxBuf;  
+  74   1              OS_EXIT_CRITICAL();/* 退出临界区 */     
+  75   1              return 1;
+  76   1      }
+  77          
+  78          void PrintChar(unsigned char ch) large reentrant // 显示字符
+  79          {
+  80   1      #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
+                  OS_CPU_SR  cpu_sr;
+              #endif
+  83   1      
+  84   1              unsigned char *t;
+  85   1      
+  86   1              OS_ENTER_CRITICAL();/* 进入临界区 */
+  87   1      
+  88   1      /*
+  89   1      #pragma ASM
+  90   1          PUSH IE; // 保存中断状态
+  91   1          CLR EA; // 关中断
+  92   1      #pragma ENDASM
+  93   1      */
+  94   1      
+  95   1              t=inTxBuf;t++;
+  96   1              if(t==TxBuf+LenTxBuf) t=TxBuf;
+  97   1              if(t==outTxBuf){
+  98   2                      OS_EXIT_CRITICAL();/* 退出临界区 */
+  99   2      
+ 100   2                      /*
+ 101   2                      #pragma ASM
+ 102   2                          POP IE;     // 恢复之前中断状态
+ 103   2                      #pragma ENDASM
+ 104   2                      */
+ 105   2      
+ 106   2                      return;
+ 107   2              } // TxBuf Full
+ 108   1              *inTxBuf=ch;
+ 109   1              inTxBuf=t;
+ 110   1      
+ 111   1              OS_EXIT_CRITICAL();/* 退出临界区 */
+ 112   1      
+ 113   1      /*
+ 114   1      #pragma ASM
+ 115   1          POP IE; // 恢复之前中断状态
+ 116   1      #pragma ENDASM
+C51 COMPILER V9.60.0.0   SERIAL                                                            01/22/2020 20:57:57 PAGE 3   
+
+ 117   1      */
+ 118   1      
+ 119   1              if(TIflag){     
+ 120   2                      OS_ENTER_CRITICAL();/* 进入临界区 */    
+ 121   2                      TIflag=0;
+ 122   2                      OS_EXIT_CRITICAL();/* 退出临界区 */ 
+ 123   2                      TI=1; // 产生串口发送中断       
+ 124   2              }
+ 125   1      }
+ 126          
+ 127          void PrintStr(unsigned char *str) large reentrant // 显示字符串
+ 128          { 
+ 129   1              int i;
+ 130   1              unsigned char j;
+ 131   1              unsigned char ch;
+ 132   1                      
+ 133   1      /*
+ 134   1      #pragma ASM
+ 135   1          PUSH IE;
+ 136   1          CLR EA;
+ 137   1      #pragma ENDASM
+ 138   1      */
+ 139   1          /* 本函数不需要临界保护 */
+ 140   1              for(i=0;i<MaxLenStr;i++){
+ 141   2                      ch=*(str+i);
+ 142   2                      if(ch=='\0') break;
+ 143   2                      else if(ch=='\n'){PrintChar(10);PrintChar(13);} 
+ 144   2                      else if(ch=='\t'){
+ 145   3                              for(j=0;j<TABNum;j++)
+ 146   3                                      PrintChar(' ');
+ 147   3                      }
+ 148   2                      else PrintChar(ch);
+ 149   2              }
+ 150   1      
+ 151   1      /*
+ 152   1      #pragma ASM
+ 153   1          POP IE;
+ 154   1      #pragma ENDASM
+ 155   1      */
+ 156   1      }
+ 157          
+ 158          void ClrScr(void) large reentrant // 清屏
+ 159          {        
+ 160   1              PrintStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); // 25个回车换行清屏
+ 161   1      }
+ 162          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    990    ----
+   CONSTANT SIZE    =     26    ----
+   XDATA SIZE       =   2062    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

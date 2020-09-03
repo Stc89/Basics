@@ -1,0 +1,1336 @@
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_TASK
+OBJECT MODULE PLACED IN .\Output\OS_TASK.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_TASK.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\In
+                    -c) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_TASK.lst) OBJECT(.\Output\OS_TASK.obj)
+
+line level    source
+
+   1          /*
+   2          *********************************************************************************************************
+   3          *                                                uC/OS-II
+   4          *                                          The Real-Time Kernel
+   5          *                                            TASK MANAGEMENT
+   6          *
+   7          *                              (c) Copyright 1992-2009, Micrium, Weston, FL
+   8          *                                           All Rights Reserved
+   9          *
+  10          * File    : OS_TASK.C
+  11          * By      : Jean J. Labrosse
+  12          * Version : V2.91
+  13          *
+  14          * LICENSING TERMS:
+  15          * ---------------
+  16          *   uC/OS-II is provided in source form for FREE evaluation, for educational use or for peaceful research.
+  17          * If you plan on using  uC/OS-II  in a commercial product you need to contact Micriµm to properly license
+  18          * its use in your product. We provide ALL the source code for your convenience and to help you experience
+  19          * uC/OS-II.   The fact that the  source is provided does  NOT  mean that you can use it without  paying a
+  20          * licensing fee.
+  21          *********************************************************************************************************
+  22          */
+  23          
+  24          #ifndef  OS_MASTER_FILE
+  25          #include <includes.h>
+  26          #endif
+  27          
+  28          /*$PAGE*/
+  29          /*
+  30          *********************************************************************************************************
+  31          *                                        CHANGE PRIORITY OF A TASK
+  32          *
+  33          * Description: This function allows you to change the priority of a task dynamically.  Note that the new
+  34          *              priority MUST be available.
+  35          *
+  36          * Arguments  : oldp     is the old priority
+  37          *
+  38          *              newp     is the new priority
+  39          *
+  40          * Returns    : OS_ERR_NONE            is the call was successful
+  41          *              OS_ERR_PRIO_INVALID    if the priority you specify is higher that the maximum allowed
+  42          *                                     (i.e. >= OS_LOWEST_PRIO)
+  43          *              OS_ERR_PRIO_EXIST      if the new priority already exist.
+  44          *              OS_ERR_PRIO            there is no task with the specified OLD priority (i.e. the OLD task 
+             -does
+  45          *                                     not exist.
+  46          *              OS_ERR_TASK_NOT_EXIST  if the task is assigned to a Mutex PIP.
+  47          *********************************************************************************************************
+  48          */
+  49          
+  50          #if OS_TASK_CHANGE_PRIO_EN > 0u
+              INT8U  OSTaskChangePrio (INT8U  oldprio,
+                                       INT8U  newprio) large reentrant
+              {
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 2   
+
+              #if (OS_EVENT_EN)
+                  OS_EVENT  *pevent;
+              #if (OS_EVENT_MULTI_EN > 0u)
+                  OS_EVENT **pevents;
+              #endif
+              #endif
+                  OS_TCB    *ptcb;
+                  INT8U      y_new;
+                  INT8U      x_new;
+                  INT8U      y_old;
+                  OS_PRIO    bity_new;
+                  OS_PRIO    bitx_new;
+                  OS_PRIO    bity_old;
+                  OS_PRIO    bitx_old;
+              #if OS_CRITICAL_METHOD == 3u
+                  OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+              #endif
+              
+              
+              /*$PAGE*/
+              #if OS_ARG_CHK_EN > 0u
+                  if (oldprio >= OS_LOWEST_PRIO) {
+                      if (oldprio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+                  if (newprio >= OS_LOWEST_PRIO) {
+                      return (OS_ERR_PRIO_INVALID);
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (OSTCBPrioTbl[newprio] != (OS_TCB *)0) {             /* New priority must not already exist     */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_PRIO_EXIST);
+                  }
+                  if (oldprio == OS_PRIO_SELF) {                          /* See if changing self                    */
+                      oldprio = OSTCBCur->OSTCBPrio;                      /* Yes, get priority                       */
+                  }
+                  ptcb = OSTCBPrioTbl[oldprio];
+                  if (ptcb == (OS_TCB *)0) {                              /* Does task to change exist?              */
+                      OS_EXIT_CRITICAL();                                 /* No, can't change its priority!          */
+                      return (OS_ERR_PRIO);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                          /* Is task assigned to Mutex               */
+                      OS_EXIT_CRITICAL();                                 /* No, can't change its priority!          */
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+              #if OS_LOWEST_PRIO <= 63u
+                  y_new                 = (INT8U)(newprio >> 3u);         /* Yes, compute new TCB fields             */
+                  x_new                 = (INT8U)(newprio & 0x07u);
+              #else
+                  y_new                 = (INT8U)((INT8U)(newprio >> 4u) & 0x0Fu);
+                  x_new                 = (INT8U)(newprio & 0x0Fu);
+              #endif
+                  bity_new              = (OS_PRIO)(1uL << y_new);
+                  bitx_new              = (OS_PRIO)(1uL << x_new);
+              
+                  OSTCBPrioTbl[oldprio] = (OS_TCB *)0;                    /* Remove TCB from old priority            */
+                  OSTCBPrioTbl[newprio] =  ptcb;                          /* Place pointer to TCB @ new priority     */
+                  y_old                 =  ptcb->OSTCBY;
+                  bity_old              =  ptcb->OSTCBBitY;
+                  bitx_old              =  ptcb->OSTCBBitX;
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 3   
+
+                  if ((OSRdyTbl[y_old] &   bitx_old) != 0u) {             /* If task is ready make it not            */
+                       OSRdyTbl[y_old] &= (OS_PRIO)~bitx_old;
+                       if (OSRdyTbl[y_old] == 0u) {
+                           OSRdyGrp &= (OS_PRIO)~bity_old;
+                       }
+                       OSRdyGrp        |= bity_new;                       /* Make new priority ready to run          */
+                       OSRdyTbl[y_new] |= bitx_new;
+                  }
+              
+              #if (OS_EVENT_EN)
+                  pevent = ptcb->OSTCBEventPtr;
+                  if (pevent != (OS_EVENT *)0) {
+                      pevent->OSEventTbl[y_old] &= (OS_PRIO)~bitx_old;    /* Remove old task prio from wait list     */
+                      if (pevent->OSEventTbl[y_old] == 0u) {
+                          pevent->OSEventGrp    &= (OS_PRIO)~bity_old;
+                      }
+                      pevent->OSEventGrp        |= bity_new;              /* Add    new task prio to   wait list     */
+                      pevent->OSEventTbl[y_new] |= bitx_new;
+                  }
+              #if (OS_EVENT_MULTI_EN > 0u)
+                  if (ptcb->OSTCBEventMultiPtr != (OS_EVENT **)0) {
+                      pevents =  ptcb->OSTCBEventMultiPtr;
+                      pevent  = *pevents;
+                      while (pevent != (OS_EVENT *)0) {
+                          pevent->OSEventTbl[y_old] &= (OS_PRIO)~bitx_old;   /* Remove old task prio from wait lists */
+                          if (pevent->OSEventTbl[y_old] == 0u) {
+                              pevent->OSEventGrp    &= (OS_PRIO)~bity_old;
+                          }
+                          pevent->OSEventGrp        |= bity_new;          /* Add    new task prio to   wait lists    */
+                          pevent->OSEventTbl[y_new] |= bitx_new;
+                          pevents++;
+                          pevent                     = *pevents;
+                      }
+                  }
+              #endif
+              #endif
+              
+                  ptcb->OSTCBPrio = newprio;                              /* Set new task priority                   */
+                  ptcb->OSTCBY    = y_new;
+                  ptcb->OSTCBX    = x_new;
+                  ptcb->OSTCBBitY = bity_new;
+                  ptcb->OSTCBBitX = bitx_new;
+                  OS_EXIT_CRITICAL();
+                  if (OSRunning == OS_TRUE) {
+                      OS_Sched();                                         /* Find new highest priority task          */
+                  }
+                  return (OS_ERR_NONE);
+              }
+              #endif
+ 165          /*$PAGE*/
+ 166          /*
+ 167          *********************************************************************************************************
+ 168          *                                            CREATE A TASK
+ 169          *
+ 170          * Description: This function is used to have uC/OS-II manage the execution of a task.  Tasks can either
+ 171          *              be created prior to the start of multitasking or by a running task.  A task cannot be
+ 172          *              created by an ISR.
+ 173          *
+ 174          * Arguments  : task     is a pointer to the task's code
+ 175          *
+ 176          *              p_arg    is a pointer to an optional data area which can be used to pass parameters to
+ 177          *                       the task when the task first executes.  Where the task is concerned it thinks
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 4   
+
+ 178          *                       it was invoked and passed the argument 'p_arg' as follows:
+ 179          *
+ 180          *                           void Task (void *p_arg)
+ 181          *                           {
+ 182          *                               for (;;) {
+ 183          *                                   Task code;
+ 184          *                               }
+ 185          *                           }
+ 186          *
+ 187          *              ptos     is a pointer to the task's top of stack.  If the configuration constant
+ 188          *                       OS_STK_GROWTH is set to 1, the stack is assumed to grow downward (i.e. from high
+ 189          *                       memory to low memory).  'pstk' will thus point to the highest (valid) memory
+ 190          *                       location of the stack.  If OS_STK_GROWTH is set to 0, 'pstk' will point to the
+ 191          *                       lowest memory location of the stack and the stack will grow with increasing
+ 192          *                       memory locations.
+ 193          *
+ 194          *              prio     is the task's priority.  A unique priority MUST be assigned to each task and the
+ 195          *                       lower the number, the higher the priority.
+ 196          *
+ 197          * Returns    : OS_ERR_NONE             if the function was successful.
+ 198          *              OS_PRIO_EXIT            if the task priority already exist
+ 199          *                                      (each task MUST have a unique priority).
+ 200          *              OS_ERR_PRIO_INVALID     if the priority you specify is higher that the maximum allowed
+ 201          *                                      (i.e. >= OS_LOWEST_PRIO)
+ 202          *              OS_ERR_TASK_CREATE_ISR  if you tried to create a task from an ISR.
+ 203          *********************************************************************************************************
+ 204          */
+ 205          
+ 206          #if OS_TASK_CREATE_EN > 0u
+ 207          INT8U  OSTaskCreate (void   (*task)(void *p_arg),
+ 208                               void    *p_arg,
+ 209                               OS_STK  *ptos,
+ 210                               INT8U    prio) large reentrant
+ 211          {
+ 212   1          OS_STK    *psp;
+ 213   1          INT8U      err;
+ 214   1      #if OS_CRITICAL_METHOD == 3u                 /* Allocate storage for CPU status register               */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+ 217   1      
+ 218   1      
+ 219   1      
+ 220   1      #ifdef OS_SAFETY_CRITICAL_IEC61508
+                  if (OSSafetyCriticalStartFlag == OS_TRUE) {
+                      OS_SAFETY_CRITICAL_EXCEPTION();
+                  }
+              #endif
+ 225   1      
+ 226   1      #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {             /* Make sure priority is within allowable range           */
+                      return (OS_ERR_PRIO_INVALID);
+                  }
+              #endif
+ 231   1          OS_ENTER_CRITICAL();
+ 232   1          if (OSIntNesting > 0u) {                 /* Make sure we don't create the task from within an ISR  */
+ 233   2              OS_EXIT_CRITICAL();
+ 234   2              return (OS_ERR_TASK_CREATE_ISR);
+ 235   2          }
+ 236   1          if (OSTCBPrioTbl[prio] == (OS_TCB *)0) { /* Make sure task doesn't already exist at this priority  */
+ 237   2              OSTCBPrioTbl[prio] = OS_TCB_RESERVED;/* Reserve the priority to prevent others from doing ...  */
+ 238   2                                                   /* ... the same thing until task is created.              */
+ 239   2              OS_EXIT_CRITICAL();
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 5   
+
+ 240   2              psp = OSTaskStkInit(task, p_arg, ptos, 0u);             /* Initialize the task's stack         */
+ 241   2              err = OS_TCBInit(prio, psp, (OS_STK *)0, 0u, 0u, (void *)0, 0u);
+ 242   2              if (err == OS_ERR_NONE) {
+ 243   3                  if (OSRunning == OS_TRUE) {      /* Find highest priority task if multitasking has started */
+ 244   4                      OS_Sched();
+ 245   4                  }
+ 246   3              } else {
+ 247   3                  OS_ENTER_CRITICAL();
+ 248   3                  OSTCBPrioTbl[prio] = (OS_TCB *)0;/* Make this priority available to others                 */
+ 249   3                  OS_EXIT_CRITICAL();
+ 250   3              }
+ 251   2              return (err);
+ 252   2          }
+ 253   1          OS_EXIT_CRITICAL();
+ 254   1          return (OS_ERR_PRIO_EXIST);
+ 255   1      }
+ 256          #endif
+ 257          /*$PAGE*/
+ 258          /*
+ 259          *********************************************************************************************************
+ 260          *                                     CREATE A TASK (Extended Version)
+ 261          *
+ 262          * Description: This function is used to have uC/OS-II manage the execution of a task.  Tasks can either
+ 263          *              be created prior to the start of multitasking or by a running task.  A task cannot be
+ 264          *              created by an ISR.  This function is similar to OSTaskCreate() except that it allows
+ 265          *              additional information about a task to be specified.
+ 266          *
+ 267          * Arguments  : task      is a pointer to the task's code
+ 268          *
+ 269          *              p_arg     is a pointer to an optional data area which can be used to pass parameters to
+ 270          *                        the task when the task first executes.  Where the task is concerned it thinks
+ 271          *                        it was invoked and passed the argument 'p_arg' as follows:
+ 272          *
+ 273          *                            void Task (void *p_arg)
+ 274          *                            {
+ 275          *                                for (;;) {
+ 276          *                                    Task code;
+ 277          *                                }
+ 278          *                            }
+ 279          *
+ 280          *              ptos      is a pointer to the task's top of stack.  If the configuration constant
+ 281          *                        OS_STK_GROWTH is set to 1, the stack is assumed to grow downward (i.e. from high
+ 282          *                        memory to low memory).  'ptos' will thus point to the highest (valid) memory
+ 283          *                        location of the stack.  If OS_STK_GROWTH is set to 0, 'ptos' will point to the
+ 284          *                        lowest memory location of the stack and the stack will grow with increasing
+ 285          *                        memory locations.  'ptos' MUST point to a valid 'free' data item.
+ 286          *
+ 287          *              prio      is the task's priority.  A unique priority MUST be assigned to each task and the
+ 288          *                        lower the number, the higher the priority.
+ 289          *
+ 290          *              id        is the task's ID (0..65535)
+ 291          *
+ 292          *              pbos      is a pointer to the task's bottom of stack.  If the configuration constant
+ 293          *                        OS_STK_GROWTH is set to 1, the stack is assumed to grow downward (i.e. from high
+ 294          *                        memory to low memory).  'pbos' will thus point to the LOWEST (valid) memory
+ 295          *                        location of the stack.  If OS_STK_GROWTH is set to 0, 'pbos' will point to the
+ 296          *                        HIGHEST memory location of the stack and the stack will grow with increasing
+ 297          *                        memory locations.  'pbos' MUST point to a valid 'free' data item.
+ 298          *
+ 299          *              stk_size  is the size of the stack in number of elements.  If OS_STK is set to INT8U,
+ 300          *                        'stk_size' corresponds to the number of bytes available.  If OS_STK is set to
+ 301          *                        INT16U, 'stk_size' contains the number of 16-bit entries available.  Finally, if
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 6   
+
+ 302          *                        OS_STK is set to INT32U, 'stk_size' contains the number of 32-bit entries
+ 303          *                        available on the stack.
+ 304          *
+ 305          *              pext      is a pointer to a user supplied memory location which is used as a TCB extension.
+ 306          *                        For example, this user memory can hold the contents of floating-point registers
+ 307          *                        during a context switch, the time each task takes to execute, the number of times
+ 308          *                        the task has been switched-in, etc.
+ 309          *
+ 310          *              opt       contains additional information (or options) about the behavior of the task.  The
+ 311          *                        LOWER 8-bits are reserved by uC/OS-II while the upper 8 bits can be application
+ 312          *                        specific.  See OS_TASK_OPT_??? in uCOS-II.H.  Current choices are:
+ 313          *
+ 314          *                        OS_TASK_OPT_STK_CHK      Stack checking to be allowed for the task
+ 315          *                        OS_TASK_OPT_STK_CLR      Clear the stack when the task is created
+ 316          *                        OS_TASK_OPT_SAVE_FP      If the CPU has floating-point registers, save them
+ 317          *                                                 during a context switch.
+ 318          *
+ 319          * Returns    : OS_ERR_NONE             if the function was successful.
+ 320          *              OS_PRIO_EXIT            if the task priority already exist
+ 321          *                                      (each task MUST have a unique priority).
+ 322          *              OS_ERR_PRIO_INVALID     if the priority you specify is higher that the maximum allowed
+ 323          *                                      (i.e. > OS_LOWEST_PRIO)
+ 324          *              OS_ERR_TASK_CREATE_ISR  if you tried to create a task from an ISR.
+ 325          *********************************************************************************************************
+ 326          */
+ 327          /*$PAGE*/
+ 328          #if OS_TASK_CREATE_EXT_EN > 0u
+              INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
+                                      void    *p_arg,
+                                      OS_STK  *ptos,
+                                      INT8U    prio,
+                                      INT16U   id,
+                                      OS_STK  *pbos,
+                                      INT32U   stk_size,
+                                      void    *pext,
+                                      INT16U   opt) large reentrant
+              {
+                  OS_STK    *psp;
+                  INT8U      err;
+              #if OS_CRITICAL_METHOD == 3u                 /* Allocate storage for CPU status register               */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #ifdef OS_SAFETY_CRITICAL_IEC61508
+                  if (OSSafetyCriticalStartFlag == OS_TRUE) {
+                      OS_SAFETY_CRITICAL_EXCEPTION();
+                  }
+              #endif
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {             /* Make sure priority is within allowable range           */
+                      return (OS_ERR_PRIO_INVALID);
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (OSIntNesting > 0u) {                 /* Make sure we don't create the task from within an ISR  */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_CREATE_ISR);
+                  }
+                  if (OSTCBPrioTbl[prio] == (OS_TCB *)0) { /* Make sure task doesn't already exist at this priority  */
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 7   
+
+                      OSTCBPrioTbl[prio] = OS_TCB_RESERVED;/* Reserve the priority to prevent others from doing ...  */
+                                                           /* ... the same thing until task is created.              */
+                      OS_EXIT_CRITICAL();
+              
+              #if (OS_TASK_STAT_STK_CHK_EN > 0u)
+                      OS_TaskStkClr(pbos, stk_size, opt);                    /* Clear the task stack (if needed)     */
+              #endif
+              
+                      psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */
+                      err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);
+                      if (err == OS_ERR_NONE) {
+                          if (OSRunning == OS_TRUE) {                        /* Find HPT if multitasking has started */
+                              OS_Sched();
+                          }
+                      } else {
+                          OS_ENTER_CRITICAL();
+                          OSTCBPrioTbl[prio] = (OS_TCB *)0;                  /* Make this priority avail. to others  */
+                          OS_EXIT_CRITICAL();
+                      }
+                      return (err);
+                  }
+                  OS_EXIT_CRITICAL();
+                  return (OS_ERR_PRIO_EXIST);
+              }
+              #endif
+ 389          /*$PAGE*/
+ 390          /*
+ 391          *********************************************************************************************************
+ 392          *                                            DELETE A TASK
+ 393          *
+ 394          * Description: This function allows you to delete a task.  The calling task can delete itself by
+ 395          *              its own priority number.  The deleted task is returned to the dormant state and can be
+ 396          *              re-activated by creating the deleted task again.
+ 397          *
+ 398          * Arguments  : prio    is the priority of the task to delete.  Note that you can explicitely delete
+ 399          *                      the current task without knowing its priority level by setting 'prio' to
+ 400          *                      OS_PRIO_SELF.
+ 401          *
+ 402          * Returns    : OS_ERR_NONE             if the call is successful
+ 403          *              OS_ERR_TASK_DEL_IDLE    if you attempted to delete uC/OS-II's idle task
+ 404          *              OS_ERR_PRIO_INVALID     if the priority you specify is higher that the maximum allowed
+ 405          *                                      (i.e. >= OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
+ 406          *              OS_ERR_TASK_DEL         if the task is assigned to a Mutex PIP.
+ 407          *              OS_ERR_TASK_NOT_EXIST   if the task you want to delete does not exist.
+ 408          *              OS_ERR_TASK_DEL_ISR     if you tried to delete a task from an ISR
+ 409          *
+ 410          * Notes      : 1) To reduce interrupt latency, OSTaskDel() 'disables' the task:
+ 411          *                    a) by making it not ready
+ 412          *                    b) by removing it from any wait lists
+ 413          *                    c) by preventing OSTimeTick() from making the task ready to run.
+ 414          *                 The task can then be 'unlinked' from the miscellaneous structures in uC/OS-II.
+ 415          *              2) The function OS_Dummy() is called after OS_EXIT_CRITICAL() because, on most processors,
+ 416          *                 the next instruction following the enable interrupt instruction is ignored.
+ 417          *              3) An ISR cannot delete a task.
+ 418          *              4) The lock nesting counter is incremented because, for a brief instant, if the current
+ 419          *                 task is being deleted, the current task would not be able to be rescheduled because it
+ 420          *                 is removed from the ready list.  Incrementing the nesting counter prevents another task
+ 421          *                 from being schedule.  This means that an ISR would return to the current task which is
+ 422          *                 being deleted.  The rest of the deletion would thus be able to be completed.
+ 423          *********************************************************************************************************
+ 424          */
+ 425          
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 8   
+
+ 426          #if OS_TASK_DEL_EN > 0u
+ 427          INT8U  OSTaskDel (INT8U prio) large reentrant
+ 428          {
+ 429   1      #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+                  OS_FLAG_NODE *pnode;
+              #endif
+ 432   1          OS_TCB       *ptcb;
+ 433   1      #if OS_CRITICAL_METHOD == 3u                            /* Allocate storage for CPU status register    */
+                  OS_CPU_SR     cpu_sr = 0u;
+              #endif
+ 436   1      
+ 437   1      
+ 438   1      
+ 439   1          if (OSIntNesting > 0u) {                            /* See if trying to delete from ISR            */
+ 440   2              return (OS_ERR_TASK_DEL_ISR);
+ 441   2          }
+ 442   1          if (prio == OS_TASK_IDLE_PRIO) {                    /* Not allowed to delete idle task             */
+ 443   2              return (OS_ERR_TASK_DEL_IDLE);
+ 444   2          }
+ 445   1      #if OS_ARG_CHK_EN > 0u
+                  if (prio >= OS_LOWEST_PRIO) {                       /* Task priority valid ?                       */
+                      if (prio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+              #endif
+ 452   1      
+ 453   1      /*$PAGE*/
+ 454   1          OS_ENTER_CRITICAL();
+ 455   1          if (prio == OS_PRIO_SELF) {                         /* See if requesting to delete self            */
+ 456   2              prio = OSTCBCur->OSTCBPrio;                     /* Set priority to delete to current           */
+ 457   2          }
+ 458   1          ptcb = OSTCBPrioTbl[prio];
+ 459   1          if (ptcb == (OS_TCB *)0) {                          /* Task to delete must exist                   */
+ 460   2              OS_EXIT_CRITICAL();
+ 461   2              return (OS_ERR_TASK_NOT_EXIST);
+ 462   2          }
+ 463   1          if (ptcb == OS_TCB_RESERVED) {                      /* Must not be assigned to Mutex               */
+ 464   2              OS_EXIT_CRITICAL();
+ 465   2              return (OS_ERR_TASK_DEL);
+ 466   2          }
+ 467   1      
+ 468   1          OSRdyTbl[ptcb->OSTCBY] &= (OS_PRIO)~ptcb->OSTCBBitX;
+ 469   1          if (OSRdyTbl[ptcb->OSTCBY] == 0u) {                 /* Make task not ready                         */
+ 470   2              OSRdyGrp           &= (OS_PRIO)~ptcb->OSTCBBitY;
+ 471   2          }
+ 472   1      
+ 473   1      #if (OS_EVENT_EN)
+ 474   1          if (ptcb->OSTCBEventPtr != (OS_EVENT *)0) {
+ 475   2              OS_EventTaskRemove(ptcb, ptcb->OSTCBEventPtr);  /* Remove this task from any event   wait list */
+ 476   2          }
+ 477   1      #if (OS_EVENT_MULTI_EN > 0u)
+                  if (ptcb->OSTCBEventMultiPtr != (OS_EVENT **)0) {   /* Remove this task from any events' wait lists*/
+                      OS_EventTaskRemoveMulti(ptcb, ptcb->OSTCBEventMultiPtr);
+                  }
+              #endif
+ 482   1      #endif
+ 483   1      
+ 484   1      #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+                  pnode = ptcb->OSTCBFlagNode;
+                  if (pnode != (OS_FLAG_NODE *)0) {                   /* If task is waiting on event flag            */
+                      OS_FlagUnlink(pnode);                           /* Remove from wait list                       */
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 9   
+
+                  }
+              #endif
+ 490   1      
+ 491   1          ptcb->OSTCBDly      = 0u;                           /* Prevent OSTimeTick() from updating          */
+ 492   1          ptcb->OSTCBStat     = OS_STAT_RDY;                  /* Prevent task from being resumed             */
+ 493   1          ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
+ 494   1          if (OSLockNesting < 255u) {                         /* Make sure we don't context switch           */
+ 495   2              OSLockNesting++;
+ 496   2          }
+ 497   1          OS_EXIT_CRITICAL();                                 /* Enabling INT. ignores next instruc.         */
+ 498   1          OS_Dummy();                                         /* ... Dummy ensures that INTs will be         */
+ 499   1          OS_ENTER_CRITICAL();                                /* ... disabled HERE!                          */
+ 500   1          if (OSLockNesting > 0u) {                           /* Remove context switch lock                  */
+ 501   2              OSLockNesting--;
+ 502   2          }
+ 503   1          OSTaskDelHook(ptcb);                                /* Call user defined hook                      */
+ 504   1          OSTaskCtr--;                                        /* One less task being managed                 */
+ 505   1          OSTCBPrioTbl[prio] = (OS_TCB *)0;                   /* Clear old priority entry                    */
+ 506   1          if (ptcb->OSTCBPrev == (OS_TCB *)0) {               /* Remove from TCB chain                       */
+ 507   2              ptcb->OSTCBNext->OSTCBPrev = (OS_TCB *)0;
+ 508   2              OSTCBList                  = ptcb->OSTCBNext;
+ 509   2          } else {
+ 510   2              ptcb->OSTCBPrev->OSTCBNext = ptcb->OSTCBNext;
+ 511   2              ptcb->OSTCBNext->OSTCBPrev = ptcb->OSTCBPrev;
+ 512   2          }
+ 513   1          ptcb->OSTCBNext     = OSTCBFreeList;                /* Return TCB to free TCB list                 */
+ 514   1          OSTCBFreeList       = ptcb;
+ 515   1      #if OS_TASK_NAME_EN > 0u
+                  ptcb->OSTCBTaskName = (INT8U *)(void *)"?";
+              #endif
+ 518   1          OS_EXIT_CRITICAL();
+ 519   1          if (OSRunning == OS_TRUE) {
+ 520   2              OS_Sched();                                     /* Find new highest priority task              */
+ 521   2          }
+ 522   1          return (OS_ERR_NONE);
+ 523   1      }
+ 524          #endif
+ 525          /*$PAGE*/
+ 526          /*
+ 527          *********************************************************************************************************
+ 528          *                                    REQUEST THAT A TASK DELETE ITSELF
+ 529          *
+ 530          * Description: This function is used to:
+ 531          *                   a) notify a task to delete itself.
+ 532          *                   b) to see if a task requested that the current task delete itself.
+ 533          *              This function is a little tricky to understand.  Basically, you have a task that needs
+ 534          *              to be deleted however, this task has resources that it has allocated (memory buffers,
+ 535          *              semaphores, mailboxes, queues etc.).  The task cannot be deleted otherwise these
+ 536          *              resources would not be freed.  The requesting task calls OSTaskDelReq() to indicate that
+ 537          *              the task needs to be deleted.  Deleting of the task is however, deferred to the task to
+ 538          *              be deleted.  For example, suppose that task #10 needs to be deleted.  The requesting task
+ 539          *              example, task #5, would call OSTaskDelReq(10).  When task #10 gets to execute, it calls
+ 540          *              this function by specifying OS_PRIO_SELF and monitors the returned value.  If the return
+ 541          *              value is OS_ERR_TASK_DEL_REQ, another task requested a task delete.  Task #10 would look li
+             -ke
+ 542          *              this:
+ 543          *
+ 544          *                   void Task(void *p_arg)
+ 545          *                   {
+ 546          *                       .
+ 547          *                       .
+ 548          *                       while (1) {
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 10  
+
+ 549          *                           OSTimeDly(1);
+ 550          *                           if (OSTaskDelReq(OS_PRIO_SELF) == OS_ERR_TASK_DEL_REQ) {
+ 551          *                               Release any owned resources;
+ 552          *                               De-allocate any dynamic memory;
+ 553          *                               OSTaskDel(OS_PRIO_SELF);
+ 554          *                           }
+ 555          *                       }
+ 556          *                   }
+ 557          *
+ 558          * Arguments  : prio    is the priority of the task to request the delete from
+ 559          *
+ 560          * Returns    : OS_ERR_NONE            if the task exist and the request has been registered
+ 561          *              OS_ERR_TASK_NOT_EXIST  if the task has been deleted.  This allows the caller to know whethe
+             -r
+ 562          *                                     the request has been executed.
+ 563          *              OS_ERR_TASK_DEL        if the task is assigned to a Mutex.
+ 564          *              OS_ERR_TASK_DEL_IDLE   if you requested to delete uC/OS-II's idle task
+ 565          *              OS_ERR_PRIO_INVALID    if the priority you specify is higher that the maximum allowed
+ 566          *                                     (i.e. >= OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
+ 567          *              OS_ERR_TASK_DEL_REQ    if a task (possibly another task) requested that the running task be
+ 568          *                                     deleted.
+ 569          *********************************************************************************************************
+ 570          */
+ 571          /*$PAGE*/
+ 572          #if OS_TASK_DEL_EN > 0u
+ 573          INT8U  OSTaskDelReq (INT8U prio) large reentrant
+ 574          {
+ 575   1          INT8U      stat;
+ 576   1          OS_TCB    *ptcb;
+ 577   1      #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+ 580   1      
+ 581   1      
+ 582   1      
+ 583   1          if (prio == OS_TASK_IDLE_PRIO) {                            /* Not allowed to delete idle task     */
+ 584   2              return (OS_ERR_TASK_DEL_IDLE);
+ 585   2          }
+ 586   1      #if OS_ARG_CHK_EN > 0u
+                  if (prio >= OS_LOWEST_PRIO) {                               /* Task priority valid ?               */
+                      if (prio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+              #endif
+ 593   1          if (prio == OS_PRIO_SELF) {                                 /* See if a task is requesting to ...  */
+ 594   2              OS_ENTER_CRITICAL();                                    /* ... this task to delete itself      */
+ 595   2              stat = OSTCBCur->OSTCBDelReq;                           /* Return request status to caller     */
+ 596   2              OS_EXIT_CRITICAL();
+ 597   2              return (stat);
+ 598   2          }
+ 599   1          OS_ENTER_CRITICAL();
+ 600   1          ptcb = OSTCBPrioTbl[prio];
+ 601   1          if (ptcb == (OS_TCB *)0) {                                  /* Task to delete must exist           */
+ 602   2              OS_EXIT_CRITICAL();
+ 603   2              return (OS_ERR_TASK_NOT_EXIST);                         /* Task must already be deleted        */
+ 604   2          }
+ 605   1          if (ptcb == OS_TCB_RESERVED) {                              /* Must NOT be assigned to a Mutex     */
+ 606   2              OS_EXIT_CRITICAL();
+ 607   2              return (OS_ERR_TASK_DEL);
+ 608   2          }
+ 609   1          ptcb->OSTCBDelReq = OS_ERR_TASK_DEL_REQ;                    /* Set flag indicating task to be DEL. */
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 11  
+
+ 610   1          OS_EXIT_CRITICAL();
+ 611   1          return (OS_ERR_NONE);
+ 612   1      }
+ 613          #endif
+ 614          /*$PAGE*/
+ 615          /*
+ 616          *********************************************************************************************************
+ 617          *                                        GET THE NAME OF A TASK
+ 618          *
+ 619          * Description: This function is called to obtain the name of a task.
+ 620          *
+ 621          * Arguments  : prio      is the priority of the task that you want to obtain the name from.
+ 622          *
+ 623          *              pname     is a pointer to a pointer to an ASCII string that will receive the name of the ta
+             -sk.
+ 624          *
+ 625          *              perr      is a pointer to an error code that can contain one of the following values:
+ 626          *
+ 627          *                        OS_ERR_NONE                if the requested task is resumed
+ 628          *                        OS_ERR_TASK_NOT_EXIST      if the task has not been created or is assigned to a M
+             -utex
+ 629          *                        OS_ERR_PRIO_INVALID        if you specified an invalid priority:
+ 630          *                                                   A higher value than the idle task or not OS_PRIO_SELF.
+ 631          *                        OS_ERR_PNAME_NULL          You passed a NULL pointer for 'pname'
+ 632          *                        OS_ERR_NAME_GET_ISR        You called this function from an ISR
+ 633          *
+ 634          *
+ 635          * Returns    : The length of the string or 0 if the task does not exist.
+ 636          *********************************************************************************************************
+ 637          */
+ 638          
+ 639          #if OS_TASK_NAME_EN > 0u
+              INT8U  OSTaskNameGet (INT8U    prio,
+                                    INT8U  **pname,
+                                    INT8U   *perr) large reentrant
+              {
+                  OS_TCB    *ptcb;
+                  INT8U      len;
+              #if OS_CRITICAL_METHOD == 3u                             /* Allocate storage for CPU status register   */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #ifdef OS_SAFETY_CRITICAL
+                  if (perr == (INT8U *)0) {
+                      OS_SAFETY_CRITICAL_EXCEPTION();
+                  }
+              #endif
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {                         /* Task priority valid ?                      */
+                      if (prio != OS_PRIO_SELF) {
+                          *perr = OS_ERR_PRIO_INVALID;                 /* No                                         */
+                          return (0u);
+                      }
+                  }
+                  if (pname == (INT8U **)0) {                          /* Is 'pname' a NULL pointer?                 */
+                      *perr = OS_ERR_PNAME_NULL;                       /* Yes                                        */
+                      return (0u);
+                  }
+              #endif
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 12  
+
+                  if (OSIntNesting > 0u) {                              /* See if trying to call from an ISR          */
+                      *perr = OS_ERR_NAME_GET_ISR;
+                      return (0u);
+                  }
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                          /* See if caller desires it's own name        */
+                      prio = OSTCBCur->OSTCBPrio;
+                  }
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                           /* Does task exist?                           */
+                      OS_EXIT_CRITICAL();                              /* No                                         */
+                      *perr = OS_ERR_TASK_NOT_EXIST;
+                      return (0u);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                       /* Task assigned to a Mutex?                  */
+                      OS_EXIT_CRITICAL();                              /* Yes                                        */
+                      *perr = OS_ERR_TASK_NOT_EXIST;
+                      return (0u);
+                  }
+                  *pname = ptcb->OSTCBTaskName;
+                  len    = OS_StrLen(*pname);
+                  OS_EXIT_CRITICAL();
+                  *perr  = OS_ERR_NONE;
+                  return (len);
+              }
+              #endif
+ 696          
+ 697          /*$PAGE*/
+ 698          /*
+ 699          *********************************************************************************************************
+ 700          *                                        ASSIGN A NAME TO A TASK
+ 701          *
+ 702          * Description: This function is used to set the name of a task.
+ 703          *
+ 704          * Arguments  : prio      is the priority of the task that you want the assign a name to.
+ 705          *
+ 706          *              pname     is a pointer to an ASCII string that contains the name of the task.
+ 707          *
+ 708          *              perr       is a pointer to an error code that can contain one of the following values:
+ 709          *
+ 710          *                        OS_ERR_NONE                if the requested task is resumed
+ 711          *                        OS_ERR_TASK_NOT_EXIST      if the task has not been created or is assigned to a M
+             -utex
+ 712          *                        OS_ERR_PNAME_NULL          You passed a NULL pointer for 'pname'
+ 713          *                        OS_ERR_PRIO_INVALID        if you specified an invalid priority:
+ 714          *                                                   A higher value than the idle task or not OS_PRIO_SELF.
+ 715          *                        OS_ERR_NAME_SET_ISR        if you called this function from an ISR
+ 716          *
+ 717          * Returns    : None
+ 718          *********************************************************************************************************
+ 719          */
+ 720          #if OS_TASK_NAME_EN > 0u
+              void  OSTaskNameSet (INT8U   prio,
+                                   INT8U  *pname,
+                                   INT8U  *perr) large reentrant
+              {
+                  OS_TCB    *ptcb;
+              #if OS_CRITICAL_METHOD == 3u                         /* Allocate storage for CPU status register       */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 13  
+
+              
+              #ifdef OS_SAFETY_CRITICAL
+                  if (perr == (INT8U *)0) {
+                      OS_SAFETY_CRITICAL_EXCEPTION();
+                  }
+              #endif
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {                     /* Task priority valid ?                          */
+                      if (prio != OS_PRIO_SELF) {
+                          *perr = OS_ERR_PRIO_INVALID;             /* No                                             */
+                          return;
+                      }
+                  }
+                  if (pname == (INT8U *)0) {                       /* Is 'pname' a NULL pointer?                     */
+                      *perr = OS_ERR_PNAME_NULL;                   /* Yes                                            */
+                      return;
+                  }
+              #endif
+                  if (OSIntNesting > 0u) {                         /* See if trying to call from an ISR              */
+                      *perr = OS_ERR_NAME_SET_ISR;
+                      return;
+                  }
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                      /* See if caller desires to set it's own name     */
+                      prio = OSTCBCur->OSTCBPrio;
+                  }
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                       /* Does task exist?                               */
+                      OS_EXIT_CRITICAL();                          /* No                                             */
+                      *perr = OS_ERR_TASK_NOT_EXIST;
+                      return;
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                   /* Task assigned to a Mutex?                      */
+                      OS_EXIT_CRITICAL();                          /* Yes                                            */
+                      *perr = OS_ERR_TASK_NOT_EXIST;
+                      return;
+                  }
+                  ptcb->OSTCBTaskName = pname;
+                  OS_EXIT_CRITICAL();
+                  *perr               = OS_ERR_NONE;
+              }
+              #endif
+ 774          
+ 775          /*$PAGE*/
+ 776          /*
+ 777          *********************************************************************************************************
+ 778          *                                        RESUME A SUSPENDED TASK
+ 779          *
+ 780          * Description: This function is called to resume a previously suspended task.  This is the only call that
+ 781          *              will remove an explicit task suspension.
+ 782          *
+ 783          * Arguments  : prio     is the priority of the task to resume.
+ 784          *
+ 785          * Returns    : OS_ERR_NONE                if the requested task is resumed
+ 786          *              OS_ERR_PRIO_INVALID        if the priority you specify is higher that the maximum allowed
+ 787          *                                         (i.e. >= OS_LOWEST_PRIO)
+ 788          *              OS_ERR_TASK_RESUME_PRIO    if the task to resume does not exist
+ 789          *              OS_ERR_TASK_NOT_EXIST      if the task is assigned to a Mutex PIP
+ 790          *              OS_ERR_TASK_NOT_SUSPENDED  if the task to resume has not been suspended
+ 791          *********************************************************************************************************
+ 792          */
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 14  
+
+ 793          
+ 794          #if OS_TASK_SUSPEND_EN > 0u
+              INT8U  OSTaskResume (INT8U prio) large reentrant
+              {
+                  OS_TCB    *ptcb;
+              #if OS_CRITICAL_METHOD == 3u                                  /* Storage for CPU status register       */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio >= OS_LOWEST_PRIO) {                             /* Make sure task priority is valid      */
+                      return (OS_ERR_PRIO_INVALID);
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                                /* Task to suspend must exist            */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_RESUME_PRIO);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                            /* See if assigned to Mutex              */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                  if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) { /* Task must be suspended                */
+                      ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    /* Remove suspension                     */
+                      if (ptcb->OSTCBStat == OS_STAT_RDY) {                 /* See if task is now ready              */
+                          if (ptcb->OSTCBDly == 0u) {
+                              OSRdyGrp               |= ptcb->OSTCBBitY;    /* Yes, Make task ready to run           */
+                              OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                              OS_EXIT_CRITICAL();
+                              if (OSRunning == OS_TRUE) {
+                                  OS_Sched();                               /* Find new highest priority task        */
+                              }
+                          } else {
+                              OS_EXIT_CRITICAL();
+                          }
+                      } else {                                              /* Must be pending on event              */
+                          OS_EXIT_CRITICAL();
+                      }
+                      return (OS_ERR_NONE);
+                  }
+                  OS_EXIT_CRITICAL();
+                  return (OS_ERR_TASK_NOT_SUSPENDED);
+              }
+              #endif
+ 841          /*$PAGE*/
+ 842          /*
+ 843          *********************************************************************************************************
+ 844          *                                             STACK CHECKING
+ 845          *
+ 846          * Description: This function is called to check the amount of free memory left on the specified task's
+ 847          *              stack.
+ 848          *
+ 849          * Arguments  : prio          is the task priority
+ 850          *
+ 851          *              p_stk_data    is a pointer to a data structure of type OS_STK_DATA.
+ 852          *
+ 853          * Returns    : OS_ERR_NONE            upon success
+ 854          *              OS_ERR_PRIO_INVALID    if the priority you specify is higher that the maximum allowed
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 15  
+
+ 855          *                                     (i.e. > OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
+ 856          *              OS_ERR_TASK_NOT_EXIST  if the desired task has not been created or is assigned to a Mutex P
+             -IP
+ 857          *              OS_ERR_TASK_OPT        if you did NOT specified OS_TASK_OPT_STK_CHK when the task was creat
+             -ed
+ 858          *              OS_ERR_PDATA_NULL      if 'p_stk_data' is a NULL pointer
+ 859          *********************************************************************************************************
+ 860          */
+ 861          #if (OS_TASK_STAT_STK_CHK_EN > 0u) && (OS_TASK_CREATE_EXT_EN > 0u)
+              INT8U  OSTaskStkChk (INT8U         prio,
+                                   OS_STK_DATA  *p_stk_data) large reentrant
+              {
+                  OS_TCB    *ptcb;
+                  OS_STK    *pchk;
+                  INT32U     nfree;
+                  INT32U     size;
+              #if OS_CRITICAL_METHOD == 3u                           /* Allocate storage for CPU status register     */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {                       /* Make sure task priority is valid             */
+                      if (prio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+                  if (p_stk_data == (OS_STK_DATA *)0) {              /* Validate 'p_stk_data'                        */
+                      return (OS_ERR_PDATA_NULL);
+                  }
+              #endif
+                  p_stk_data->OSFree = 0u;                           /* Assume failure, set to 0 size                */
+                  p_stk_data->OSUsed = 0u;
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                        /* See if check for SELF                        */
+                      prio = OSTCBCur->OSTCBPrio;
+                  }
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                         /* Make sure task exist                         */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                  if ((ptcb->OSTCBOpt & OS_TASK_OPT_STK_CHK) == 0u) { /* Make sure stack checking option is set      */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_OPT);
+                  }
+                  nfree = 0u;
+                  size  = ptcb->OSTCBStkSize;
+                  pchk  = ptcb->OSTCBStkBottom;
+                  OS_EXIT_CRITICAL();
+              #if OS_STK_GROWTH == 1u
+                  while (*pchk++ == (OS_STK)0) {                    /* Compute the number of zero entries on the stk */
+                      nfree++;
+                  }
+              #else
+                  while (*pchk-- == (OS_STK)0) {
+                      nfree++;
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 16  
+
+                  }
+              #endif
+                  p_stk_data->OSFree = nfree * sizeof(OS_STK);          /* Compute number of free bytes on the stack */
+                  p_stk_data->OSUsed = (size - nfree) * sizeof(OS_STK); /* Compute number of bytes used on the stack */
+                  return (OS_ERR_NONE);
+              }
+              #endif
+ 922          /*$PAGE*/
+ 923          /*
+ 924          *********************************************************************************************************
+ 925          *                                            SUSPEND A TASK
+ 926          *
+ 927          * Description: This function is called to suspend a task.  The task can be the calling task if the
+ 928          *              priority passed to OSTaskSuspend() is the priority of the calling task or OS_PRIO_SELF.
+ 929          *
+ 930          * Arguments  : prio     is the priority of the task to suspend.  If you specify OS_PRIO_SELF, the
+ 931          *                       calling task will suspend itself and rescheduling will occur.
+ 932          *
+ 933          * Returns    : OS_ERR_NONE               if the requested task is suspended
+ 934          *              OS_ERR_TASK_SUSPEND_IDLE  if you attempted to suspend the idle task which is not allowed.
+ 935          *              OS_ERR_PRIO_INVALID       if the priority you specify is higher that the maximum allowed
+ 936          *                                        (i.e. >= OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
+ 937          *              OS_ERR_TASK_SUSPEND_PRIO  if the task to suspend does not exist
+ 938          *              OS_ERR_TASK_NOT_EXITS     if the task is assigned to a Mutex PIP
+ 939          *
+ 940          * Note       : You should use this function with great care.  If you suspend a task that is waiting for
+ 941          *              an event (i.e. a message, a semaphore, a queue ...) you will prevent this task from
+ 942          *              running when the event arrives.
+ 943          *********************************************************************************************************
+ 944          */
+ 945          
+ 946          #if OS_TASK_SUSPEND_EN > 0u
+              INT8U  OSTaskSuspend (INT8U prio) large reentrant
+              {
+                  BOOLEAN    self;
+                  OS_TCB    *ptcb;
+                  INT8U      y;
+              #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio == OS_TASK_IDLE_PRIO) {                            /* Not allowed to suspend idle task    */
+                      return (OS_ERR_TASK_SUSPEND_IDLE);
+                  }
+                  if (prio >= OS_LOWEST_PRIO) {                               /* Task priority valid ?               */
+                      if (prio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                                 /* See if suspend SELF                 */
+                      prio = OSTCBCur->OSTCBPrio;
+                      self = OS_TRUE;
+                  } else if (prio == OSTCBCur->OSTCBPrio) {                   /* See if suspending self              */
+                      self = OS_TRUE;
+                  } else {
+                      self = OS_FALSE;                                        /* No suspending another task          */
+                  }
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 17  
+
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                                  /* Task to suspend must exist          */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_SUSPEND_PRIO);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                              /* See if assigned to Mutex            */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                  y            = ptcb->OSTCBY;
+                  OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;                   /* Make task not ready                 */
+                  if (OSRdyTbl[y] == 0u) {
+                      OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                  }
+                  ptcb->OSTCBStat |= OS_STAT_SUSPEND;                         /* Status of task is 'SUSPENDED'       */
+                  OS_EXIT_CRITICAL();
+                  if (self == OS_TRUE) {                                      /* Context switch only if SELF         */
+                      OS_Sched();                                             /* Find new highest priority task      */
+                  }
+                  return (OS_ERR_NONE);
+              }
+              #endif
+ 999          /*$PAGE*/
+1000          /*
+1001          *********************************************************************************************************
+1002          *                                            QUERY A TASK
+1003          *
+1004          * Description: This function is called to obtain a copy of the desired task's TCB.
+1005          *
+1006          * Arguments  : prio         is the priority of the task to obtain information from.
+1007          *
+1008          *              p_task_data  is a pointer to where the desired task's OS_TCB will be stored.
+1009          *
+1010          * Returns    : OS_ERR_NONE            if the requested task is suspended
+1011          *              OS_ERR_PRIO_INVALID    if the priority you specify is higher that the maximum allowed
+1012          *                                     (i.e. > OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
+1013          *              OS_ERR_PRIO            if the desired task has not been created
+1014          *              OS_ERR_TASK_NOT_EXIST  if the task is assigned to a Mutex PIP
+1015          *              OS_ERR_PDATA_NULL      if 'p_task_data' is a NULL pointer
+1016          *********************************************************************************************************
+1017          */
+1018          
+1019          #if OS_TASK_QUERY_EN > 0u
+              INT8U  OSTaskQuery (INT8U    prio,
+                                  OS_TCB  *p_task_data) large reentrant
+              {
+                  OS_TCB    *ptcb;
+              #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+              
+              
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio > OS_LOWEST_PRIO) {                 /* Task priority valid ?                              */
+                      if (prio != OS_PRIO_SELF) {
+                          return (OS_ERR_PRIO_INVALID);
+                      }
+                  }
+                  if (p_task_data == (OS_TCB *)0) {            /* Validate 'p_task_data'                             */
+                      return (OS_ERR_PDATA_NULL);
+                  }
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 18  
+
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                  /* See if suspend SELF                                */
+                      prio = OSTCBCur->OSTCBPrio;
+                  }
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                   /* Task to query must exist                           */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_PRIO);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {               /* Task to query must not be assigned to a Mutex      */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                                                               /* Copy TCB into user storage area                    */
+                  OS_MemCopy((INT8U *)p_task_data, (INT8U *)ptcb, sizeof(OS_TCB));
+                  OS_EXIT_CRITICAL();
+                  return (OS_ERR_NONE);
+              }
+              #endif
+1059          /*$PAGE*/
+1060          /*
+1061          *********************************************************************************************************
+1062          *                                 GET THE CURRENT VALUE OF A TASK REGISTER
+1063          *
+1064          * Description: This function is called to obtain the current value of a task register.  Task registers
+1065          *              are application specific and can be used to store task specific values such as 'error
+1066          *              numbers' (i.e. errno), statistics, etc.  Each task register can hold a 32-bit value.
+1067          *
+1068          * Arguments  : prio      is the priority of the task you want to get the task register from.  If you
+1069          *                        specify OS_PRIO_SELF then the task register of the current task will be obtained.
+1070          *
+1071          *              id        is the 'id' of the desired task register.  Note that the 'id' must be less
+1072          *                        than OS_TASK_REG_TBL_SIZE
+1073          *
+1074          *              perr      is a pointer to a variable that will hold an error code related to this call.
+1075          *
+1076          *                        OS_ERR_NONE            if the call was successful
+1077          *                        OS_ERR_PRIO_INVALID    if you specified an invalid priority
+1078          *                        OS_ERR_ID_INVALID      if the 'id' is not between 0 and OS_TASK_REG_TBL_SIZE-1
+1079          *
+1080          * Returns    : The current value of the task's register or 0 if an error is detected.
+1081          *
+1082          * Note(s)    : The maximum number of task variables is 254
+1083          *********************************************************************************************************
+1084          */
+1085          
+1086          #if OS_TASK_REG_TBL_SIZE > 0u
+              INT32U  OSTaskRegGet (INT8U   prio,
+                                    INT8U   id,
+                                    INT8U  *perr) large reentrant
+              {
+              #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+                  INT32U     value;
+                  OS_TCB    *ptcb;
+              
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio >= OS_LOWEST_PRIO) {
+                      if (prio != OS_PRIO_SELF) {
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 19  
+
+                          *perr = OS_ERR_PRIO_INVALID;
+                          return (0u);
+                      }
+                  }
+                  if (id >= OS_TASK_REG_TBL_SIZE) {
+                      *perr = OS_ERR_ID_INVALID;
+                      return (0u);
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                  /* See if need to get register from current task      */
+                      ptcb = OSTCBCur;
+                  } else {
+                      ptcb = OSTCBPrioTbl[prio];
+                  }
+                  value = ptcb->OSTCBRegTbl[id];
+                  OS_EXIT_CRITICAL();
+                  *perr = OS_ERR_NONE;
+                  return (value);
+              }
+              #endif
+1122          
+1123          /*$PAGE*/
+1124          /*
+1125          *********************************************************************************************************
+1126          *                                 SET THE CURRENT VALUE OF A TASK VARIABLE
+1127          *
+1128          * Description: This function is called to change the current value of a task register.  Task registers
+1129          *              are application specific and can be used to store task specific values such as 'error
+1130          *              numbers' (i.e. errno), statistics, etc.  Each task register can hold a 32-bit value.
+1131          *
+1132          * Arguments  : prio      is the priority of the task you want to set the task register for.  If you
+1133          *                        specify OS_PRIO_SELF then the task register of the current task will be obtained.
+1134          *
+1135          *              id        is the 'id' of the desired task register.  Note that the 'id' must be less
+1136          *                        than OS_TASK_REG_TBL_SIZE
+1137          *
+1138          *              value     is the desired value for the task register.
+1139          *
+1140          *              perr      is a pointer to a variable that will hold an error code related to this call.
+1141          *
+1142          *                        OS_ERR_NONE            if the call was successful
+1143          *                        OS_ERR_PRIO_INVALID    if you specified an invalid priority
+1144          *                        OS_ERR_ID_INVALID      if the 'id' is not between 0 and OS_TASK_REG_TBL_SIZE-1
+1145          *
+1146          * Returns    : The current value of the task's variable or 0 if an error is detected.
+1147          *
+1148          * Note(s)    : The maximum number of task variables is 254
+1149          *********************************************************************************************************
+1150          */
+1151          
+1152          #if OS_TASK_REG_TBL_SIZE > 0u
+              void  OSTaskRegSet (INT8U    prio,
+                                  INT8U    id,
+                                  INT32U   value,
+                                  INT8U   *perr) large reentrant
+              {
+              #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+                  OS_CPU_SR  cpu_sr = 0u;
+              #endif
+                  OS_TCB    *ptcb;
+              
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 20  
+
+              
+              #if OS_ARG_CHK_EN > 0u
+                  if (prio >= OS_LOWEST_PRIO) {
+                      if (prio != OS_PRIO_SELF) {
+                          *perr = OS_ERR_PRIO_INVALID;
+                          return;
+                      }
+                  }
+                  if (id >= OS_TASK_REG_TBL_SIZE) {
+                      *perr = OS_ERR_ID_INVALID;
+                      return;
+                  }
+              #endif
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                  /* See if need to get register from current task      */
+                      ptcb = OSTCBCur;
+                  } else {
+                      ptcb = OSTCBPrioTbl[prio];
+                  }
+                  ptcb->OSTCBRegTbl[id] = value;
+                  OS_EXIT_CRITICAL();
+                  *perr                 = OS_ERR_NONE;
+              }
+              #endif
+1187          
+1188          /*$PAGE*/
+1189          /*
+1190          *********************************************************************************************************
+1191          *                                              CATCH ACCIDENTAL TASK RETURN
+1192          *
+1193          * Description: This function is called if a task accidentally returns without deleting itself.  In other
+1194          *              words, a task should either be an infinite loop or delete itself if it's done.
+1195          *
+1196          * Arguments  : none
+1197          *
+1198          * Returns    : none
+1199          *
+1200          * Note(s)    : This function is INTERNAL to uC/OS-II and your application should not call it.
+1201          *********************************************************************************************************
+1202          */
+1203          
+1204          void  OS_TaskReturn (void) large reentrant
+1205          {
+1206   1          OSTaskReturnHook(OSTCBCur);                   /* Call hook to let user decide on what to do        */
+1207   1      
+1208   1      #if OS_TASK_DEL_EN > 0u
+1209   1          (void)OSTaskDel(OS_PRIO_SELF);                /* Delete task if it accidentally returns!           */
+1210   1      #else
+                  for (;;) {
+                      OSTimeDly(OS_TICKS_PER_SEC);
+                  }
+              #endif
+1215   1      }
+1216          
+1217          /*$PAGE*/
+1218          /*
+1219          *********************************************************************************************************
+1220          *                                        CLEAR TASK STACK
+1221          *
+1222          * Description: This function is used to clear the stack of a task (i.e. write all zeros)
+1223          *
+1224          * Arguments  : pbos     is a pointer to the task's bottom of stack.  If the configuration constant
+C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 21  
+
+1225          *                       OS_STK_GROWTH is set to 1, the stack is assumed to grow downward (i.e. from high
+1226          *                       memory to low memory).  'pbos' will thus point to the lowest (valid) memory
+1227          *                       location of the stack.  If OS_STK_GROWTH is set to 0, 'pbos' will point to the
+1228          *                       highest memory location of the stack and the stack will grow with increasing
+1229          *                       memory locations.  'pbos' MUST point to a valid 'free' data item.
+1230          *
+1231          *              size     is the number of 'stack elements' to clear.
+1232          *
+1233          *              opt      contains additional information (or options) about the behavior of the task.  The
+1234          *                       LOWER 8-bits are reserved by uC/OS-II while the upper 8 bits can be application
+1235          *                       specific.  See OS_TASK_OPT_??? in uCOS-II.H.
+1236          *
+1237          * Returns    : none
+1238          *********************************************************************************************************
+1239          */
+1240          #if (OS_TASK_STAT_STK_CHK_EN > 0u) && (OS_TASK_CREATE_EXT_EN > 0u)
+              void  OS_TaskStkClr (OS_STK  *pbos,
+                                   INT32U   size,
+                                   INT16U   opt) large reentrant
+              {
+                  if ((opt & OS_TASK_OPT_STK_CHK) != 0x0000u) {      /* See if stack checking has been enabled       */
+                      if ((opt & OS_TASK_OPT_STK_CLR) != 0x0000u) {  /* See if stack needs to be cleared             */
+              #if OS_STK_GROWTH == 1u
+                          while (size > 0u) {                        /* Stack grows from HIGH to LOW memory          */
+                              size--;
+                              *pbos++ = (OS_STK)0;                   /* Clear from bottom of stack and up!           */
+                          }
+              #else
+                          while (size > 0u) {                        /* Stack grows from LOW to HIGH memory          */
+                              size--;
+                              *pbos-- = (OS_STK)0;                   /* Clear from bottom of stack and down          */
+                          }
+              #endif
+                      }
+                  }
+              }
+              
+              #endif
+1263                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+             -                                                                                                                                                                                                    
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1389    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
