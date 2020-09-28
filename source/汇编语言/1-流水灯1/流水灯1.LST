@@ -1,39 +1,18 @@
                                                                     页     1
-                                                                    07-31-20
-                                                                    21:13:46
+                                                                    09-28-20
+                                                                    20:05:42
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
 
             ;流水灯程序
-            ;使用杜邦线连接P1与LED端口J9
-            
+            P1M0 DATA 092H
+            P1M1 DATA 091H
             ORG 00H
-            
-0000 74FF   START:MOV A,#0FFH    ;赋初值
-0002 C3           CLR C
-0003 7A08         MOV R2,#8
-                  
-0005 13     LOOP1:RRC A           ; 带进位右移
-0006 F590        MOV P1,A
-0008 120019      CALL DELAY
-000B DAF8        DJNZ R2,LOOP1
-000D 7A07        MOV R2,#7
-                 
-000F 33     LOOP2:RLC A          ;  带进位左移
-0010 F590         MOV P1,A
-0012 120019       CALL DELAY
-0015 DAF8         DJNZ R2,LOOP2
-0017 80E7         JMP START
-                  
-0019 7B14   DELAY:MOV R3,#20     ;   延时0.2秒
-001B 7C14   D1:   MOV R4,#20
-001D 7DF8   D2:   MOV R5,#248
-001F DDFE         DJNZ R5,$
-0021 DCFA         DJNZ R4,D2
-0023 DBF6         DJNZ R3,D1
-0025 22           RET
-                  
+0000 7592FF MOV P1M0,#11111111B ;设置GPIO口模式
+0003 759100 MOV P1M1,#00000000B ;设置GPIO口模式
+0006 7590FF MOV P1,#11111111B ;设置GPIO口的状态
+0009 80FE   sjmp $ ;表示程序停止在这里
             END
 
 
@@ -55,11 +34,32 @@
 
 
 
-D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
  
                                                                     页     2
-                                                                    07-31-20
-                                                                    21:13:46
+                                                                    09-28-20
+                                                                    20:05:42
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
@@ -83,9 +83,6 @@ D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM
             CY                       = 00D7H CONST 常量 
             C_T2                     = 00C9H CONST 常量 
             C_T2                     = 00C9H CONST 常量 
-            D1                       = 001BH CODE  标号 
-            D2                       = 001DH CODE  标号 
-            DELAY                    = 0019H CODE  标号 
             DPH                      = 0083H CONST 常量 
             DPL                      = 0082H CONST 常量 
             EA                       = 00AFH CONST 常量 
@@ -108,24 +105,24 @@ D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM
             IP                       = 00B8H CONST 常量 
             IT0                      = 0088H CONST 常量 
             IT1                      = 008AH CONST 常量 
-            LOOP1                    = 0005H CODE  标号 
-            LOOP2                    = 000FH CODE  标号 
             OV                       = 00D2H CONST 常量 
             P                        = 00D0H CONST 常量 
+            P0                       = 0080H CONST 常量 
+            P1                       = 0090H CONST 常量 
+            P1M0                     = 0092H CONST 常量 
+            P1M1                     = 0091H CONST 常量 
+            P2                       = 00A0H CONST 常量 
 
 
-D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
  
                                                                     页     3
-                                                                    07-31-20
-                                                                    21:13:46
+                                                                    09-28-20
+                                                                    20:05:42
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
 
-            P0                       = 0080H CONST 常量 
-            P1                       = 0090H CONST 常量 
-            P2                       = 00A0H CONST 常量 
             P3                       = 00B0H CONST 常量 
             PCON                     = 0087H CONST 常量 
             PS                       = 00BCH CONST 常量 
@@ -151,7 +148,6 @@ D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM
             SM1                      = 009EH CONST 常量 
             SM2                      = 009DH CONST 常量 
             SP                       = 0081H CONST 常量 
-            START                    = 0000H CODE  标号 
             T0                       = 00B4H CONST 常量 
             T1                       = 00B5H CONST 常量 
             T2CON                    = 00C8H CONST 常量 
@@ -171,26 +167,26 @@ D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM
             TL1                      = 008BH CONST 常量 
             TL2                      = 00CCH CONST 常量 
             TMOD                     = 0089H CONST 常量 
-
-
-D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
- 
-                                                                    页     4
-                                                                    07-31-20
-                                                                    21:13:46
-伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
-
-地址  机器码 源程序
-
             TR0                      = 008CH CONST 常量 
             TR1                      = 008EH CONST 常量 
             TR2                      = 00CAH CONST 常量 
             TR2                      = 00CAH CONST 常量 
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
+ 
+                                                                    页     4
+                                                                    09-28-20
+                                                                    20:05:42
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
             TXD                      = 00B1H CONST 常量 
             WR                       = 00B6H CONST 常量 
 
 
-            公有符号:   98
+            公有符号:   94
             私有符号:    0
 
 
@@ -232,5 +228,9 @@ D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM
 
 
 
-D:\SOURCE\STC89C51\TOOLS\5.汇编软件\1-流水灯1\流水灯1.ASM       
+
+
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
  

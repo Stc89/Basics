@@ -1,0 +1,138 @@
+C51 COMPILER V9.00   CORE                                                                  09/14/2020 15:15:14 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE CORE
+OBJECT MODULE PLACED IN core.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE core.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "core.h"
+   2          #include "stc8g.h"
+   3          #include "task_switch.h"
+   4          
+   5          
+   6          static void task_idle(void);
+   7          
+   8          
+   9          volatile TCB idata os_tcb[MAX_TASK];
+  10          /*用二维数组比较浪费空间(比如空闲任务堆栈要的ram并不大,但和实际任务分配相同的空间)
+  11          ,且一块连续这么大的空间并不多见(常见的是更具任务具体任务分配一维数组)*/
+  12          unsigned char idata os_tsak_stack[MAX_TASK][40];        
+  13          
+  14          
+  15          const unsigned char os_map_tab[] = {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+  16                  
+  17          volatile unsigned char os_task_rdy_tab;                         //任务就绪表(只要创建,则就绪)
+  18          volatile unsigned char os_task_running_id;                      //正在运行的任务id
+  19          volatile unsigned char os_int_count;                            //进入中断嵌套层的次数
+  20          bit os_running = os_false;                                                      //系统是否运行
+  21          
+  22          /* 初始化系统 */
+  23          void os_init(void)
+  24          {
+  25   1              EA = 0;
+  26   1              ET0 = 1;                        //定时器0开中断
+  27   1              AUXR &= 0x7f;           //12T模式
+  28   1              TMOD &= 0xf0;
+  29   1              TMOD |= 0x01;           //16位计数器
+  30   1              TH0 = 0xee;
+  31   1              TL0 = 0x00;                     //5ms中断
+  32   1              os_int_count = 0;
+  33   1              os_task_rdy_tab = 0;
+  34   1              os_task_create(MAX_TASK-1,task_idle,(unsigned char)os_tsak_stack[MAX_TASK-1]);
+  35   1      }
+  36          
+  37          
+  38          /* 空闲任务,必须创建,在系统中其他任务挂起时,系统要有任务运行,一般任务优先级最低,初始化时被创建 */
+  39          static void task_idle(void)
+  40          {
+  41   1              while(1)
+  42   1              {
+  43   2                      //绝对不能有延时,
+  44   2              }
+  45   1      }
+  46          
+  47          
+  48          
+  49          /* 创建任务 */
+  50          void os_task_create(unsigned char task_id,void (*task)(void),unsigned char stack_point)
+  51          {
+  52   1              char cpu_sr;
+  53   1              
+  54   1              os_enter_critical();
+  55   1              ((unsigned char idata*)stack_point)[0] = (unsigned int)task;
+C51 COMPILER V9.00   CORE                                                                  09/14/2020 15:15:14 PAGE 2   
+
+  56   1              ((unsigned char idata*)stack_point)[1] = (unsigned int)task >> 8;       //任务地址放在栈底两个字节
+  57   1              os_tcb[task_id].os_task_stcak_bottom = stack_point;                                     //栈底
+  58   1      //      os_tcb[task_id].os_task_stcak_top = stack_point + 14;                           //栈顶(起始这里应该,对任务堆栈初始化后的指针)
+  59   1              //为什么要加1?(因为栈中已经有数据了task)当然初不初始化都可以,用上面的也行(只不过好多人对为什么14有疑惑)
+  60   1              os_tcb[task_id].os_task_stcak_top = os_tesk_stack_init(stack_point + 1);        
+  61   1              os_task_rdy_tab |= os_map_tab[task_id];                                                         //更新任务就绪表
+  62   1              os_tcb[task_id].os_tsak_wait_tick = 0;                                                          //无等待
+  63   1              os_tcb[task_id].suspend = 0;                                                                            //任务以就绪
+  64   1              os_exit_critical();
+  65   1      }
+*** WARNING C280 IN LINE 52 OF CORE.C: 'cpu_sr': unreferenced local variable
+  66          
+  67          /* 任务开始运行 */
+  68          void os_start(void)
+  69          {
+  70   1              unsigned char i;
+  71   1              
+  72   1              for(i=0; i<MAX_TASK; i++)
+  73   1              {
+  74   2                      if(os_task_rdy_tab & os_map_tab[i])
+  75   2                      {
+  76   3                              break;
+  77   3                      }
+  78   2              }
+  79   1              os_task_running_id = i;//优先级最高的先运行
+  80   1              EA = 1;
+  81   1              SP = os_tcb[os_task_running_id].os_task_stcak_bottom + 1;//弹出是任务地址
+  82   1              TR0 = 1;
+  83   1              os_running = os_true;
+  84   1      }
+  85          
+  86          /* 进入中断 */
+  87          void os_int_enter(void)
+  88          {
+  89   1              if(os_true == os_running)
+  90   1              {
+  91   2                      if(os_int_count < 256)//51单片机中断最多只能进行一次嵌套,os_int_count最大为2,进入本函数前,最多为1
+  92   2                      {
+  93   3                              os_int_count++;
+  94   3                      }
+  95   2              }
+  96   1      }
+  97          
+  98          /* 退出中断 */
+  99          void os_int_exit(void)
+ 100          {
+ 101   1              if(os_true == os_running)
+ 102   1              {
+ 103   2                      if(os_int_count >= 1)
+ 104   2                      {
+ 105   3                              os_int_count--;
+ 106   3                      }
+ 107   2              }
+ 108   1      }
+ 109          
+ 110          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    199    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.00   CORE                                                                  09/14/2020 15:15:14 PAGE 3   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11       6
+   IDATA SIZE       =    132    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

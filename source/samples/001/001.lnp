@@ -1,0 +1,8 @@
+"STARTUP.obj",
+"main.obj",
+"core.obj",
+"delay.obj",
+"task_switch.obj",
+"uart.obj" 
+TO "001" 
+RAMSIZE(256) 

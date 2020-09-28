@@ -1,0 +1,63 @@
+C51 COMPILER V9.00   UART                                                                  09/14/2020 15:15:14 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uart.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "stc8g.h"
+   2          #include <stdio.h>
+   3          
+   4          //UART1 初始化
+   5          void Uart1Init(void)    //115200bps@11.0592MHz
+   6          {
+   7   1              PCON &= 0x7F;           //波特率不倍速
+   8   1              SCON    = 0x50;         //8位数据，可变波特率
+   9   1              AUXR |= 0x04;           //1T模式
+  10   1      //      BRT     = 0xFD;         //设置独立波特率发生器重装值
+  11   1              AUXR |=0X01;            //串口1选择独立发生器为波特率发生器
+  12   1              AUXR |=0X10;            //启动独立波特率发生器
+  13   1              ES = 1;                         //使能串口1中断
+  14   1      }
+  15          
+  16          //UART1 发送串口数据
+  17          void UART1_SendData(char dat)
+  18          {
+  19   1              ES=0;                   //关串口中断
+  20   1              SBUF=dat;                       
+  21   1              while(TI!=1);   //等待发送成功
+  22   1              TI=0;                   //清除发送中断标志
+  23   1              ES=1;                   //开串口中断
+  24   1      }
+  25          
+  26          //UART1 发送字符串
+  27          void UART1_SendString(char *s)
+  28          {
+  29   1              while(*s)//检测字符串结束符
+  30   1              {
+  31   2                      UART1_SendData(*s++);//发送当前字符
+  32   2              }
+  33   1      }
+  34          
+  35          //重写putchar函数
+  36          char putchar(char c)
+  37          {
+  38   1              UART1_SendData(c);
+  39   1              return c;
+  40   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     73    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

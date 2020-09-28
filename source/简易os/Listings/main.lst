@@ -1,0 +1,80 @@
+C51 COMPILER V9.00   MAIN                                                                  09/14/2020 11:46:30 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) OBJECT(.\Object
+                    -s\main.obj)
+
+line level    source
+
+   1          #include "core.h"
+   2          #include "task_switch.h"
+   3          #include <stc12c5a60s2.h>
+*** WARNING C318 IN LINE 3 OF main.c: can't open file 'stc12c5a60s2.h'
+   4          
+   5          sbit led2 = P1^2;
+*** ERROR C202 IN LINE 5 OF MAIN.C: 'P1': undefined identifier
+   6          sbit led3 = P1^3;
+*** ERROR C202 IN LINE 6 OF MAIN.C: 'P1': undefined identifier
+   7          
+   8          
+   9          /* 系统初始化 */
+  10          void system_init(void)
+  11          {
+  12   1      
+  13   1      }
+  14          
+  15          void test(void)
+  16          {
+  17   1              char i = 0;
+  18   1              
+  19   1              os_delay(10);   
+  20   1              i++;
+  21   1              i++;
+  22   1      }
+  23          
+  24          void task_0(void)
+  25          {
+  26   1              while(1)
+  27   1              {
+  28   2                      led2 = 0;
+*** ERROR C202 IN LINE 28 OF MAIN.C: 'led2': undefined identifier
+  29   2                      test();
+  30   2                      led2 = 1;
+*** ERROR C202 IN LINE 30 OF MAIN.C: 'led2': undefined identifier
+  31   2                      os_delay(10);
+  32   2              }
+  33   1      }
+  34          
+  35          void task_1(void)
+  36          {
+  37   1              while(1)
+  38   1              {
+  39   2                      led3 = 0;
+*** ERROR C202 IN LINE 39 OF MAIN.C: 'led3': undefined identifier
+  40   2                      os_delay(100);
+  41   2                      led3 = 1;
+*** ERROR C202 IN LINE 41 OF MAIN.C: 'led3': undefined identifier
+  42   2                      os_delay(100);
+  43   2              }
+  44   1      }
+  45          
+  46          char *p = "hello";
+  47          
+C51 COMPILER V9.00   MAIN                                                                  09/14/2020 11:46:30 PAGE 2   
+
+  48          int main(void)
+  49          {
+  50   1              system_init();
+  51   1              os_init();
+  52   1              os_task_create(1,task_1,(unsigned char)os_tsak_stack[1]);
+  53   1              os_task_create(0,task_0,(unsigned char)os_tsak_stack[0]);
+  54   1              os_start();
+  55   1              
+  56   1              return 0;
+  57   1      }
+  58          
+  59          
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  6 ERROR(S)

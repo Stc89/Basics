@@ -1,8 +1,8 @@
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/12/2020  16:19:43  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22                                                        09/27/2020  20:58:22  PAGE 1
 
 
-BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
-C:\KEIL_V5\C51\BIN\BL51.EXE LED.obj TO LED RAMSIZE (256)
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE LED.obj TO LED RAMSIZE (256)
 
 
 MEMORY MODEL: SMALL
@@ -10,7 +10,7 @@ MEMORY MODEL: SMALL
 
 INPUT MODULES INCLUDED:
   LED.obj (LED)
-  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_STARTUP)
 
 
 LINK MAP OF MODULE:  LED (LED)
@@ -26,10 +26,10 @@ LINK MAP OF MODULE:  LED (LED)
 
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
-            CODE    0003H     004AH     UNIT         ?PR?MAIN?LED
-            CODE    004DH     0010H     UNIT         ?PR?_DELAY_MS?LED
-            CODE    005DH     000CH     UNIT         ?C_C51STARTUP
-            CODE    0069H     0008H     UNIT         ?CO?LED
+            CODE    0003H     0046H     UNIT         ?PR?MAIN?LED
+            CODE    0049H     0010H     UNIT         ?PR?_DELAY_MS?LED
+            CODE    0059H     000CH     UNIT         ?C_C51STARTUP
+            CODE    0065H     0008H     UNIT         ?CO?LED
 
 
 
@@ -59,7 +59,7 @@ SYMBOL TABLE OF MODULE:  LED (LED)
   D:0092H         PUBLIC        P1M0
   D:0096H         PUBLIC        P2M0
   D:0091H         PUBLIC        P1M1
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  16:19:43  PAGE 2
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/27/2020  20:58:22  PAGE 2
 
 
   D:0080H         PUBLIC        P0
@@ -79,55 +79,54 @@ SYMBOL TABLE OF MODULE:  LED (LED)
   D:00CBH         PUBLIC        P6M1
   D:00C8H         PUBLIC        P5
   D:00E1H         PUBLIC        P7M1
-  D:00E8H         PUBLIC        P6
   C:0003H         PUBLIC        main
   D:0008H         PUBLIC        ledIndex
   B:00C0H.0       PUBLIC        P40
-  C:004DH         PUBLIC        _delay_ms
-  C:0069H         PUBLIC        ledNum
+  C:0049H         PUBLIC        _delay_ms
+  C:0065H         PUBLIC        ledNum
   D:0094H         PUBLIC        P0M0
   -------         PROC          MAIN
-  C:0003H         LINE#         103
-  C:0003H         LINE#         104
-  C:0003H         LINE#         105
-  C:0008H         LINE#         106
-  C:000CH         LINE#         107
-  C:0010H         LINE#         108
-  C:0014H         LINE#         109
-  C:0018H         LINE#         110
-  C:001CH         LINE#         111
-  C:0020H         LINE#         112
-  C:0024H         LINE#         114
-  C:0026H         LINE#         115
-  C:0028H         LINE#         116
-  C:0028H         LINE#         117
-  C:0028H         LINE#         118
-  C:0031H         LINE#         119
-  C:0033H         LINE#         120
-  C:003EH         LINE#         121
-  C:003EH         LINE#         122
-  C:0041H         LINE#         123
-  C:0041H         LINE#         124
-  C:0046H         LINE#         125
-  C:004BH         LINE#         126
+  C:0003H         LINE#         113
+  C:0003H         LINE#         114
+  C:0003H         LINE#         115
+  C:0008H         LINE#         116
+  C:000CH         LINE#         117
+  C:0010H         LINE#         118
+  C:0014H         LINE#         119
+  C:0018H         LINE#         120
+  C:001CH         LINE#         121
+  C:0020H         LINE#         122
+  C:0024H         LINE#         124
+  C:0026H         LINE#         125
+  C:0028H         LINE#         126
+  C:0028H         LINE#         127
+  C:0028H         LINE#         128
+  C:0031H         LINE#         129
+  C:0033H         LINE#         130
+  C:003AH         LINE#         131
+  C:003AH         LINE#         132
+  C:003DH         LINE#         133
+  C:003DH         LINE#         134
+  C:0042H         LINE#         135
+  C:0047H         LINE#         136
   -------         ENDPROC       MAIN
   -------         PROC          _DELAY_MS
   D:0007H         SYMBOL        ms
   -------         DO            
   D:0004H         SYMBOL        i
   -------         ENDDO         
-  C:004DH         LINE#         138
-  C:004DH         LINE#         139
-  C:004DH         LINE#         141
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/12/2020  16:19:43  PAGE 3
+  C:0049H         LINE#         148
+  C:0049H         LINE#         149
+  C:0049H         LINE#         151
+  C:0049H         LINE#         152
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/27/2020  20:58:22  PAGE 3
 
 
-  C:004DH         LINE#         142
-  C:0051H         LINE#         143
-  C:005AH         LINE#         144
-  C:005CH         LINE#         145
+  C:004DH         LINE#         153
+  C:0056H         LINE#         154
+  C:0058H         LINE#         155
   -------         ENDPROC       _DELAY_MS
   -------         ENDMOD        LED
 
-Program Size: data=10.0 xdata=0 code=113
+Program Size: data=10.0 xdata=0 code=109
 LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

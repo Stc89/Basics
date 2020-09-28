@@ -125,7 +125,7 @@ void main(void)
 		ledIndex = 0;
     while(1)
     {
-        P6 = ~ledNum[ledIndex];	//输出低驱动
+        P1 = ~ledNum[ledIndex];	//输出低驱动
 				ledIndex++;
 				if(ledIndex > 7)
 				{

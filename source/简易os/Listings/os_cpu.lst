@@ -1,0 +1,44 @@
+A51 MACRO ASSEMBLER  OS_CPU                                                               08/20/2016 21:17:15 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02b
+OBJECT MODULE PLACED IN .\Objects\os_cpu.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE os_cpu.asm SET(SMALL) DEBUG PRINT(.\Listings\os_cpu.lst) OBJECT(.\Objec
+                      ts\os_cpu.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     
+                       2     
+                       3     
+                       4     
+                       5     
+                       6     
+0000                   7     OS_CPU_SR_Save:
+0000 AFA8              8             mov r7,IE
+0002 75A800            9             mov IE,#0
+0005 22               10             ret
+                      11             
+                      12             
+0006                  13     OS_CPU_SR_Restore:
+0006 8FA8             14             mov IE,r7
+0008 22               15             ret
+                      16             
+                      17     end
+A51 MACRO ASSEMBLER  OS_CPU                                                               08/20/2016 21:17:15 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+IE . . . . . . . .  D ADDR   00A8H   A   
+OS_CPU_SR_RESTORE.  C ADDR   0006H   A   
+OS_CPU_SR_SAVE . .  C ADDR   0000H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

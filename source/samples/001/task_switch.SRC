@@ -1,0 +1,830 @@
+; .\task_switch.SRC generated from: task_switch.c
+; COMPILER INVOKED BY:
+;        C:\Keil\C51\BIN\C51.EXE task_switch.c BROWSE DEBUG OBJECTEXTEND SRC(.\task_switch.SRC)
+
+$NOMOD51
+
+NAME	TASK_SWITCH
+
+CCF2	BIT	0D8H.2
+P0M1	DATA	093H
+P1M0	DATA	092H
+P2M0	DATA	096H
+P1M1	DATA	091H
+P0	DATA	080H
+P3M0	DATA	0B2H
+P2M1	DATA	095H
+P1	DATA	090H
+P4M0	DATA	0B4H
+P3M1	DATA	0B1H
+P2	DATA	0A0H
+P5M0	DATA	0CAH
+P4M1	DATA	0B3H
+P3	DATA	0B0H
+WKTCH	DATA	0ABH
+AC	BIT	0D0H.6
+P5M1	DATA	0C9H
+P4	DATA	0C0H
+P5	DATA	0C8H
+EA	BIT	0A8H.7
+WKTCL	DATA	0AAH
+SPCTL	DATA	0CEH
+CF	BIT	0D8H.7
+CH	DATA	0F9H
+P_SW1	DATA	0A2H
+P_SW2	DATA	0BAH
+DPH1	DATA	0E5H
+EADC	BIT	0A8H.5
+IE	DATA	0A8H
+CL	DATA	0E9H
+IAP_CMD	DATA	0C5H
+CCAP0H	DATA	0FAH
+CCAP1H	DATA	0FBH
+DPL1	DATA	0E4H
+CCAP2H	DATA	0FCH
+ADC_RES	DATA	0BDH
+IP2H	DATA	0B6H
+IP3H	DATA	0EEH
+CCAP0L	DATA	0EAH
+CR	BIT	0D8H.6
+TA	DATA	0AEH
+CCAP1L	DATA	0EBH
+CCAPM0	DATA	0DAH
+CCAP2L	DATA	0ECH
+CCAPM1	DATA	0DBH
+INTCLKO	DATA	08FH
+CCAPM2	DATA	0DCH
+ES	BIT	0A8H.4
+PADC	BIT	0B8H.5
+IP	DATA	0B8H
+ADCCFG	DATA	0DEH
+RI	BIT	098H.0
+CY	BIT	0D0H.7
+TI	BIT	098H.1
+IAP_ADDRH	DATA	0C3H
+PS	BIT	0B8H.4
+SP	DATA	081H
+CMOD	DATA	0D9H
+CCON	DATA	0D8H
+IAP_ADDRL	DATA	0C4H
+OV	BIT	0D0H.2
+PPCA	BIT	0B8H.7
+LIRTRIM	DATA	09EH
+PWMCFG01	DATA	0F6H
+CMPCR1	DATA	0E6H
+CMPCR2	DATA	0E7H
+PWMCFG23	DATA	0F7H
+ELVD	BIT	0A8H.6
+PWMCFG45	DATA	0FEH
+P00	BIT	080H.0
+ADC_CONTR	DATA	0BCH
+SBUF	DATA	099H
+P10	BIT	090H.0
+PCON	DATA	087H
+P01	BIT	080H.1
+P20	BIT	0A0H.0
+P11	BIT	090H.1
+P02	BIT	080H.2
+IAP_TPS	DATA	0F5H
+P30	BIT	0B0H.0
+P21	BIT	0A0H.1
+P12	BIT	090H.2
+P03	BIT	080H.3
+P40	BIT	0C0H.0
+P31	BIT	0B0H.1
+P22	BIT	0A0H.2
+SCON	DATA	098H
+P13	BIT	090H.3
+P04	BIT	080H.4
+P50	BIT	0C8H.0
+P41	BIT	0C0H.1
+P32	BIT	0B0H.2
+P23	BIT	0A0H.3
+P14	BIT	090H.4
+TMOD	DATA	089H
+TCON	DATA	088H
+P05	BIT	080H.5
+P51	BIT	0C8H.1
+P42	BIT	0C0H.2
+P33	BIT	0B0H.3
+P24	BIT	0A0H.4
+P15	BIT	090H.5
+P06	BIT	080H.6
+P52	BIT	0C8H.2
+P43	BIT	0C0H.3
+PLVD	BIT	0B8H.6
+P34	BIT	0B0H.4
+P25	BIT	0A0H.5
+P16	BIT	090H.6
+P07	BIT	080H.7
+P53	BIT	0C8H.3
+P44	BIT	0C0H.4
+P35	BIT	0B0H.5
+P26	BIT	0A0H.6
+P17	BIT	090H.7
+P54	BIT	0C8H.4
+P45	BIT	0C0H.5
+P36	BIT	0B0H.6
+P27	BIT	0A0H.7
+P55	BIT	0C8H.5
+P46	BIT	0C0H.6
+P37	BIT	0B0H.7
+P56	BIT	0C8H.6
+P47	BIT	0C0H.7
+P57	BIT	0C8H.7
+IE0	BIT	088H.1
+IE1	BIT	088H.3
+IE2	DATA	0AFH
+B	DATA	0F0H
+AUXR	DATA	08EH
+IAP_CONTR	DATA	0C7H
+ACC	DATA	0E0H
+ET0	BIT	0A8H.1
+ET1	BIT	0A8H.3
+TF0	BIT	088H.5
+RSTCFG	DATA	0FFH
+IP2	DATA	0B5H
+TF1	BIT	088H.7
+IP3	DATA	0DFH
+RB8	BIT	098H.2
+TH0	DATA	08CH
+EX0	BIT	0A8H.0
+TH1	DATA	08DH
+IT0	BIT	088H.0
+T2H	DATA	0D6H
+EX1	BIT	0A8H.2
+TB8	BIT	098H.3
+IT1	BIT	088H.2
+T3H	DATA	0D4H
+P	BIT	0D0H.0
+T4H	DATA	0D2H
+SM0	BIT	098H.7
+TL0	DATA	08AH
+SM1	BIT	098H.6
+TL1	DATA	08BH
+T2L	DATA	0D7H
+SM2	BIT	098H.5
+T3L	DATA	0D5H
+T4L	DATA	0D3H
+PT0	BIT	0B8H.1
+RS0	BIT	0D0H.3
+PT1	BIT	0B8H.3
+RS1	BIT	0D0H.4
+IAP_DATA	DATA	0C2H
+TR0	BIT	088H.4
+TR1	BIT	088H.6
+WDT_CONTR	DATA	0C1H
+PX0	BIT	0B8H.0
+PX1	BIT	0B8H.2
+IRTRIM	DATA	09FH
+PCA_PWM0	DATA	0F2H
+PCA_PWM1	DATA	0F3H
+PCA_PWM2	DATA	0F4H
+DPH	DATA	083H
+T4T3M	DATA	0D1H
+ADC_RESL	DATA	0BEH
+DPL	DATA	082H
+SPSTAT	DATA	0CDH
+IPH	DATA	0B7H
+PWMSET	DATA	0F1H
+S2BUF	DATA	09BH
+S3BUF	DATA	0ADH
+REN	BIT	098H.4
+S4BUF	DATA	085H
+S2CON	DATA	09AH
+DPS	DATA	0E3H
+S3CON	DATA	0ACH
+S4CON	DATA	084H
+AUXINTIF	DATA	0EFH
+SADEN	DATA	0B9H
+SADDR	DATA	0A9H
+IAP_TRIG	DATA	0C6H
+F0	BIT	0D0H.5
+IRCBAND	DATA	09DH
+PSW	DATA	0D0H
+CCF0	BIT	0D8H.0
+CCF1	BIT	0D8H.1
+SPDAT	DATA	0CFH
+P0M0	DATA	094H
+?PR?os_cpu_sr_save?TASK_SWITCH           SEGMENT CODE 
+?PR?_os_cpu_sr_restore?TASK_SWITCH       SEGMENT CODE 
+?PR?_os_tesk_stack_init?TASK_SWITCH      SEGMENT CODE 
+?DT?_os_tesk_stack_init?TASK_SWITCH      SEGMENT DATA OVERLAYABLE 
+?PR?_os_delay?TASK_SWITCH                SEGMENT CODE 
+?DT?_os_delay?TASK_SWITCH                SEGMENT DATA OVERLAYABLE 
+?PR?os_time_tick?TASK_SWITCH             SEGMENT CODE 
+?PR?timer0_isr?TASK_SWITCH               SEGMENT CODE 
+?DT?timer0_isr?TASK_SWITCH               SEGMENT DATA OVERLAYABLE 
+	EXTRN	DATA (os_task_running_id)
+	EXTRN	CODE (os_int_enter)
+	EXTRN	DATA (os_map_tab)
+	EXTRN	DATA (os_int_count)
+	EXTRN	CODE (os_int_exit)
+	EXTRN	DATA (os_task_rdy_tab)
+	EXTRN	BIT (os_running)
+	EXTRN	IDATA (os_tcb)
+	PUBLIC	timer0_isr
+	PUBLIC	os_time_tick
+	PUBLIC	_os_delay
+	PUBLIC	_os_tesk_stack_init
+	PUBLIC	_os_cpu_sr_restore
+	PUBLIC	os_cpu_sr_save
+
+	RSEG  ?DT?timer0_isr?TASK_SWITCH
+?timer0_isr?BYTE:
+     cpu_sr?547:   DS   1
+
+	RSEG  ?DT?_os_tesk_stack_init?TASK_SWITCH
+?_os_tesk_stack_init?BYTE:
+       r_sp?242:   DS   1
+
+	RSEG  ?DT?_os_delay?TASK_SWITCH
+?_os_delay?BYTE:
+      tisks?343:   DS   1
+; #include "task_switch.h"
+; #include "stc8g.h"
+; #include "core.h"
+; 
+; 
+; /* 进入临界段 */
+; char os_cpu_sr_save(void)
+
+	RSEG  ?PR?os_cpu_sr_save?TASK_SWITCH
+os_cpu_sr_save:
+	USING	0
+			; SOURCE LINE # 7
+; {
+			; SOURCE LINE # 8
+; 	__asm mov r7,IE		//得到中断控制寄存器值
+	 mov r7,IE		 
+; 	__asm mov IE,#0
+	 mov IE,#0
+; 	__asm ret			//返回值是在r7中
+	 ret			 
+; 	return 0;			//返回这条指令实际不会被执行到,但因为这个函数确实要返回值,所以写一下(不然会有警告)
+			; SOURCE LINE # 12
+	MOV  	R7,#00H
+; }
+			; SOURCE LINE # 13
+?C0001:
+	RET  	
+; END OF os_cpu_sr_save
+
+; 
+; 
+; /* 退出临界段 */
+; void os_cpu_sr_restore(char cpu_sr)
+
+	RSEG  ?PR?_os_cpu_sr_restore?TASK_SWITCH
+_os_cpu_sr_restore:
+	USING	0
+			; SOURCE LINE # 17
+;---- Variable 'cpu_sr?140' assigned to Register 'R7' ----
+; {
+			; SOURCE LINE # 18
+; 	cpu_sr = cpu_sr;	//第一个参数(char类型)是存在r7里面的,
+			; SOURCE LINE # 19
+; 	__asm mov IE,r7		//恢复中断控制寄存器值
+	 mov IE,r7		 
+; 	__asm ret			//也可以没有(函数会有ret)
+	 ret			 
+; }
+			; SOURCE LINE # 22
+	RET  	
+; END OF _os_cpu_sr_restore
+
+; 
+; 
+; 
+; /* 任务堆栈初始化 */
+; unsigned char os_tesk_stack_init(unsigned char stack_point)
+
+	RSEG  ?PR?_os_tesk_stack_init?TASK_SWITCH
+_os_tesk_stack_init:
+	USING	0
+			; SOURCE LINE # 27
+;---- Variable 'stack_point?241' assigned to Register 'R7' ----
+; {
+			; SOURCE LINE # 28
+; 	unsigned char r_sp = SP;
+			; SOURCE LINE # 29
+	MOV  	r_sp?242,SP
+; 	SP = stack_point;
+			; SOURCE LINE # 30
+	MOV  	SP,R7
+; 	__asm PUSH ACC				//寄存器入栈(在此之前不能有任何运算操作,不然会改变寄存器值)
+	 PUSH ACC				 
+; 	__asm PUSH B
+	 PUSH B
+; 	__asm PUSH DPH
+	 PUSH DPH
+; 	__asm PUSH DPL
+	 PUSH DPL
+; 	__asm PUSH PSW
+	 PUSH PSW
+; 	__asm PUSH 0
+	 PUSH 0
+; 	__asm PUSH 1
+	 PUSH 1
+; 	__asm PUSH 2
+	 PUSH 2
+; 	__asm PUSH 3
+	 PUSH 3
+; 	__asm PUSH 4
+	 PUSH 4
+; 	__asm PUSH 5
+	 PUSH 5
+; 	__asm PUSH 6
+	 PUSH 6
+; 	__asm PUSH 7
+	 PUSH 7
+; 	
+; 	stack_point = SP;
+			; SOURCE LINE # 45
+	MOV  	R7,SP
+; 	SP = r_sp;
+			; SOURCE LINE # 46
+	MOV  	SP,r_sp?242
+; 	
+; 	return stack_point;
+			; SOURCE LINE # 48
+; }
+			; SOURCE LINE # 49
+?C0003:
+	RET  	
+; END OF _os_tesk_stack_init
+
+; 
+; 
+; 
+; 
+; 
+; 
+; 
+; /*因为没有对PC直接操作的指令,但中断过程和过程调用可以使PC入栈,
+; 中断返回,过程返回可以,使PC出栈,可以间接的利用此方法对PC操作*/
+; 
+; /* 系统延时 */
+; void os_delay(unsigned char tisks)
+
+	RSEG  ?PR?_os_delay?TASK_SWITCH
+_os_delay:
+	USING	0
+			; SOURCE LINE # 61
+	MOV  	tisks?343,R7
+; {
+			; SOURCE LINE # 62
+; 	unsigned char i;
+; //	char cpu_sr;
+; 	
+; 	if(tisks > 0)
+			; SOURCE LINE # 66
+	MOV  	A,tisks?343
+	SETB 	C
+	SUBB 	A,#00H
+	JNC  	$ + 5H
+	LJMP 	?C0010
+; 	{	
+			; SOURCE LINE # 67
+; 		//os_enter_critical();		
+; 		EA = 0;						//直接操作,而不用临界段的方法主要是为了任务切换更快
+			; SOURCE LINE # 69
+	CLR  	EA
+; 		__asm PUSH ACC				//寄存器入栈(在此之前不能有任何运算操作,不然会改变寄存器值)
+	 PUSH ACC				 
+; 		__asm PUSH B
+	 PUSH B
+; 		__asm PUSH DPH
+	 PUSH DPH
+; 		__asm PUSH DPL
+	 PUSH DPL
+; 		__asm PUSH PSW
+	 PUSH PSW
+; 		__asm PUSH 0
+	 PUSH 0
+; 		__asm PUSH 1
+	 PUSH 1
+; 		__asm PUSH 2
+	 PUSH 2
+; 		__asm PUSH 3
+	 PUSH 3
+; 		__asm PUSH 4
+	 PUSH 4
+; 		__asm PUSH 5
+	 PUSH 5
+; 		__asm PUSH 6
+	 PUSH 6
+; 		__asm PUSH 7
+	 PUSH 7
+; 		os_tcb[os_task_running_id].os_task_stcak_top = SP;
+			; SOURCE LINE # 83
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+01H)
+	MOV  	R0,A
+	MOV  	@R0,SP
+; 		
+; 
+; 		os_tcb[os_task_running_id].os_tsak_wait_tick = tisks;	//延时时间
+			; SOURCE LINE # 86
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb)
+	MOV  	R0,A
+	MOV  	@R0,tisks?343
+; 		os_tcb[os_task_running_id].suspend = 1;					//因为有延时,所以先挂起本任务
+			; SOURCE LINE # 87
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+03H)
+	MOV  	R0,A
+	MOV  	@R0,#01H
+; 		for(i=0; i<MAX_TASK; i++)								//找到已经就绪,未被挂起,且优先级最高的任务
+			; SOURCE LINE # 88
+;---- Variable 'i?344' assigned to Register 'R7' ----
+	CLR  	A
+	MOV  	R7,A
+?C0005:
+; 		{
+			; SOURCE LINE # 89
+; 			if(os_task_rdy_tab & os_map_tab[i])
+			; SOURCE LINE # 90
+	MOV  	A,#LOW (os_map_tab)
+	ADD  	A,R7
+	MOV  	R0,A
+	MOV  	A,@R0
+	ANL  	A,os_task_rdy_tab
+	JZ   	?C0007
+; 			{
+			; SOURCE LINE # 91
+; 				if(0 == os_tcb[i].suspend)
+			; SOURCE LINE # 92
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+03H)
+	MOV  	R0,A
+	MOV  	A,@R0
+	JZ   	?C0006
+; 				{
+			; SOURCE LINE # 93
+; 					break;
+			; SOURCE LINE # 94
+; 				}
+			; SOURCE LINE # 95
+?C0009:
+; 			}
+			; SOURCE LINE # 96
+; 		}
+			; SOURCE LINE # 97
+?C0007:
+	INC  	R7
+	CJNE 	R7,#03H,?C0005
+?C0006:
+; 		os_task_running_id = i;								//可执行的最高优先级任务
+			; SOURCE LINE # 98
+	MOV  	os_task_running_id,R7
+; 
+; 		SP = os_tcb[os_task_running_id].os_task_stcak_top;	//最高优先级任务的栈顶
+			; SOURCE LINE # 100
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+01H)
+	MOV  	R0,A
+	MOV  	A,@R0
+	MOV  	SP,A
+; 		__asm POP 7
+	 POP 7
+; 		__asm POP 6
+	 POP 6
+; 		__asm POP 5
+	 POP 5
+; 		__asm POP 4
+	 POP 4
+; 		__asm POP 3
+	 POP 3
+; 		__asm POP 2
+	 POP 2
+; 		__asm POP 1
+	 POP 1
+; 		__asm POP 0
+	 POP 0
+; 		__asm POP PSW
+	 POP PSW
+; 		__asm POP DPL
+	 POP DPL
+; 		__asm POP DPH
+	 POP DPH
+; 		__asm POP B
+	 POP B
+; 		__asm POP ACC
+	 POP ACC
+; 		EA = 1;
+			; SOURCE LINE # 114
+	SETB 	EA
+; 		//os_exit_critical();
+; 		//__asm RET	//后面是函数返回,即 ret
+; 		//__asm reti
+; 	}
+			; SOURCE LINE # 118
+; }
+			; SOURCE LINE # 119
+?C0010:
+	RET  	
+; END OF _os_delay
+
+; 
+; /* 系统心跳更新 */
+; void os_time_tick(void)
+
+	RSEG  ?PR?os_time_tick?TASK_SWITCH
+os_time_tick:
+	USING	0
+			; SOURCE LINE # 122
+; {
+			; SOURCE LINE # 123
+; 	unsigned char i;
+; 	
+; 	for(i=0; i<MAX_TASK; i++)
+			; SOURCE LINE # 126
+;---- Variable 'i?445' assigned to Register 'R7' ----
+	CLR  	A
+	MOV  	R7,A
+?C0011:
+; 	{
+			; SOURCE LINE # 127
+; 		if(os_tcb[i].os_tsak_wait_tick)
+			; SOURCE LINE # 128
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb)
+	MOV  	R0,A
+	MOV  	A,@R0
+	JZ   	?C0013
+; 		{
+			; SOURCE LINE # 129
+; 			os_tcb[i].os_tsak_wait_tick--;
+			; SOURCE LINE # 130
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb)
+	MOV  	R0,A
+	DEC  	@R0
+; 			if(0 == os_tcb[i].os_tsak_wait_tick) 	//没有等待时间,则任务进入就绪状态
+			; SOURCE LINE # 131
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb)
+	MOV  	R0,A
+	MOV  	A,@R0
+	JNZ  	?C0013
+; 			{
+			; SOURCE LINE # 132
+; 				os_tcb[i].suspend = 0;		//
+			; SOURCE LINE # 133
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+03H)
+	MOV  	R0,A
+	CLR  	A
+	MOV  	@R0,A
+; 			}
+			; SOURCE LINE # 134
+; 		}
+			; SOURCE LINE # 135
+; 	}
+			; SOURCE LINE # 136
+?C0013:
+	INC  	R7
+	CJNE 	R7,#03H,?C0011
+; 	
+; }
+			; SOURCE LINE # 138
+?C0016:
+	RET  	
+; END OF os_time_tick
+
+CSEG	AT	0000BH
+	LJMP	timer0_isr
+
+; 
+; 
+; /* 任务切换心跳 */
+; void timer0_isr(void) interrupt 1 	//using 0 默认用,所有的寄存器会自动入栈, 
+
+	RSEG  ?PR?timer0_isr?TASK_SWITCH
+	USING	0
+timer0_isr:
+	PUSH 	ACC
+	PUSH 	B
+	PUSH 	DPH
+	PUSH 	DPL
+	PUSH 	PSW
+	MOV  	PSW,#00H
+	PUSH 	AR0
+	PUSH 	AR1
+	PUSH 	AR2
+	PUSH 	AR3
+	PUSH 	AR4
+	PUSH 	AR5
+	PUSH 	AR6
+	PUSH 	AR7
+	USING	0
+			; SOURCE LINE # 142
+; {							//  用using 1 2 3 则需要手动对r0-r7入栈,出栈(请查看寄存器组选择(看任意一本讲51的书))
+; 	unsigned char i;
+; 	char cpu_sr;
+; 	
+; 	if(os_true == os_running)
+			; SOURCE LINE # 147
+	JNB  	os_running,?C0025
+; 	{
+			; SOURCE LINE # 148
+; 		os_enter_critical();
+			; SOURCE LINE # 149
+	LCALL	os_cpu_sr_save
+; 		
+; 	/*	寄存器入栈(注释的部分是在进入中断函数前已经压入栈中
+; 		(函数调用会让PC压栈,中断函数不但会让PC压栈,还会对下面五个寄存器压栈)
+; 		,就是我写的这个顺序)	*/
+; 	//	__asm PUSH ACC			
+; 	//	__asm PUSH B
+; 	//	__asm PUSH DPH
+; 	//	__asm PUSH DPL
+; 	//	__asm PUSH PSW
+; //		__asm PUSH 0
+; //		__asm PUSH 1
+; //		__asm PUSH 2
+; //		__asm PUSH 3
+; //		__asm PUSH 4
+; //		__asm PUSH 5
+; //		__asm PUSH 6
+; //		__asm PUSH 7
+; 		os_int_enter();
+			; SOURCE LINE # 167
+	LCALL	os_int_enter
+; 		
+; 		os_time_tick();
+			; SOURCE LINE # 169
+	LCALL	os_time_tick
+; 		if(1 == os_int_count)		//当然,51单片机最多只能有一次中断嵌套,os_int_count最大为2(+本次)
+			; SOURCE LINE # 170
+	MOV  	A,os_int_count
+	XRL  	A,#01H
+	JNZ  	?C0018
+; 		{
+			; SOURCE LINE # 171
+; 			os_tcb[os_task_running_id].os_task_stcak_top = SP;	
+			; SOURCE LINE # 172
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+01H)
+	MOV  	R0,A
+	MOV  	@R0,SP
+; 			
+; 			for(i=0; i<MAX_TASK; i++)		//找到已经就绪,未被挂起,且优先级最高的任务(任务调度器)
+			; SOURCE LINE # 174
+;---- Variable 'i?546' assigned to Register 'R7' ----
+	CLR  	A
+	MOV  	R7,A
+?C0019:
+; 			{
+			; SOURCE LINE # 175
+; 				if(os_task_rdy_tab & os_map_tab[i])
+			; SOURCE LINE # 176
+	MOV  	A,#LOW (os_map_tab)
+	ADD  	A,R7
+	MOV  	R0,A
+	MOV  	A,@R0
+	ANL  	A,os_task_rdy_tab
+	JZ   	?C0021
+; 				{
+			; SOURCE LINE # 177
+; 					if(0 == os_tcb[i].suspend)
+			; SOURCE LINE # 178
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+03H)
+	MOV  	R0,A
+	MOV  	A,@R0
+	JZ   	?C0020
+; 					{
+			; SOURCE LINE # 179
+; 						break;
+			; SOURCE LINE # 180
+; 					}
+			; SOURCE LINE # 181
+?C0023:
+; 				}
+			; SOURCE LINE # 182
+; 			}
+			; SOURCE LINE # 183
+?C0021:
+	INC  	R7
+	CJNE 	R7,#03H,?C0019
+?C0020:
+; 			if(os_task_running_id != i)		//现在执行的任务就是优先级最高的,所以不需要任务切换
+			; SOURCE LINE # 184
+	MOV  	A,os_task_running_id
+	XRL  	A,R7
+	JZ   	?C0018
+; 			{
+			; SOURCE LINE # 185
+; 				os_task_running_id = i;			//可执行的最高优先级任务
+			; SOURCE LINE # 186
+	MOV  	os_task_running_id,R7
+; 				SP = os_tcb[os_task_running_id].os_task_stcak_top;	//最高优先级任务的栈顶
+			; SOURCE LINE # 187
+	MOV  	R7,os_task_running_id
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,ACC
+	ADD  	A,#LOW (os_tcb+01H)
+	MOV  	R0,A
+	MOV  	A,@R0
+	MOV  	SP,A
+; 			}
+			; SOURCE LINE # 188
+; 		}
+			; SOURCE LINE # 189
+?C0018:
+; 		
+; 		TF0 = 0;			//清除中断标志
+			; SOURCE LINE # 191
+	CLR  	TF0
+; 		TH0 = 0xee;			//时间重装载
+			; SOURCE LINE # 192
+	MOV  	TH0,#0EEH
+; 		TL0 = 0x00;
+			; SOURCE LINE # 193
+	MOV  	TL0,#00H
+; 		os_int_exit();
+			; SOURCE LINE # 194
+	LCALL	os_int_exit
+; 		
+; 		
+; //		__asm POP 7
+; //		__asm POP 6
+; //		__asm POP 5
+; //		__asm POP 4
+; //		__asm POP 3
+; //		__asm POP 2
+; //		__asm POP 1
+; //		__asm POP 0
+; 		
+; 		os_exit_critical();
+			; SOURCE LINE # 206
+	LCALL	os_cpu_sr_save
+	LCALL	_os_cpu_sr_restore
+; 		/*和前面的道理相同(既然压栈了,当然也要出栈)(说明,后面手动加的__asm RETI,则下面的这几跳POP是必须要的,
+; 			这是为什么呢?    哈哈,因为默认情况下,RETI指令是要在,POP的后面,不然就不能执行POP,这几个寄存器值就恢复不了
+; 			,最重要的是SP也就乱套了 ,,,,,,,)*/
+; 	//	__asm POP PSW			
+; 	//	__asm POP DPL
+; 	//	__asm POP DPH
+; 	//	__asm POP B
+; 	//	__asm POP ACC
+; 		/*写不写都一样(写了,这条语句执行完会进行上面寄存器和PC出栈,
+; 		不写的话,C语言写的中断函数,编译器汇编过后,会在后面加一条reti指令,和上面执行相同的功能)
+; 		【写到这里,同学我突然有这么一个想法,能不能用ret(reti对中断标志位有清零作用,这里我们手动清除标志位就可以了)
+; 		,函数返回指令来返回中断函数,当然这些POP之类的指令就需要收到写了,程序是玩出来的,大家可以尽情的尝试哈^_^】*/
+; 	//	__asm RETI	
+; 	//	__asm	ret   //好像不可以,为什么呢?
+; 	}
+			; SOURCE LINE # 221
+; 	
+; }
+			; SOURCE LINE # 223
+?C0025:
+	POP  	AR7
+	POP  	AR6
+	POP  	AR5
+	POP  	AR4
+	POP  	AR3
+	POP  	AR2
+	POP  	AR1
+	POP  	AR0
+	POP  	PSW
+	POP  	DPL
+	POP  	DPH
+	POP  	B
+	POP  	ACC
+	RETI 	
+; END OF timer0_isr
+
+	END
