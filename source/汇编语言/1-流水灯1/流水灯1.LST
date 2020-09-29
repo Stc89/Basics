@@ -1,41 +1,41 @@
                                                                     页     1
                                                                     09-28-20
-                                                                    20:05:42
+                                                                    20:23:59
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
 
             ;流水灯程序
+            
             P1M0 DATA 092H
             P1M1 DATA 091H
             ORG 00H
-0000 7592FF MOV P1M0,#11111111B ;设置GPIO口模式
-0003 759100 MOV P1M1,#00000000B ;设置GPIO口模式
-0006 7590FF MOV P1,#11111111B ;设置GPIO口的状态
-0009 80FE   sjmp $ ;表示程序停止在这里
+0000 759200 MOV P1M0,#00000000B
+0003 759100 MOV P1M1,#00000000B
+0006 7590FF MOV P1,#11111111B
+            
+            START:
+0009 C294       CLR P1.4        ; 置0，
+000B C295       CLR P1.5        ; 置0，
+000D C296       CLR P1.6        ; 置0，
+000F 12001E     LCALL DELAY     ; 延时0.2s
+0012 D294       SETB P1.4       ; 置1，点亮LED
+0014 D295       SETB P1.5       ; 置1，点亮LED
+0016 D296       SETB P1.6       ; 置1，点亮LED
+0018 12001E     LCALL DELAY     ; 延时0.2s
+001B 020009     LJMP START      ; 进行重新循环
+            DELAY:
+001E 7DC8       MOV R5,#200      ; 执行MOV指令为1个机器周期
+            D1:
+0020 7EC8       MOV R6, #200     ; 执行的时间为：1*20 个机器周期
+            D2:
+0022 7FF8       MOV R7, #248    ; 该条指令执行了: 1*20*20
+0024 DFFE       DJNZ R7,$       ; 该条指令执行了: 2*20*20*248
+0026 DEFA       DJNZ R6, D2     ; 该条指令执行了: 2*20*20 个机器周期
+0028 DDF6       DJNZ R5, D1     ; 该条指令执行了: 2*20
+002A 22         RET             ; 该条指令执行了: 2
+            
             END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -59,7 +59,7 @@ D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM
  
                                                                     页     2
                                                                     09-28-20
-                                                                    20:05:42
+                                                                    20:23:59
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
@@ -83,6 +83,9 @@ D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM
             CY                       = 00D7H CONST 常量 
             C_T2                     = 00C9H CONST 常量 
             C_T2                     = 00C9H CONST 常量 
+            D1                       = 0020H CODE  标号 
+            D2                       = 0022H CODE  标号 
+            DELAY                    = 001EH CODE  标号 
             DPH                      = 0083H CONST 常量 
             DPL                      = 0082H CONST 常量 
             EA                       = 00AFH CONST 常量 
@@ -109,20 +112,20 @@ D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM
             P                        = 00D0H CONST 常量 
             P0                       = 0080H CONST 常量 
             P1                       = 0090H CONST 常量 
-            P1M0                     = 0092H CONST 常量 
-            P1M1                     = 0091H CONST 常量 
-            P2                       = 00A0H CONST 常量 
 
 
 D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
  
                                                                     页     3
                                                                     09-28-20
-                                                                    20:05:42
+                                                                    20:23:59
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
 
+            P1M0                     = 0092H CONST 常量 
+            P1M1                     = 0091H CONST 常量 
+            P2                       = 00A0H CONST 常量 
             P3                       = 00B0H CONST 常量 
             PCON                     = 0087H CONST 常量 
             PS                       = 00BCH CONST 常量 
@@ -148,6 +151,7 @@ D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM
             SM1                      = 009EH CONST 常量 
             SM2                      = 009DH CONST 常量 
             SP                       = 0081H CONST 常量 
+            START                    = 0009H CODE  标号 
             T0                       = 00B4H CONST 常量 
             T1                       = 00B5H CONST 常量 
             T2CON                    = 00C8H CONST 常量 
@@ -167,31 +171,27 @@ D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM
             TL1                      = 008BH CONST 常量 
             TL2                      = 00CCH CONST 常量 
             TMOD                     = 0089H CONST 常量 
-            TR0                      = 008CH CONST 常量 
-            TR1                      = 008EH CONST 常量 
-            TR2                      = 00CAH CONST 常量 
-            TR2                      = 00CAH CONST 常量 
 
 
 D:\SOURCE\BASICS\SOURCE\汇编语言\1-流水灯1\流水灯1.ASM          
  
                                                                     页     4
                                                                     09-28-20
-                                                                    20:05:42
+                                                                    20:23:59
 伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
 
 地址  机器码 源程序
 
+            TR0                      = 008CH CONST 常量 
+            TR1                      = 008EH CONST 常量 
+            TR2                      = 00CAH CONST 常量 
+            TR2                      = 00CAH CONST 常量 
             TXD                      = 00B1H CONST 常量 
             WR                       = 00B6H CONST 常量 
 
 
-            公有符号:   94
+            公有符号:   98
             私有符号:    0
-
-
-
-
 
 
 

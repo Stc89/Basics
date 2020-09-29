@@ -1,12 +1,14 @@
 ;流水灯程序
-;使用杜邦线连接P1与LED端口J9
+
 P1M0 DATA 092H
 P1M1 DATA 091H
 ORG 00H
-MOV P1M0,#11111111B
+MOV P1M0,#00000000B
 MOV P1M1,#00000000B
 MOV P1,#11111111B
-sjmp $
+;sjmp $
+
+
 START:
     CLR P1.5        ; 置0，点亮LED
     LCALL DELAY     ; 延时0.2s
@@ -14,9 +16,9 @@ START:
     LCALL DELAY     ; 延时0.2s
     LJMP START      ; 进行重新循环
 DELAY:
-    MOV R5,#20      ; 执行MOV指令为1个机器周期
+    MOV R5,#200      ; 执行MOV指令为1个机器周期
 D1:
-    MOV R6, #20     ; 执行的时间为：1*20 个机器周期
+    MOV R6, #200     ; 执行的时间为：1*20 个机器周期
 D2:
     MOV R7, #248    ; 该条指令执行了: 1*20*20
     DJNZ R7,$       ; 该条指令执行了: 2*20*20*248

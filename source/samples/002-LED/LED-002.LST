@@ -1,0 +1,183 @@
+C51 COMPILER V9.00   LED_002                                                               09/29/2020 10:01:42 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE LED_002
+OBJECT MODULE PLACED IN LED-002.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE LED-002.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC 1T Series MCU Demo Programme -------------------------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966 ------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.STCMCUDATA.com  ---------------------------------------*/
+   9          /* --- QQ:  800003751 -------------------------------------------------*/
+  10          /* 如果要在程序中使用此代码,请在程序中注明使用了STC的资料及程序            */
+  11          /*---------------------------------------------------------------------*/
+  12          
+  13          #include    "reg51.h"
+  14          
+  15          #define     MAIN_Fosc       24000000L   //定义主时钟
+  16          
+  17          /*************  功能说明    **************
+  18          
+  19          程序使用P6口来演示跑马灯，输出低驱动。
+  20          
+  21          下载时, 选择时钟 24MHZ (用户可自行修改频率).
+  22          
+  23          当用户使用硬件 USB 对 STC8H8K64U 系列进行 ISP 下载时不能调节内部 IRC 的频率，
+  24          但用户可用选择内部预置的 16 个频率
+  25          （分别是 5.5296M、 6M、 11.0592M、 12M、 18.432M、 20M、 22.1184M、 
+  26          24M、27M、 30M、 33.1776M、 35M、 36.864M、 40M、 44.2368M 和 48M）。
+  27          下载时用户只能从频率下拉列表中进行选择其中之一，而不能手动输入其他频率。
+  28          （使用串口下载则可用输入 4M～48M 之间的任意频率）。
+  29          
+  30          ******************************************/
+  31          
+  32          typedef     unsigned char   u8;
+  33          typedef     unsigned int    u16;
+  34          typedef     unsigned long   u32;
+  35          
+  36          sfr P4   = 0xC0;
+  37          sfr P5   = 0xC8;
+  38          sfr P6   = 0xE8;
+  39          sfr P7   = 0xF8;
+  40          sfr P1M1 = 0x91;    //PxM1.n,PxM0.n     =00--->Standard,    01--->push-pull
+  41          sfr P1M0 = 0x92;    //                  =10--->pure input,  11--->open drain
+  42          sfr P0M1 = 0x93;
+  43          sfr P0M0 = 0x94;
+  44          sfr P2M1 = 0x95;
+  45          sfr P2M0 = 0x96;
+  46          sfr P3M1 = 0xB1;
+  47          sfr P3M0 = 0xB2;
+  48          sfr P4M1 = 0xB3;
+  49          sfr P4M0 = 0xB4;
+  50          sfr P5M1 = 0xC9;
+  51          sfr P5M0 = 0xCA;
+  52          sfr P6M1 = 0xCB;
+  53          sfr P6M0 = 0xCC;
+  54          sfr P7M1 = 0xE1;
+  55          sfr P7M0 = 0xE2;
+C51 COMPILER V9.00   LED_002                                                               09/29/2020 10:01:42 PAGE 2   
+
+  56          
+  57          sbit P00 = P0^0;
+  58          sbit P01 = P0^1;
+  59          sbit P02 = P0^2;
+  60          sbit P03 = P0^3;
+  61          sbit P04 = P0^4;
+  62          sbit P05 = P0^5;
+  63          sbit P06 = P0^6;
+  64          sbit P07 = P0^7;
+  65          sbit P10 = P1^0;
+  66          sbit P11 = P1^1;
+  67          sbit P12 = P1^2;
+  68          sbit P13 = P1^3;
+  69          sbit P14 = P1^4;
+  70          sbit P15 = P1^5;
+  71          sbit P16 = P1^6;
+  72          sbit P17 = P1^7;
+  73          sbit P20 = P2^0;
+  74          sbit P21 = P2^1;
+  75          sbit P22 = P2^2;
+  76          sbit P23 = P2^3;
+  77          sbit P24 = P2^4;
+  78          sbit P25 = P2^5;
+  79          sbit P26 = P2^6;
+  80          sbit P27 = P2^7;
+  81          sbit P30 = P3^0;
+  82          sbit P31 = P3^1;
+  83          sbit P32 = P3^2;
+  84          sbit P33 = P3^3;
+  85          sbit P34 = P3^4;
+  86          sbit P35 = P3^5;
+  87          sbit P36 = P3^6;
+  88          sbit P37 = P3^7;
+  89          sbit P40 = P4^0;
+  90          sbit P41 = P4^1;
+  91          sbit P42 = P4^2;
+  92          sbit P43 = P4^3;
+  93          sbit P44 = P4^4;
+  94          sbit P45 = P4^5;
+  95          sbit P46 = P4^6;
+  96          sbit P47 = P4^7;
+  97          sbit P50 = P5^0;
+  98          sbit P51 = P5^1;
+  99          sbit P52 = P5^2;
+ 100          sbit P53 = P5^3;
+ 101          sbit P54 = P5^4;
+ 102          sbit P55 = P5^5;
+ 103          sbit P56 = P5^6;
+ 104          sbit P57 = P5^7;
+ 105          
+ 106          u8 ledIndex;
+ 107          u8 code ledNum[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+ 108          
+ 109          void  delay_ms(u8 ms);
+ 110          
+ 111          
+ 112          /******************** 主函数 **************************/
+ 113          void main(void)
+ 114          {
+ 115   1          P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+ 116   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+ 117   1          P2M1 = 0;   P2M0 = 0;   //设置为准双向口
+C51 COMPILER V9.00   LED_002                                                               09/29/2020 10:01:42 PAGE 3   
+
+ 118   1          P3M1 = 0;   P3M0 = 0;   //设置为准双向口
+ 119   1          P4M1 = 0;   P4M0 = 0;   //设置为准双向口
+ 120   1          P5M1 = 0;   P5M0 = 0;   //设置为准双向口
+ 121   1          P6M1 = 0;   P6M0 = 0;   //设置为准双向口
+ 122   1          P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+ 123   1      
+ 124   1          P40 = 0;            //LED Power On
+ 125   1                      ledIndex = 0;
+ 126   1          while(1)
+ 127   1          {
+ 128   2              P1 = ~ledNum[ledIndex]; //输出低驱动
+ 129   2                                      ledIndex++;
+ 130   2                                      if(ledIndex > 7)
+ 131   2                                      {
+ 132   3                                                      ledIndex = 0;
+ 133   3                                      }
+ 134   2              delay_ms(250);
+ 135   2              delay_ms(250);
+ 136   2          }
+ 137   1      }
+ 138          
+ 139          //========================================================================
+ 140          // 函数: void  delay_ms(u8 ms)
+ 141          // 描述: 延时函数。
+ 142          // 参数: ms,要延时的ms数, 这里只支持1~255ms. 自动适应主时钟.
+ 143          // 返回: none.
+ 144          // 版本: VER1.0
+ 145          // 日期: 2013-4-1
+ 146          // 备注: 
+ 147          //========================================================================
+ 148          void  delay_ms(u8 ms)
+ 149          {
+ 150   1           u16 i;
+ 151   1           do{
+ 152   2                i = MAIN_Fosc / 13000;
+ 153   2                while(--i)    ;   //14T per loop
+ 154   2           }while(--ms);
+ 155   1      }
+ 156          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     86    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
