@@ -31,8 +31,8 @@
 
 sbit WorkLedCtrl=P6^0;
 
-OS_EVENT *UartMbox;
-OS_EVENT *AckMbox;
+//OS_EVENT *UartMbox;
+//OS_EVENT *AckMbox;
 
 OS_STK AppStartStk[TASK_STK_SIZE];
 OS_STK PowerLedStk[TASK_STK_SIZE];
@@ -52,7 +52,7 @@ int main(void)
 {
 	InitSystem();
 
-	OSTaskCreate(AppStart, (void *)0, AppStartStk, APPSTARTPRIO);
+	//OSTaskCreate(AppStart, (void *)0, AppStartStk, APPSTARTPRIO);
 
 	OSStart();
 
@@ -61,45 +61,45 @@ int main(void)
 
 /*
 ********************************************************************************************************* 
-*                                             ÏµÍ³¿ªÊ¼ÈÎÎñ
+*                                             ç³»ç»Ÿå¼€å§‹ä»»åŠ¡
 *
-* ÃèÊö       : ¿ª¶¨Ê±Æ÷T0ÖĞ¶Ï£¬´´½¨ÏûÏ¢ÓÊÏäÒÔ¼°ËùÓĞÆäËûµÄÈÎÎñ£¬È»ºó×ÔÎÒÉ¾³ı¡£
+* æè¿°       : å¼€å®šæ—¶å™¨T0ä¸­æ–­ï¼Œåˆ›å»ºæ¶ˆæ¯é‚®ç®±ä»¥åŠæ‰€æœ‰å…¶ä»–çš„ä»»åŠ¡ï¼Œç„¶åè‡ªæˆ‘åˆ é™¤ã€‚
 *
-* ²ÎÊı       : p_arg
+* å‚æ•°       : p_arg
 *
-* ×¢Òâ       : ÏµÍ³Æô¶¯ºóµÚÒ»Ê±¼ä¿ª¶¨Ê±Æ÷ÖĞ¶Ï£¬·ñÔòÏµÍ³ÆäËüÈÎÎñÎŞ·¨µÃµ½Ö´ĞĞ¡£		                        	
+* æ³¨æ„       : ç³»ç»Ÿå¯åŠ¨åç¬¬ä¸€æ—¶é—´å¼€å®šæ—¶å™¨ä¸­æ–­ï¼Œå¦åˆ™ç³»ç»Ÿå…¶å®ƒä»»åŠ¡æ— æ³•å¾—åˆ°æ‰§è¡Œã€‚		                        	
 *********************************************************************************************************
 */
 void AppStart(void *p_arg) large reentrant
 {
 	p_arg=p_arg;
-	ET0=1; /* ½÷¼Ç£ºÏµÍ³Æô¶¯ºóµÚÒ»Ê±¼ä¿ª¶¨Ê±Æ÷ÖĞ¶Ï */
+	ET0=1; /* è°¨è®°ï¼šç³»ç»Ÿå¯åŠ¨åç¬¬ä¸€æ—¶é—´å¼€å®šæ—¶å™¨ä¸­æ–­ */
 
-	UartMbox=OSMboxCreate((void *)0);
-	AckMbox=OSMboxCreate((void *)0);
+	//UartMbox=OSMboxCreate((void *)0);
+	//AckMbox=OSMboxCreate((void *)0);
 
 	LogoDisp();
 	PrintStr("You can input by the terminal!\n\n\n");
 	
-	OSTaskCreate(PowerLed, (void *)0, PowerLedStk, POWERLEDPRIO);
-	OSTaskCreate(UartRcv, (void *)0, UartRcvStk, UARTRCVPRIO);
-	OSTaskCreate(UartSend, (void *)0, UartSendStk, UARTSENDPRIO);
+	//OSTaskCreate(PowerLed, (void *)0, PowerLedStk, POWERLEDPRIO);
+	//OSTaskCreate(UartRcv, (void *)0, UartRcvStk, UARTRCVPRIO);
+	//OSTaskCreate(UartSend, (void *)0, UartSendStk, UARTSENDPRIO);
 
-	OSTaskDel(OS_PRIO_SELF);	
+	//OSTaskDel(OS_PRIO_SELF);	
 }
 
 /*
 ********************************************************************************************************* 
-*                                             ¹¤×÷×´Ì¬Ö¸Ê¾ÈÎÎñ
+*                                             å·¥ä½œçŠ¶æ€æŒ‡ç¤ºä»»åŠ¡
 *
-* ÃèÊö       : CPUÕı³£¹¤×÷Ê±£¬Ã¿ÃëÖÓÉÁË¸5´Î£¬²»¹¤×÷Ê±²»ÉÁË¸£¬¿ØÖÆ¶Ë¿ÚP3.4¡£
+* æè¿°       : CPUæ­£å¸¸å·¥ä½œæ—¶ï¼Œæ¯ç§’é’Ÿé—ªçƒ5æ¬¡ï¼Œä¸å·¥ä½œæ—¶ä¸é—ªçƒï¼Œæ§åˆ¶ç«¯å£P3.4ã€‚
 *
-* ²ÎÊı       : p_arg
+* å‚æ•°       : p_arg
 *
-* ×¢Òâ       : Ò»¸öÊ±ÖÓ½ÚÅÄÎª0.02s£¬½¨ÒéÓÅÏÈ¼¶ÉèÎª×îµÍ£¬¸ßÓÚÏµÍ³¿ÕÏĞÈÎÎñºÍÏµÍ³Í³¼ÆÈÎÎñ¡£Ç¿ÁÒÒıÆğÄúµÄÖØÊÓ£º
+* æ³¨æ„       : ä¸€ä¸ªæ—¶é’ŸèŠ‚æ‹ä¸º0.02sï¼Œå»ºè®®ä¼˜å…ˆçº§è®¾ä¸ºæœ€ä½ï¼Œé«˜äºç³»ç»Ÿç©ºé—²ä»»åŠ¡å’Œç³»ç»Ÿç»Ÿè®¡ä»»åŠ¡ã€‚å¼ºçƒˆå¼•èµ·æ‚¨çš„é‡è§†ï¼š
 *			   ..\ucos_51\ucos-ii\src\ucos_ii.h	
 *			   		OS_EXT  DF_IDATA  volatile  INT32U  OSIdleCtr; 
-*			   "OSIdleCtr" ±äÁ¿Îñ±ØÉèÖÃÎª "idata" ´æ´¢ÀàĞÍ£¬·ñÔòÈÎÎñÔËĞĞ½ÚÅÄ±äÂı¡£		                        	
+*			   "OSIdleCtr" å˜é‡åŠ¡å¿…è®¾ç½®ä¸º "idata" å­˜å‚¨ç±»å‹ï¼Œå¦åˆ™ä»»åŠ¡è¿è¡ŒèŠ‚æ‹å˜æ…¢ã€‚		                        	
 *********************************************************************************************************
 */
 void PowerLed(void *p_arg) large reentrant
@@ -113,7 +113,7 @@ void PowerLed(void *p_arg) large reentrant
 	for(;;)
 	{
 		OS_ENTER_CRITICAL();
-		WorkLedCtrl=!WorkLedCtrl; /* ±£»¤ÁÙ½ç×ÊÔ´ */
+		WorkLedCtrl=!WorkLedCtrl; /* ä¿æŠ¤ä¸´ç•Œèµ„æº */
 		OS_EXIT_CRITICAL();
 
 		OSTimeDlyHMSM(0,0,0,200);
@@ -124,16 +124,17 @@ void PowerLed(void *p_arg) large reentrant
 
 /*
 ********************************************************************************************************* 
-*                                             ´®¿ÚÊÕ·¢ÈÎÎñ
+*                                             ä¸²å£æ”¶å‘ä»»åŠ¡
 *
-* ÃèÊö       : UartRcvÈÎÎñ¸ºÔğ´Ó¼üÅÌ½ÓÊÕ£¬Í¨¹ıÏûÏ¢ÓÊÏä·¢ËÍ¸øUartSendÈÎÎñ´¦Àí²¢ÔÚÖÕ¶Ë´òÓ¡¡£
+* æè¿°       : UartRcvä»»åŠ¡è´Ÿè´£ä»é”®ç›˜æ¥æ”¶ï¼Œé€šè¿‡æ¶ˆæ¯é‚®ç®±å‘é€ç»™UartSendä»»åŠ¡å¤„ç†å¹¶åœ¨ç»ˆç«¯æ‰“å°ã€‚
 *
-* ²ÎÊı       : p_arg
+* å‚æ•°       : p_arg
 *
-* ×¢Òâ       : ¶àÈÎÎñµÄ²¢·¢Ö´ĞĞ£¬ĞëÍ×ÉÆ´¦Àí¶ÔÁÙ½ç×ÊÔ´µÄ·ÃÎÊÒÔ¼°¶àÈÎÎñÖ®¼äµÄÍ¨ĞÅ¡£	                        	
+* æ³¨æ„       : å¤šä»»åŠ¡çš„å¹¶å‘æ‰§è¡Œï¼Œé¡»å¦¥å–„å¤„ç†å¯¹ä¸´ç•Œèµ„æºçš„è®¿é—®ä»¥åŠå¤šä»»åŠ¡ä¹‹é—´çš„é€šä¿¡ã€‚	                        	
 *********************************************************************************************************
 */
 // ------------------------------------------------------------------------------------------------------
+#if 0
 void UartRcv(void *p_arg) large reentrant
 {
 	INT8U Rxbuf;
@@ -187,5 +188,5 @@ void UartSend(void *p_arg) large reentrant
 	}
 }
 // ------------------------------------------------------------------------------------------------------
-
+#endif
 

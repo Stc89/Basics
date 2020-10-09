@@ -4,63 +4,6 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 D:\source\Basics\source\samples\002-LED\LED-002.uvproj
-Project File Date:  09/28/2020
+Project File Date:  09/29/2020
 
 <h2>Output:</h2>
-Build target 'Target 1'
-assembling STARTUP.A51...
-compiling LED-002.c...
-linking...
-Program Size: data=10.0 xdata=0 code=109
-"LED-002" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-assembling STARTUP.A51...
-compiling LED-002.c...
-linking...
-Program Size: data=10.0 xdata=0 code=109
-creating hex file from "LED-002"...
-"LED-002" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-assembling STARTUP.A51...
-compiling LED-002.c...
-LED-002.C(57): error C202: 'P0': undefined identifier
-LED-002.C(58): error C202: 'P0': undefined identifier
-LED-002.C(59): error C202: 'P0': undefined identifier
-LED-002.C(60): error C202: 'P0': undefined identifier
-LED-002.C(61): error C202: 'P0': undefined identifier
-LED-002.C(62): error C202: 'P0': undefined identifier
-LED-002.C(63): error C202: 'P0': undefined identifier
-LED-002.C(64): error C202: 'P0': undefined identifier
-LED-002.C(65): error C202: 'P1': undefined identifier
-LED-002.C(66): error C202: 'P1': undefined identifier
-LED-002.C(67): error C202: 'P1': undefined identifier
-LED-002.C(68): error C202: 'P1': undefined identifier
-LED-002.C(69): error C202: 'P1': undefined identifier
-LED-002.C(70): error C202: 'P1': undefined identifier
-LED-002.C(71): error C202: 'P1': undefined identifier
-LED-002.C(72): error C202: 'P1': undefined identifier
-LED-002.C(73): error C202: 'P2': undefined identifier
-LED-002.C(74): error C202: 'P2': undefined identifier
-LED-002.C(75): error C202: 'P2': undefined identifier
-LED-002.C(76): error C202: 'P2': undefined identifier
-LED-002.C(77): error C202: 'P2': undefined identifier
-LED-002.C(78): error C202: 'P2': undefined identifier
-LED-002.C(79): error C202: 'P2': undefined identifier
-LED-002.C(80): error C202: 'P2': undefined identifier
-LED-002.C(81): error C202: 'P3': undefined identifier
-LED-002.C(82): error C202: 'P3': undefined identifier
-LED-002.C(83): error C202: 'P3': undefined identifier
-LED-002.C(84): error C202: 'P3': undefined identifier
-LED-002.C(85): error C202: 'P3': undefined identifier
-LED-002.C(86): error C202: 'P3': undefined identifier
-LED-002.C(87): error C202: 'P3': undefined identifier
-LED-002.C(88): error C202: 'P3': undefined identifier
-LED-002.C(128): error C202: 'P1': undefined identifier
-Target not created
-Build target 'Target 1'
-assembling STARTUP.A51...
-compiling LED-002.c...
-linking...
-Program Size: data=10.0 xdata=0 code=109
-creating hex file from "LED-002"...
-"LED-002" - 0 Error(s), 0 Warning(s).

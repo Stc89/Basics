@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_FLAG
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_FLAG
 OBJECT MODULE PLACED IN .\Output\OS_FLAG.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_FLAG.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\In
-                    -c) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_FLAG.lst) OBJECT(.\Output\OS_FLAG.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_FLAG.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) 
+                    -DEBUG OBJECTEXTEND PRINT(.\Listing\OS_FLAG.lst) OBJECT(.\Output\OS_FLAG.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               *              flags         Is a bit pattern indicating which bit(s) (i.e. flags) you wish to check.
               *                            The bits you want are specified by setting the corresponding bits in
               *                            'flags'.  e.g. if your application wants to wait for bits 0 and 1 then
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 2   
 
               *                            'flags' would contain 0x03.
               *
@@ -126,7 +126,7 @@ line level    source
                   if (pgrp == (OS_FLAG_GRP *)0) {                        /* Validate 'pgrp'                          */
                       *perr = OS_ERR_FLAG_INVALID_PGRP;
                       return ((OS_FLAGS)0);
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 3   
 
                   }
               #endif
@@ -190,7 +190,7 @@ line level    source
                                }
                            } else {
                                *perr = OS_ERR_FLAG_NOT_RDY;
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 4   
 
                            }
                            OS_EXIT_CRITICAL();
@@ -254,7 +254,7 @@ line level    source
                       *perr = OS_ERR_CREATE_ISR;                  /* ... can't CREATE from an ISR                    */
                       return ((OS_FLAG_GRP *)0);
                   }
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 5   
 
                   OS_ENTER_CRITICAL();
                   pgrp = OSFlagFreeList;                          /* Get next free event flag                        */
@@ -318,7 +318,7 @@ line level    source
               #if OS_FLAG_DEL_EN > 0u
               OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
                                        INT8U         opt,
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 6   
 
                                        INT8U        *perr) large reentrant
               {
@@ -382,7 +382,7 @@ line level    source
                            while (pnode != (OS_FLAG_NODE *)0) {          /* Ready ALL tasks waiting for flags        */
                                (void)OS_FlagTaskRdy(pnode, (OS_FLAGS)0);
                                pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 7   
 
                            }
               #if OS_FLAG_NAME_EN > 0u
@@ -446,7 +446,7 @@ line level    source
               
               
               
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 8   
 
               #ifdef OS_SAFETY_CRITICAL
                   if (perr == (INT8U *)0) {
@@ -510,7 +510,7 @@ line level    source
               void  OSFlagNameSet (OS_FLAG_GRP  *pgrp,
                                    INT8U        *pname,
                                    INT8U        *perr) large reentrant
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 9   
 
               {
               #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
@@ -574,7 +574,7 @@ line level    source
               *                            OS_FLAG_WAIT_SET_ALL   You will wait for ALL bits in 'mask' to be set   (1)
               *                            OS_FLAG_WAIT_CLR_ANY   You will wait for ANY bit  in 'mask' to be clear (0)
               *                            OS_FLAG_WAIT_SET_ANY   You will wait for ANY bit  in 'mask' to be set   (1)
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 10  
 
               *
               *                            NOTE: Add OS_FLAG_CONSUME if you want the event flag to be 'consumed' by
@@ -638,7 +638,7 @@ line level    source
                       return ((OS_FLAGS)0);
                   }
               #endif
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 11  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 11  
 
                   if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
                       *perr = OS_ERR_PEND_ISR;                           /* ... can't PEND from an ISR               */
@@ -702,7 +702,7 @@ line level    source
                                    pgrp->OSFlagFlags |= flags_rdy;       /* Set ONLY the flags that we wanted        */
                                }
                                OSTCBCur->OSTCBFlagsRdy = flags_rdy;      /* Save flags that were ready               */
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 12  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 12  
 
                                OS_EXIT_CRITICAL();                       /* Yes, condition met, return to caller     */
                                *perr                   = OS_ERR_NONE;
@@ -766,7 +766,7 @@ line level    source
                                pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;
                                break;
               
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 13  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 13  
 
               #if OS_FLAG_WAIT_CLR_EN > 0u
                           case OS_FLAG_WAIT_CLR_ALL:
@@ -830,7 +830,7 @@ line level    source
               *                            and 5 you would set 'flags' to:
               *
               *                                0x31     (note, bit 0 is least significant bit)
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 14  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 14  
 
               *
               *                            If 'opt' (see below) is OS_FLAG_CLR, each bit that is set in 'flags' will
@@ -894,7 +894,7 @@ line level    source
               /*$PAGE*/
                   OS_ENTER_CRITICAL();
                   switch (opt) {
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 15  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 15  
 
                       case OS_FLAG_CLR:
                            pgrp->OSFlagFlags &= (OS_FLAGS)~flags;  /* Clear the flags specified in the group         */
@@ -958,7 +958,7 @@ line level    source
                                OS_EXIT_CRITICAL();
                                *perr = OS_ERR_FLAG_WAIT_TYPE;
                                return ((OS_FLAGS)0);
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 16  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 16  
 
                       }
                       pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext; /* Point to next task waiting for event flag(s) */
@@ -1022,7 +1022,7 @@ line level    source
                   }
                   OS_ENTER_CRITICAL();
                   flags = pgrp->OSFlagFlags;
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 17  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 17  
 
                   OS_EXIT_CRITICAL();
                   *perr = OS_ERR_NONE;
@@ -1086,7 +1086,7 @@ line level    source
               #endif
                   pnode->OSFlagNodeFlags    = flags;                /* Save the flags that we need to wait for       */
                   pnode->OSFlagNodeWaitType = wait_type;            /* Save the type of wait we are doing            */
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 18  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 18  
 
                   pnode->OSFlagNodeTCB      = (void *)OSTCBCur;     /* Link to task's TCB                            */
                   pnode->OSFlagNodeNext     = pgrp->OSFlagWaitList; /* Add node at beginning of event flag wait list */
@@ -1150,7 +1150,7 @@ line level    source
               #if OS_FLAG_NAME_EN > 0u
                       pgrp1->OSFlagName     = (INT8U *)(void *)"?";               /* Unknown name                    */
               #endif
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 19  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 19  
 
                   }
                   pgrp1                 = &OSFlagTbl[ix];
@@ -1214,7 +1214,7 @@ line level    source
               /*
               *********************************************************************************************************
               *                                  UNLINK EVENT FLAG NODE FROM WAITING LIST
-C51 COMPILER V9.60.0.0   OS_FLAG                                                           01/22/2020 20:57:56 PAGE 20  
+C51 COMPILER V9.00   OS_FLAG                                                               10/09/2020 18:11:58 PAGE 20  
 
               *
               * Description: This function is internal to uC/OS-II and is used to unlink an event flag node from a

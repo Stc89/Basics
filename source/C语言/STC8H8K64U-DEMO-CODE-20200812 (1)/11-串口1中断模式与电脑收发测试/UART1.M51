@@ -1,8 +1,8 @@
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/17/2020  13:12:34  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22                                                        10/04/2020  23:14:28  PAGE 1
 
 
-BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
-C:\KEIL_V5\C51\BIN\BL51.EXE UART1.obj TO UART1 RAMSIZE (256)
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE UART1.obj TO UART1 RAMSIZE (256)
 
 
 MEMORY MODEL: SMALL
@@ -10,8 +10,8 @@ MEMORY MODEL: SMALL
 
 INPUT MODULES INCLUDED:
   UART1.obj (UART1)
-  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
-  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?CLDPTR)
 
 
 LINK MAP OF MODULE:  UART1 (UART1)
@@ -34,13 +34,13 @@ LINK MAP OF MODULE:  UART1 (UART1)
             CODE    0003H     001AH     UNIT         ?PR?_SETTIMER2BAUDRAYE?UART1
                     001DH     0006H                  *** GAP ***
             CODE    0023H     0003H     ABSOLUTE     
-            CODE    0026H     0056H     UNIT         ?PR?MAIN?UART1
-            CODE    007CH     0043H     UNIT         ?PR?_UART1_CONFIG?UART1
-            CODE    00BFH     0033H     UNIT         ?PR?UART1_INT?UART1
-            CODE    00F2H     0023H     UNIT         ?CO?UART1
-            CODE    0115H     0019H     UNIT         ?C?LIB_CODE
-            CODE    012EH     0016H     UNIT         ?PR?_PRINTSTRING1?UART1
-            CODE    0144H     000CH     UNIT         ?C_C51STARTUP
+            CODE    0026H     0052H     UNIT         ?PR?MAIN?UART1
+            CODE    0078H     0041H     UNIT         ?PR?_UART1_CONFIG?UART1
+            CODE    00B9H     002FH     UNIT         ?PR?UART1_INT?UART1
+            CODE    00E8H     0023H     UNIT         ?CO?UART1
+            CODE    010BH     0019H     UNIT         ?C?LIB_CODE
+            CODE    0124H     0016H     UNIT         ?PR?_PRINTSTRING1?UART1
+            CODE    013AH     000CH     UNIT         ?C_C51STARTUP
 
 
 
@@ -59,7 +59,7 @@ SEGMENT
   +--> ?PR?_PRINTSTRING1?UART1
 
 ?PR?_UART1_CONFIG?UART1
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/17/2020  13:12:34  PAGE 2
+BL51 BANKED LINKER/LOCATER V6.22                                                      10/04/2020  23:14:28  PAGE 2
 
 
   +--> ?PR?_SETTIMER2BAUDRAYE?UART1
@@ -101,16 +101,16 @@ SYMBOL TABLE OF MODULE:  UART1 (UART1)
   B:00A8H.4       PUBLIC        ES
   I:0021H         PUBLIC        RX1_Buffer
   B:0098H.0       PUBLIC        RI
-  C:00BFH         PUBLIC        UART1_int
+  C:00B9H         PUBLIC        UART1_int
   B:0098H.1       PUBLIC        TI
   C:0026H         PUBLIC        main
   D:0099H         PUBLIC        SBUF
   D:0098H         PUBLIC        SCON
   D:0089H         PUBLIC        TMOD
-  C:012EH         PUBLIC        _PrintString1
+  C:0124H         PUBLIC        _PrintString1
   D:00AFH         PUBLIC        IE2
   D:008EH         PUBLIC        AUXR
-  C:007CH         PUBLIC        _UART1_config
+  C:0078H         PUBLIC        _UART1_config
   B:00A8H.3       PUBLIC        ET1
   D:008DH         PUBLIC        TH1
   D:00D6H         PUBLIC        TH2
@@ -119,7 +119,7 @@ SYMBOL TABLE OF MODULE:  UART1 (UART1)
   B:0088H.6       PUBLIC        TR1
   D:0008H         PUBLIC        RX1_Cnt
   D:0009H         PUBLIC        TX1_Cnt
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/17/2020  13:12:34  PAGE 3
+BL51 BANKED LINKER/LOCATER V6.22                                                      10/04/2020  23:14:28  PAGE 3
 
 
   B:0098H.4       PUBLIC        REN
@@ -146,20 +146,20 @@ SYMBOL TABLE OF MODULE:  UART1 (UART1)
   C:0060H         LINE#         156
   C:0068H         LINE#         157
   C:006AH         LINE#         158
-  C:007AH         LINE#         159
-  C:007AH         LINE#         160
+  C:0076H         LINE#         159
+  C:0076H         LINE#         160
   -------         ENDPROC       MAIN
   -------         PROC          _PRINTSTRING1
   D:0001H         SYMBOL        puts
-  C:012EH         LINE#         173
-  C:012EH         LINE#         174
-  C:012EH         LINE#         175
-  C:0133H         LINE#         176
-  C:0133H         LINE#         177
-  C:0135H         LINE#         178
-  C:0137H         LINE#         179
-  C:013AH         LINE#         180
-  C:0143H         LINE#         181
+  C:0124H         LINE#         173
+  C:0124H         LINE#         174
+  C:0124H         LINE#         175
+  C:0129H         LINE#         176
+  C:0129H         LINE#         177
+  C:012BH         LINE#         178
+  C:012DH         LINE#         179
+  C:0130H         LINE#         180
+  C:0139H         LINE#         181
   -------         ENDPROC       _PRINTSTRING1
   -------         PROC          _SETTIMER2BAUDRAYE
   D:0004H         SYMBOL        dat
@@ -176,58 +176,58 @@ SYMBOL TABLE OF MODULE:  UART1 (UART1)
   -------         ENDPROC       _SETTIMER2BAUDRAYE
   -------         PROC          _UART1_CONFIG
   D:0007H         SYMBOL        brt
-  C:007CH         LINE#         212
-  C:007CH         LINE#         213
-  C:007CH         LINE#         215
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/17/2020  13:12:34  PAGE 4
+  C:0078H         LINE#         212
+  C:0078H         LINE#         213
+  C:0078H         LINE#         215
+BL51 BANKED LINKER/LOCATER V6.22                                                      10/04/2020  23:14:28  PAGE 4
 
 
-  C:0081H         LINE#         216
-  C:0081H         LINE#         217
-  C:0084H         LINE#         218
-  C:008BH         LINE#         219
-  C:008DH         LINE#         223
-  C:008DH         LINE#         224
-  C:008FH         LINE#         225
-  C:0092H         LINE#         226
-  C:0095H         LINE#         227
-  C:0098H         LINE#         228
-  C:009BH         LINE#         229
-  C:009EH         LINE#         230
-  C:00A1H         LINE#         231
-  C:00A3H         LINE#         232
-  C:00A6H         LINE#         233
-  C:00A8H         LINE#         234
-  C:00A8H         LINE#         237
-  C:00B0H         LINE#         239
-  C:00B2H         LINE#         240
-  C:00B4H         LINE#         241
-  C:00B7H         LINE#         242
-  C:00B7H         LINE#         245
-  C:00B9H         LINE#         246
-  C:00BCH         LINE#         247
-  C:00BEH         LINE#         248
+  C:007BH         LINE#         216
+  C:007BH         LINE#         217
+  C:007EH         LINE#         218
+  C:0085H         LINE#         219
+  C:0087H         LINE#         223
+  C:0087H         LINE#         224
+  C:0089H         LINE#         225
+  C:008CH         LINE#         226
+  C:008FH         LINE#         227
+  C:0092H         LINE#         228
+  C:0095H         LINE#         229
+  C:0098H         LINE#         230
+  C:009BH         LINE#         231
+  C:009DH         LINE#         232
+  C:00A0H         LINE#         233
+  C:00A2H         LINE#         234
+  C:00A2H         LINE#         237
+  C:00AAH         LINE#         239
+  C:00ACH         LINE#         240
+  C:00AEH         LINE#         241
+  C:00B1H         LINE#         242
+  C:00B1H         LINE#         245
+  C:00B3H         LINE#         246
+  C:00B6H         LINE#         247
+  C:00B8H         LINE#         248
   -------         ENDPROC       _UART1_CONFIG
   -------         PROC          UART1_INT
-  C:00BFH         LINE#         260
-  C:00C8H         LINE#         262
-  C:00CBH         LINE#         263
-  C:00CBH         LINE#         264
-  C:00CDH         LINE#         265
-  C:00D4H         LINE#         266
-  C:00E4H         LINE#         267
-  C:00E4H         LINE#         269
-  C:00E7H         LINE#         270
-  C:00E7H         LINE#         271
-  C:00E9H         LINE#         272
-  C:00EBH         LINE#         273
-  C:00EBH         LINE#         274
+  C:00B9H         LINE#         260
+  C:00C2H         LINE#         262
+  C:00C5H         LINE#         263
+  C:00C5H         LINE#         264
+  C:00C7H         LINE#         265
+  C:00CEH         LINE#         266
+  C:00DAH         LINE#         267
+  C:00DAH         LINE#         269
+  C:00DDH         LINE#         270
+  C:00DDH         LINE#         271
+  C:00DFH         LINE#         272
+  C:00E1H         LINE#         273
+  C:00E1H         LINE#         274
   -------         ENDPROC       UART1_INT
   -------         ENDMOD        UART1
 
   -------         MODULE        ?C?CLDPTR
-  C:0115H         PUBLIC        ?C?CLDPTR
+  C:010BH         PUBLIC        ?C?CLDPTR
   -------         ENDMOD        ?C?CLDPTR
 
-Program Size: data=75.1 xdata=0 code=330
+Program Size: data=75.1 xdata=0 code=320
 LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

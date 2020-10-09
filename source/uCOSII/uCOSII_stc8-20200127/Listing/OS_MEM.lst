@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_MEM
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_MEM
 OBJECT MODULE PLACED IN .\Output\OS_MEM.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_MEM.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\Inc
-                    -) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_MEM.lst) OBJECT(.\Output\OS_MEM.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_MEM.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) D
+                    -EBUG OBJECTEXTEND PRINT(.\Listing\OS_MEM.lst) OBJECT(.\Output\OS_MEM.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               *                                                   - must be greater than the size of a pointer
               *                                                   - must be able to hold an integral number of pointers
               * Returns    : != (OS_MEM *)0  is the partition was created
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 2   
 
               *              == (OS_MEM *)0  if the partition was not created because of invalid arguments or, no
               *                              free partition is available.
@@ -126,7 +126,7 @@ line level    source
                       return ((OS_MEM *)0);
                   }
                   plink = (void **)addr;                            /* Create linked list of free memory blocks      */
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 3   
 
                   pblk  = (INT8U *)addr;
                   loops  = nblks - 1u;
@@ -190,7 +190,7 @@ line level    source
               #endif
                   OS_ENTER_CRITICAL();
                   if (pmem->OSMemNFree > 0u) {                      /* See if there are any free memory blocks       */
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 4   
 
                       pblk                = pmem->OSMemFreeList;    /* Yes, point to next free memory block          */
                       pmem->OSMemFreeList = *(void **)pblk;         /*      Adjust pointer to new free list          */
@@ -254,7 +254,7 @@ line level    source
                       return (0u);
                   }
               #endif
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 5   
 
                   if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
                       *perr = OS_ERR_NAME_GET_ISR;
@@ -318,7 +318,7 @@ line level    source
                       *perr = OS_ERR_PNAME_NULL;
                       return;
                   }
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 6   
 
               #endif
                   if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
@@ -382,7 +382,7 @@ line level    source
               /*$PAGE*/
               /*
               *********************************************************************************************************
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 7   
 
               *                                          QUERY MEMORY PARTITION
               *
@@ -446,7 +446,7 @@ line level    source
               */
               
               void  OS_MemInit (void) large reentrant
-C51 COMPILER V9.60.0.0   OS_MEM                                                            01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_MEM                                                                10/09/2020 18:11:58 PAGE 8   
 
               {
               #if OS_MAX_MEM_PART == 1u

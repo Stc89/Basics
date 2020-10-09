@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_SEM
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_SEM
 OBJECT MODULE PLACED IN .\Output\OS_SEM.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_SEM.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\Inc
-                    -) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_SEM.lst) OBJECT(.\Output\OS_SEM.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_SEM.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) D
+                    -EBUG OBJECTEXTEND PRINT(.\Listing\OS_SEM.lst) OBJECT(.\Output\OS_SEM.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               #if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
                   OS_CPU_SR  cpu_sr = 0u;
               #endif
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 2   
 
               
               
@@ -126,7 +126,7 @@ line level    source
                   if (OSEventFreeList != (OS_EVENT *)0) {                /* See if pool of free ECB pool was empty   */
                       OSEventFreeList = (OS_EVENT *)OSEventFreeList->OSEventPtr;
                   }
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 3   
 
                   OS_EXIT_CRITICAL();
                   if (pevent != (OS_EVENT *)0) {                         /* Get an event control block               */
@@ -190,7 +190,7 @@ line level    source
                   OS_CPU_SR  cpu_sr = 0u;
               #endif
               
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 4   
 
               
               
@@ -254,7 +254,7 @@ line level    source
                            OS_EXIT_CRITICAL();
                            if (tasks_waiting == OS_TRUE) {               /* Reschedule only if task(s) were waiting  */
                                OS_Sched();                               /* Find highest priority task ready to run  */
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 5   
 
                            }
                            *perr                  = OS_ERR_NONE;
@@ -318,7 +318,7 @@ line level    source
                   if (perr == (INT8U *)0) {
                       OS_SAFETY_CRITICAL_EXCEPTION();
                   }
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 6   
 
               #endif
               
@@ -382,7 +382,7 @@ line level    source
               /*$PAGE*/
               /*
               *********************************************************************************************************
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 7   
 
               *                                      ABORT WAITING ON A SEMAPHORE
               *
@@ -446,7 +446,7 @@ line level    source
                   OS_ENTER_CRITICAL();
                   if (pevent->OSEventGrp != 0u) {                   /* See if any task waiting on semaphore?         */
                       nbr_tasks = 0u;
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 8   
 
                       switch (opt) {
                           case OS_PEND_OPT_BROADCAST:               /* Do we need to abort ALL waiting tasks?        */
@@ -510,7 +510,7 @@ line level    source
                   }
                   OS_ENTER_CRITICAL();
                   if (pevent->OSEventGrp != 0u) {                   /* See if any task waiting for semaphore         */
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 9   
 
                                                                     /* Ready HPT waiting on event                    */
                       (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_OK);
@@ -574,7 +574,7 @@ line level    source
                   OS_ENTER_CRITICAL();
                   p_sem_data->OSEventGrp = pevent->OSEventGrp;           /* Copy message mailbox wait list           */
                   psrc                   = &pevent->OSEventTbl[0];
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 10  
 
                   pdest                  = &p_sem_data->OSEventTbl[0];
                   for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
@@ -638,7 +638,7 @@ line level    source
                       *perr = OS_ERR_EVENT_TYPE;
                       return;
                   }
-C51 COMPILER V9.60.0.0   OS_SEM                                                            01/22/2020 20:57:56 PAGE 11  
+C51 COMPILER V9.00   OS_SEM                                                                10/09/2020 18:11:58 PAGE 11  
 
                   OS_ENTER_CRITICAL();
                   *perr = OS_ERR_NONE;

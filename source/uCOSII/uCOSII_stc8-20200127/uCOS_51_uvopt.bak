@@ -8,7 +8,7 @@
   <Extensions>
     <cExt>*.c</cExt>
     <aExt>*.s*; *.src; *.a*</aExt>
-    <oExt>*.obj</oExt>
+    <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
     <tExt>*.txt; *.h; *.inc</tExt>
     <pExt>*.plm</pExt>
@@ -130,15 +130,54 @@
         <tIfile></tIfile>
         <pMon></pMon>
       </DebugOpt>
+      <TargetDriverDllRegistry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGDP51</Key>
+          <Name>(98=-1,-1,-1,-1,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=-1,-1,-1,-1,0)(3003=1581,510,1792,786,0)(91=1097,414,1307,689,0)(92=1348,426,1558,701,0)(94=-1,-1,-1,-1,0)(5023=-1,-1,-1,-1,0)</Name>
+        </SetRegEntry>
+      </TargetDriverDllRegistry>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>174</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>418</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>-16766507</Address>
+          <ByteObject>0</ByteObject>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>uCOS-II\MCS-51\OS_CPU_A.A51</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
-        <aSer1>0</aSer1>
+        <aSer1>1</aSer1>
         <aSer2>0</aSer2>
         <aPa>0</aPa>
-        <viewmode>0</viewmode>
+        <viewmode>1</viewmode>
         <vrSel>0</vrSel>
         <aSym>0</aSym>
         <aTbox>0</aTbox>
@@ -150,7 +189,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -172,10 +211,10 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829377</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>168</TopLine>
+      <CurrentLine>181</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\uCOS-II\MCS-51\STARTUP.A51</PathWithFileName>
       <FilenameWithoutPath>STARTUP.A51</FilenameWithoutPath>
@@ -183,30 +222,30 @@
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>2</FileNumber>
-      <FileType>2</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829293</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>268</TopLine>
+      <CurrentLine>283</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\uCOS-II\MCS-51\OS_CPU_A.ASM</PathWithFileName>
-      <FilenameWithoutPath>OS_CPU_A.ASM</FilenameWithoutPath>
+      <PathWithFileName>.\uCOS-II\MCS-51\OS_CPU_C.C</PathWithFileName>
+      <FilenameWithoutPath>OS_CPU_C.C</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>3</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829395</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>108450688</TopLine>
+      <CurrentLine>20322596</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\uCOS-II\MCS-51\OS_CPU_C.C</PathWithFileName>
-      <FilenameWithoutPath>OS_CPU_C.C</FilenameWithoutPath>
+      <PathWithFileName>.\uCOS-II\MCS-51\OS_CPU_A.A51</PathWithFileName>
+      <FilenameWithoutPath>OS_CPU_A.A51</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -221,13 +260,125 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829385</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>2007</TopLine>
+      <CurrentLine>2021</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\uCOS-II\Src\uCOS_II.C</PathWithFileName>
-      <FilenameWithoutPath>uCOS_II.C</FilenameWithoutPath>
+      <PathWithFileName>.\uCOS-II\Src\OS_CORE.C</PathWithFileName>
+      <FilenameWithoutPath>OS_CORE.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>5</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_FLAG.C</PathWithFileName>
+      <FilenameWithoutPath>OS_FLAG.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>6</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_MBOX.C</PathWithFileName>
+      <FilenameWithoutPath>OS_MBOX.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>7</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_MEM.C</PathWithFileName>
+      <FilenameWithoutPath>OS_MEM.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>8</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_MUTEX.C</PathWithFileName>
+      <FilenameWithoutPath>OS_MUTEX.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>9</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_Q.C</PathWithFileName>
+      <FilenameWithoutPath>OS_Q.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>10</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_SEM.C</PathWithFileName>
+      <FilenameWithoutPath>OS_SEM.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>11</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_TASK.C</PathWithFileName>
+      <FilenameWithoutPath>OS_TASK.C</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>12</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>10829395</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\uCOS-II\Src\OS_TIME.C</PathWithFileName>
+      <FilenameWithoutPath>OS_TIME.C</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -238,28 +389,28 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>5</FileNumber>
+      <FileNumber>13</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829395</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\BSP\serial.c</PathWithFileName>
       <FilenameWithoutPath>serial.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>6</FileNumber>
+      <FileNumber>14</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829395</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>108450528</TopLine>
+      <CurrentLine>20322596</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\BSP\system.c</PathWithFileName>
       <FilenameWithoutPath>system.c</FilenameWithoutPath>
@@ -273,14 +424,14 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>7</FileNumber>
+      <FileNumber>15</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>170</TopLine>
+      <CurrentLine>188</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\APP\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -294,14 +445,14 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>8</FileNumber>
+      <FileNumber>16</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>10829395</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>108450448</TopLine>
+      <CurrentLine>20322596</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Note\ReadMe.txt</PathWithFileName>
       <FilenameWithoutPath>ReadMe.txt</FilenameWithoutPath>
@@ -1643,5 +1794,46 @@
       </Window>
     </View>
   </WinLayout>
+
+  <MDIGroups>
+    <Orientation>1</Orientation>
+    <ActiveMDIGroup>0</ActiveMDIGroup>
+    <MDIGroup>
+      <Size>100</Size>
+      <ActiveTab>4</ActiveTab>
+      <Documents>
+        <Doc>
+          <Name>.\APP\main.c</Name>
+          <ColumnNumber>18</ColumnNumber>
+          <TopLine>170</TopLine>
+          <CurrentLine>188</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\Note\ReadMe.txt</Name>
+          <ColumnNumber>10829315</ColumnNumber>
+          <TopLine>33</TopLine>
+          <CurrentLine>42</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\uCOS-II\Src\OS_CORE.C</Name>
+          <ColumnNumber>10829385</ColumnNumber>
+          <TopLine>2007</TopLine>
+          <CurrentLine>2021</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\uCOS-II\MCS-51\STARTUP.A51</Name>
+          <ColumnNumber>10829377</ColumnNumber>
+          <TopLine>168</TopLine>
+          <CurrentLine>181</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\uCOS-II\MCS-51\OS_CPU_C.C</Name>
+          <ColumnNumber>10829293</ColumnNumber>
+          <TopLine>268</TopLine>
+          <CurrentLine>283</CurrentLine>
+        </Doc>
+      </Documents>
+    </MDIGroup>
+  </MDIGroups>
 
 </ProjectOpt>

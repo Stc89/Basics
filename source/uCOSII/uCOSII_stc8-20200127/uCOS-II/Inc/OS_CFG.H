@@ -31,11 +31,11 @@
 
 #define OS_DEBUG_EN               0u   /* Disable(1) debug variables                                    */
 
-#define OS_TASK_SW_HOOK_EN        1u   /*  Not include code for OSTaskSwHook()                          */
+#define OS_TASK_SW_HOOK_EN        0u   /*  Not include code for OSTaskSwHook()                          */
 
 #define OS_APP_HOOKS_EN           0u   /* Application-defined hooks are called from the uC/OS-II hooks */
 
-#define MAX_STK_SIZE		   1024	   /* Max. stack size 											   */
+#define MAX_STK_SIZE		   8	   /* Max. stack size 											   */
 
 #define OS_MAX_EVENTS             5    /* Max. number of event control blocks in your application ...  */
                                        /* ... MUST be > 0                                              */
@@ -45,7 +45,7 @@
                                        /* ... MUST be > 0                                              */
 #define OS_MAX_QS                 2    /* Max. number of queue control blocks in your application ...  */
                                        /* ... MUST be > 0                                              */
-#define OS_MAX_TASKS             11    /* Max. number of tasks in your application ...                 */
+#define OS_MAX_TASKS             3    /* Max. number of tasks in your application ...                 */
                                        /* ... MUST be >= 2                                             */
 
 #define OS_TICK_STEP_EN           0u   /* Disable tick stepping feature for uC/OS-View                  */
@@ -54,12 +54,12 @@
 #define OS_LOWEST_PRIO           12    /* Defines the lowest priority that can be assigned ...         */
                                        /* ... MUST NEVER be higher than 63!                            */
 
-#define TASK_STK_SIZE 			512    /* Default task stack size 									   */
+#define TASK_STK_SIZE 			8    /* Default task stack size 									   */
 
-#define OS_TASK_IDLE_STK_SIZE   512    /* Idle task stack size (# of OS_STK wide entries)              */
+#define OS_TASK_IDLE_STK_SIZE   8    /* Idle task stack size (# of OS_STK wide entries)              */
 
 #define OS_TASK_STAT_EN           0    /* Enable (1) or Disable(0) the statistics task                 */
-#define OS_TASK_STAT_STK_SIZE   512    /* Statistics task stack size (# of OS_STK wide entries)        */
+#define OS_TASK_STAT_STK_SIZE   8    /* Statistics task stack size (# of OS_STK wide entries)        */
 
 #define OS_TASK_PROFILE_EN        0u   /*  Not include variables in OS_TCB for profiling               */
 
@@ -72,7 +72,7 @@
 #define OS_TASK_REG_TBL_SIZE      0u   /*     Size of task variables array (#of INT32U entries)        */
 
 #define OS_ARG_CHK_EN             0    /* Enable (1) or Disable (0) argument checking                  */
-#define OS_CPU_HOOKS_EN           1    /* uC/OS-II hooks are found in the processor port files         */
+#define OS_CPU_HOOKS_EN           0    /* uC/OS-II hooks are found in the processor port files         */
 
 
                                        /* ----------------------- EVENT FLAGS ------------------------ */
@@ -86,10 +86,10 @@
 #define OS_FLAGS_NBITS           8u   /* Size in #bits of OS_FLAGS data type (8, 16 or 32)            */
 
                                        /* -------------------- MESSAGE MAILBOXES --------------------- */
-#define OS_MBOX_EN                1    /* Enable (1) or Disable (0) code generation for MAILBOXES      */
+#define OS_MBOX_EN                0    /* Enable (1) or Disable (0) code generation for MAILBOXES      */
 #define OS_MBOX_ACCEPT_EN         0    /*     Include code for OSMboxAccept()                          */
 #define OS_MBOX_DEL_EN            0    /*     Include code for OSMboxDel()                             */
-#define OS_MBOX_POST_EN           1    /*     Include code for OSMboxPost()                            */
+#define OS_MBOX_POST_EN           0    /*     Include code for OSMboxPost()                            */
 #define OS_MBOX_POST_OPT_EN       0    /*     Include code for OSMboxPostOpt()                         */
 #define OS_MBOX_QUERY_EN          0    /*     Include code for OSMboxQuery()                           */
 
@@ -137,7 +137,7 @@
 #define OS_TASK_CHANGE_PRIO_EN    0    /*     Include code for OSTaskChangePrio()                      */
 #define OS_TASK_CREATE_EN         1    /*     Include code for OSTaskCreate()                          */
 #define OS_TASK_CREATE_EXT_EN     0    /*     Include code for OSTaskCreateExt()                       */
-#define OS_TASK_DEL_EN            1    /*     Include code for OSTaskDel()                             */
+#define OS_TASK_DEL_EN            0    /*     Include code for OSTaskDel()                             */
 #define OS_TASK_SUSPEND_EN        0    /*     Include code for OSTaskSuspend() and OSTaskResume()      */
 #define OS_TASK_QUERY_EN          0    /*     Include code for OSTaskQuery()                           */
 
@@ -152,7 +152,7 @@
 #define OS_SCHED_LOCK_EN          0    /*     Include code for OSSchedLock() and OSSchedUnlock()       */
 
 
-#define OS_TICKS_PER_SEC         50    /* Set the number of ticks in one second                        */
+#define OS_TICKS_PER_SEC         200    /* Set the number of ticks in one second                        */
 
 #define OS_TMR_CFG_NAME_EN        0u   /*     Determine timer names                                    */
 
@@ -163,7 +163,7 @@
 #define OS_TIME_TICK_HOOK_EN      0u   /*     Not include code for OSTimeTickHook()                        */
 
 
-typedef INT16U             OS_FLAGS;   /* Date type for event flag bits (8, 16 or 32 bits)             */
+typedef INT8U             OS_FLAGS;   /* Date type for event flag bits (8, 16 or 32 bits)             */
 
 #endif
 

@@ -1,10 +1,10 @@
-A51 MACRO ASSEMBLER  STARTUP                                                              01/22/2020 20:57:55 PAGE     1
+A51 MACRO ASSEMBLER  STARTUP                                                              10/09/2020 18:11:58 PAGE     1
 
 
-MACRO ASSEMBLER A51 V8.2.7.0
+MACRO ASSEMBLER A51 V8.01
 OBJECT MODULE PLACED IN .\Output\STARTUP.obj
-ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE uCOS-II\MCS-51\STARTUP.A51 SET(LARGE) DEBUG PRINT(.\Listing\STARTUP.lst
-                      ) OBJECT(.\Output\STARTUP.obj) EP
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE uCOS-II\MCS-51\STARTUP.A51 SET(LARGE) DEBUG PRINT(.\Listing\STARTUP.lst) O
+                      BJECT(.\Output\STARTUP.obj) EP
 
 LOC  OBJ            LINE     SOURCE
 
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
                       53     ;     <i> The absolute start address of XDATA memory
   0000                54     XDATASTART      EQU     0     
                       55     ;
-A51 MACRO ASSEMBLER  STARTUP                                                              01/22/2020 20:57:55 PAGE     2
+A51 MACRO ASSEMBLER  STARTUP                                                              10/09/2020 18:11:58 PAGE     2
 
                       56     ; <o> XDATALEN: XDATA memory size <0x0-0xFFFF> 
                       57     ;     <i> The length of XDATA memory in bytes.
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
                      119     ; <o> SFR address which supplies uppermost address byte <0x0-0xFF> 
                      120     ; <i> most 8051 variants use P2 as uppermost address byte
   00A0               121     PPAGE_SFR       DATA    0A0H
-A51 MACRO ASSEMBLER  STARTUP                                                              01/22/2020 20:57:55 PAGE     3
+A51 MACRO ASSEMBLER  STARTUP                                                              10/09/2020 18:11:58 PAGE     3
 
                      122     ;
                      123     ; </e>
@@ -201,7 +201,7 @@ LOC  OBJ            LINE     SOURCE
                              ENDIF
                      186     
                      187     IF IBPSTACK <> 0
-A51 MACRO ASSEMBLER  STARTUP                                                              01/22/2020 20:57:55 PAGE     4
+A51 MACRO ASSEMBLER  STARTUP                                                              10/09/2020 18:11:58 PAGE     4
 
                              EXTRN DATA (?C_IBP)
                              
@@ -234,7 +234,7 @@ LOC  OBJ            LINE     SOURCE
 001D 020000   F      216                     LJMP    ?C_START        ;main()
                      217     
                      218                     END
-A51 MACRO ASSEMBLER  STARTUP                                                              01/22/2020 20:57:55 PAGE     5
+A51 MACRO ASSEMBLER  STARTUP                                                              10/09/2020 18:11:58 PAGE     5
 
 SYMBOL TABLE LISTING
 ------ ----- -------

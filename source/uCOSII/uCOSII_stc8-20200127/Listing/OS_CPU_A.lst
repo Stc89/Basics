@@ -1,10 +1,10 @@
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     1
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     1
 
 
-MACRO ASSEMBLER A51 V8.2.7.0
+MACRO ASSEMBLER A51 V8.01
 OBJECT MODULE PLACED IN .\Output\OS_CPU_A.obj
-ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE uCOS-II\MCS-51\OS_CPU_A.A51 SET(LARGE) DEBUG PRINT(.\Listing\OS_CPU_A.l
-                      st) OBJECT(.\Output\OS_CPU_A.obj) EP
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE uCOS-II\MCS-51\OS_CPU_A.A51 SET(LARGE) DEBUG PRINT(.\Listing\OS_CPU_A.lst)
+                       OBJECT(.\Output\OS_CPU_A.obj) EP
 
 LOC  OBJ            LINE     SOURCE
 
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
                      781             EXTRN XDATA (OSPrioCur)
                      782             EXTRN XDATA (OSPrioHighRdy)
                      783         
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     2
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     2
 
                      784             EXTRN CODE  (_?OSTaskSwHook)
                      785             EXTRN CODE  (_?OSIntEnter)
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
                      847             POP  ACC
                      848             MOV  R2,A
                      849             POP  ACC
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     3
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     3
 
                      850             MOV  R1,A
                      851             POP  ACC
@@ -201,7 +201,7 @@ LOC  OBJ            LINE     SOURCE
 0016 E0              911             MOVX A,@DPTR    ;OSTCBStkPtr «void÷∏’Î
 0017 F8              912             MOV  R0,A
 0018 A3              913             INC  DPTR
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     4
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     4
 
 0019 E0              914             MOVX A,@DPTR
 001A F9              915             MOV  R1,A
@@ -269,7 +269,7 @@ LOC  OBJ            LINE     SOURCE
 0022                1021     OSIntCtxSw_in:
                     1022     
                     1023             ;ªÒµ√∂—’ª≥§∂»∫Õ∆ ºµÿ÷∑£¨»ŒŒÒ’ªΩ·ππ æ“‚Õº(OS_CPU_C.C)
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     5
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     5
 
 0022 E581           1024             MOV  A,SP
 0024 C3             1025             CLR  C  ;Ω¯Œª±Í÷æŒªCy«Â¡„
@@ -337,7 +337,7 @@ LOC  OBJ            LINE     SOURCE
                     1086             
                     1087     ;OSIntCtxSw_in:
                     1088     
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     6
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     6
 
                     1089             ;OSTCBCur = OSTCBHighRdy
 0053 900000   F     1090             MOV  DPTR,  #OSTCBHighRdy  ;should use DPTR1
@@ -405,7 +405,7 @@ LOC  OBJ            LINE     SOURCE
 0000                1151     _?OSIntCtxSw:
                     1152     
                     1153             USING 0
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     7
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     7
 
                     1154     
                     1155                     ;µ˜’˚SP÷∏’Î»•µÙ‘⁄µ˜”√OSIntExit()°¢OSIntCtxSw()π≥Ã÷–—π»Î∂—’ªµƒ∂‡”‡ƒ⁄»›
@@ -473,7 +473,7 @@ LOC  OBJ            LINE     SOURCE
                     1261             USING 0
 0000 C2AF           1262             CLR  EA         ;πÿ÷–∂œ£¨∑¿÷π÷–∂œ«∂Ã◊
                     1263             PUSHALL
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     8
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     8
 
 0024 120000   F     1286             LCALL _?OSIntEnter      ;Õ®÷™ƒ⁄∫ÀΩ¯»Î÷–∂œ
                     1287             
@@ -489,7 +489,7 @@ LOC  OBJ            LINE     SOURCE
                     1319     ;--------------------
                     1320     END
                              ;--------------------
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE     9
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE     9
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -557,7 +557,7 @@ CCAP3H. . . . . . . . . . . .  D ADDR   00FDH   A
 CCAP3L. . . . . . . . . . . .  D ADDR   00EDH   A   
 CCAPM0. . . . . . . . . . . .  D ADDR   00DAH   A   
 CCAPM1. . . . . . . . . . . .  D ADDR   00DBH   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    10
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    10
 
 CCAPM2. . . . . . . . . . . .  D ADDR   00DCH   A   
 CCAPM3. . . . . . . . . . . .  D ADDR   00DDH   A   
@@ -625,7 +625,7 @@ EC2T1SI . . . . . . . . . . .  N NUMB   0001H   A
 EC2T2SI . . . . . . . . . . .  N NUMB   0002H   A   
 EC3I. . . . . . . . . . . . .  N NUMB   0004H   A   
 EC3T1SI . . . . . . . . . . .  N NUMB   0001H   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    11
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    11
 
 EC3T2SI . . . . . . . . . . .  N NUMB   0002H   A   
 EC4I. . . . . . . . . . . . .  N NUMB   0004H   A   
@@ -693,7 +693,7 @@ ET3 . . . . . . . . . . . . .  N NUMB   0020H   A
 ET4 . . . . . . . . . . . . .  N NUMB   0040H   A   
 ETADC . . . . . . . . . . . .  N NUMB   0040H   A   
 ETXI. . . . . . . . . . . . .  N NUMB   0010H   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    12
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    12
 
 EX0 . . . . . . . . . . . . .  B ADDR   00A8H.0 A   
 EX1 . . . . . . . . . . . . .  B ADDR   00A8H.2 A   
@@ -761,7 +761,7 @@ INVCMPO . . . . . . . . . . .  N NUMB   0080H   A
 INVIO . . . . . . . . . . . .  N NUMB   0040H   A   
 IP. . . . . . . . . . . . . .  D ADDR   00B8H   A   
 IP2 . . . . . . . . . . . . .  D ADDR   00B5H   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    13
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    13
 
 IP2H. . . . . . . . . . . . .  D ADDR   00B6H   A   
 IP3 . . . . . . . . . . . . .  D ADDR   00DFH   A   
@@ -829,7 +829,7 @@ P0NCS . . . . . . . . . . . .  N NUMB   FE18H   A
 P0PU. . . . . . . . . . . . .  N NUMB   FE10H   A   
 P1. . . . . . . . . . . . . .  D ADDR   0090H   A   
 P10 . . . . . . . . . . . . .  B ADDR   0090H.0 A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    14
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    14
 
 P11 . . . . . . . . . . . . .  B ADDR   0090H.1 A   
 P12 . . . . . . . . . . . . .  B ADDR   0090H.2 A   
@@ -897,7 +897,7 @@ P5NCS . . . . . . . . . . . .  N NUMB   FE1DH   A
 P5PU. . . . . . . . . . . . .  N NUMB   FE15H   A   
 P6. . . . . . . . . . . . . .  D ADDR   00E8H   A   
 P60 . . . . . . . . . . . . .  B ADDR   00E8H.0 A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    15
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    15
 
 P61 . . . . . . . . . . . . .  B ADDR   00E8H.1 A   
 P62 . . . . . . . . . . . . .  B ADDR   00E8H.2 A   
@@ -965,7 +965,7 @@ PT1 . . . . . . . . . . . . .  B ADDR   00B8H.3 A
 PT1H. . . . . . . . . . . . .  N NUMB   0008H   A   
 PWM0. . . . . . . . . . . . .  N NUMB   0002H   A   
 PWM0CR. . . . . . . . . . . .  N NUMB   FF04H   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    16
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    16
 
 PWM0HLD . . . . . . . . . . .  N NUMB   FF05H   A   
 PWM0T1H . . . . . . . . . . .  N NUMB   FF00H   A   
@@ -1033,7 +1033,7 @@ PX4 . . . . . . . . . . . . .  N NUMB   0010H   A
 PX4H. . . . . . . . . . . . .  N NUMB   0010H   A   
 P_SW1 . . . . . . . . . . . .  D ADDR   00A2H   A   
 P_SW2 . . . . . . . . . . . .  D ADDR   00BAH   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    17
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    17
 
 RB8 . . . . . . . . . . . . .  B ADDR   0098H.2 A   
 REN . . . . . . . . . . . . .  B ADDR   0098H.4 A   
@@ -1101,7 +1101,7 @@ SMOD0 . . . . . . . . . . . .  N NUMB   0040H   A
 SP. . . . . . . . . . . . . .  D ADDR   0081H   A   
 SPCTL . . . . . . . . . . . .  D ADDR   00CEH   A   
 SPDAT . . . . . . . . . . . .  D ADDR   00CFH   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    18
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    18
 
 SPEED . . . . . . . . . . . .  N NUMB   0003H   A   
 SPEN. . . . . . . . . . . . .  N NUMB   0040H   A   
@@ -1169,7 +1169,7 @@ VOCTRL. . . . . . . . . . . .  D ADDR   00BBH   A
 WCOL. . . . . . . . . . . . .  N NUMB   0040H   A   
 WDTA. . . . . . . . . . . . .  N NUMB   0001H   A   
 WDT_CONTR . . . . . . . . . .  D ADDR   00C1H   A   
-A51 MACRO ASSEMBLER  OS_CPU_A                                                             01/22/2020 20:57:55 PAGE    19
+A51 MACRO ASSEMBLER  OS_CPU_A                                                             10/09/2020 18:11:58 PAGE    19
 
 WDT_FLAG. . . . . . . . . . .  N NUMB   0080H   A   
 WDT_PS. . . . . . . . . . . .  N NUMB   0007H   A   

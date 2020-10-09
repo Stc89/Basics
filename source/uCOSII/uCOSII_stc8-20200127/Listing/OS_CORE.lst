@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_CORE
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_CORE
 OBJECT MODULE PLACED IN .\Output\OS_CORE.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_CORE.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\In
-                    -c) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_CORE.lst) OBJECT(.\Output\OS_CORE.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_CORE.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) 
+                    -DEBUG OBJECTEXTEND PRINT(.\Listing\OS_CORE.lst) OBJECT(.\Output\OS_CORE.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52              4u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, 3u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, /* 0xD0 to 0xDF                   */
   53              5u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, 3u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, /* 0xE0 to 0xEF                   */
   54              4u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, 3u, 0u, 1u, 0u, 2u, 0u, 1u, 0u  /* 0xF0 to 0xFF                   */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 2   
 
   55          };
   56          
@@ -126,7 +126,7 @@ line level    source
               #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
                   OS_CPU_SR  cpu_sr = 0u;
               #endif
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 3   
 
               
               
@@ -190,7 +190,7 @@ line level    source
  175          *                        OS_ERR_NONE                if the requested task is resumed
  176          *                        OS_ERR_EVENT_TYPE          if 'pevent' is not pointing to the proper event
  177          *                                                   control block type.
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 4   
 
  178          *                        OS_ERR_PNAME_NULL          You passed a NULL pointer for 'pname'
  179          *                        OS_ERR_PEVENT_NULL         if you passed a NULL pointer for 'pevent'
@@ -254,7 +254,7 @@ line level    source
  237          *********************************************************************************************************
  238          *                                      PEND ON MULTIPLE EVENTS
  239          *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 5   
 
  240          * Description: This function waits for multiple events.  If multiple events are ready at the start of the
  241          *              pend call, then all available events are returned as ready.  If the task must pend on the
@@ -318,7 +318,7 @@ line level    source
  299          *                      else
  300          *                    Return timeout
  301          *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 6   
 
  302          *              2) 'pevents_rdy' initialized to NULL PRIOR to all other validation or function handling in
  303          *                 case of any error(s).
@@ -382,7 +382,7 @@ line level    source
                                break;
               #endif
               #if (OS_MBOX_EN > 0u)
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 7   
 
                           case OS_EVENT_TYPE_MBOX:
                                break;
@@ -446,7 +446,7 @@ line level    source
                                     events_rdy_nbr++;
               
                                } else {
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 8   
 
                                     events_stat |= OS_STAT_MBOX;      /* Configure multi-pend for mailbox events     */
                                }
@@ -510,7 +510,7 @@ line level    source
                            if (pevent != (OS_EVENT *)0) {             /* If task event ptr != NULL, ...              */
                               *pevents_rdy++ =  pevent;               /* ... return available event ...              */
                               *pevents_rdy   = (OS_EVENT *)0;         /* ... & NULL terminate return event array     */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 9   
 
                                 events_rdy_nbr++;
               
@@ -574,7 +574,7 @@ line level    source
                   ((OS_Q_EN    > 0u) && (OS_MAX_QS > 0u)))
                   OSTCBCur->OSTCBMsg           = (void      *)0;      /* Clear task  message                         */
               #endif
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 10  
 
                   OS_EXIT_CRITICAL();
               
@@ -638,7 +638,7 @@ line level    source
  599   1      #if OS_TMR_EN > 0u
                   OSTmr_Init();                                                /* Initialize the Timer Manager          
              -   */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 11  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 11  
 
               #endif
  602   1      
@@ -702,7 +702,7 @@ line level    source
  659          *              2) Rescheduling is prevented when the scheduler is locked (see OS_SchedLock())
  660          *********************************************************************************************************
  661          */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 12  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 12  
 
  662          
  663          void  OSIntExit (void) large reentrant
@@ -766,7 +766,7 @@ line level    source
  721          *                                          PREVENT SCHEDULING
  722          *
  723          * Description: This function is used to prevent rescheduling to take place.  This allows your application
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 13  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 13  
 
  724          *              to prevent context switches until you are ready to permit context switching.
  725          *
@@ -830,7 +830,7 @@ line level    source
                       if (OSLockNesting > 0u) {                          /* Do not decrement if already 0            */
                           OSLockNesting--;                               /* Decrement lock nesting level             */
                           if (OSLockNesting == 0u) {                     /* See if scheduler is enabled and ...      */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 14  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 14  
 
                               if (OSIntNesting == 0u) {                  /* ... not in an ISR                        */
                                   OS_EXIT_CRITICAL();
@@ -894,7 +894,7 @@ line level    source
  845          *                 CPU Usage (%) = 100 * (1 - ------------)
  846          *                                            OSIdleCtrMax
  847          *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 15  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 15  
 
  848          * Arguments  : none
  849          *
@@ -958,7 +958,7 @@ line level    source
                   OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter              
              - */
                   OSTime++;
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 16  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 16  
 
                   OS_EXIT_CRITICAL();
               #endif
@@ -1022,7 +1022,7 @@ line level    source
              - */
  950   6                              OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
  951   6                          }
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 17  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 17  
 
  952   5                      }
  953   4                  }
@@ -1067,10 +1067,10 @@ line level    source
  991          */
  992          
  993          #if OS_TASK_DEL_EN > 0u
- 994          void  OS_Dummy (void) large reentrant
- 995          {
- 996   1      }
- 997          #endif
+              void  OS_Dummy (void) large reentrant
+              {
+              }
+              #endif
  998          
  999          /*$PAGE*/
 1000          /*
@@ -1086,7 +1086,7 @@ line level    source
 1010          *                          such as MAILBOXEs and QUEUEs.  The pointer is not used when called by other
 1011          *                          service functions.
 1012          *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 18  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 18  
 
 1013          *              msk         is a mask that is used to clear the status byte of the TCB.  For example,
 1014          *                          OSSemPost() will pass OS_STAT_SEM, OSMboxPost() will pass OS_STAT_MBOX etc.
@@ -1103,25 +1103,25 @@ line level    source
 1025          *********************************************************************************************************
 1026          */
 1027          #if (OS_EVENT_EN)
-1028          INT8U  OS_EventTaskRdy (OS_EVENT  *pevent,
-1029                                  void      *pmsg,
-1030                                  INT8U      msk,
-1031                                  INT8U      pend_stat) large reentrant
-1032          {
-1033   1          OS_TCB   *ptcb;
-1034   1          INT8U     y;
-1035   1          INT8U     x;
-1036   1          INT8U     prio;
-1037   1      #if OS_LOWEST_PRIO > 63u
+              INT8U  OS_EventTaskRdy (OS_EVENT  *pevent,
+                                      void      *pmsg,
+                                      INT8U      msk,
+                                      INT8U      pend_stat) large reentrant
+              {
+                  OS_TCB   *ptcb;
+                  INT8U     y;
+                  INT8U     x;
+                  INT8U     prio;
+              #if OS_LOWEST_PRIO > 63u
                   OS_PRIO  *ptbl;
               #endif
-1040   1      
-1041   1      
-1042   1      #if OS_LOWEST_PRIO <= 63u
-1043   1          y    = OSUnMapTbl[pevent->OSEventGrp];              /* Find HPT waiting for message                */
-1044   1          x    = OSUnMapTbl[pevent->OSEventTbl[y]];
-1045   1          prio = (INT8U)((y << 3u) + x);                      /* Find priority of task getting the msg       */
-1046   1      #else
+              
+              
+              #if OS_LOWEST_PRIO <= 63u
+                  y    = OSUnMapTbl[pevent->OSEventGrp];              /* Find HPT waiting for message                */
+                  x    = OSUnMapTbl[pevent->OSEventTbl[y]];
+                  prio = (INT8U)((y << 3u) + x);                      /* Find priority of task getting the msg       */
+              #else
                   if ((pevent->OSEventGrp & 0xFFu) != 0u) {           /* Find HPT waiting for message                */
                       y = OSUnMapTbl[ pevent->OSEventGrp & 0xFFu];
                   } else {
@@ -1135,35 +1135,35 @@ line level    source
                   }
                   prio = (INT8U)((y << 4u) + x);                      /* Find priority of task getting the msg       */
               #endif
-1060   1      
-1061   1          ptcb                  =  OSTCBPrioTbl[prio];        /* Point to this task's OS_TCB                 */
-1062   1          ptcb->OSTCBDly        =  0u;                        /* Prevent OSTimeTick() from readying task     */
-1063   1      #if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u)) || (OS_MBOX_EN > 0u)
-1064   1          ptcb->OSTCBMsg        =  pmsg;                      /* Send message directly to waiting task       */
-1065   1      #else
+              
+                  ptcb                  =  OSTCBPrioTbl[prio];        /* Point to this task's OS_TCB                 */
+                  ptcb->OSTCBDly        =  0u;                        /* Prevent OSTimeTick() from readying task     */
+              #if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u)) || (OS_MBOX_EN > 0u)
+                  ptcb->OSTCBMsg        =  pmsg;                      /* Send message directly to waiting task       */
+              #else
                   pmsg                  =  pmsg;                      /* Prevent compiler warning if not used        */
               #endif
-1068   1          ptcb->OSTCBStat      &= (INT8U)~msk;                /* Clear bit associated with event type        */
-1069   1          ptcb->OSTCBStatPend   =  pend_stat;                 /* Set pend status of post or abort            */
-1070   1                                                              /* See if task is ready (could be susp'd)      */
-1071   1          if ((ptcb->OSTCBStat &   OS_STAT_SUSPEND) == OS_STAT_RDY) {
-1072   2              OSRdyGrp         |=  ptcb->OSTCBBitY;           /* Put task in the ready to run list           */
-1073   2              OSRdyTbl[y]      |=  ptcb->OSTCBBitX;
-1074   2          }
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 19  
+                  ptcb->OSTCBStat      &= (INT8U)~msk;                /* Clear bit associated with event type        */
+                  ptcb->OSTCBStatPend   =  pend_stat;                 /* Set pend status of post or abort            */
+                                                                      /* See if task is ready (could be susp'd)      */
+                  if ((ptcb->OSTCBStat &   OS_STAT_SUSPEND) == OS_STAT_RDY) {
+                      OSRdyGrp         |=  ptcb->OSTCBBitY;           /* Put task in the ready to run list           */
+                      OSRdyTbl[y]      |=  ptcb->OSTCBBitX;
+                  }
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 19  
 
-1075   1      
-1076   1          OS_EventTaskRemove(ptcb, pevent);                   /* Remove this task from event   wait list     */
-1077   1      #if (OS_EVENT_MULTI_EN > 0u)
+              
+                  OS_EventTaskRemove(ptcb, pevent);                   /* Remove this task from event   wait list     */
+              #if (OS_EVENT_MULTI_EN > 0u)
                   if (ptcb->OSTCBEventMultiPtr != (OS_EVENT **)0) {   /* Remove this task from events' wait lists    */
                       OS_EventTaskRemoveMulti(ptcb, ptcb->OSTCBEventMultiPtr);
                       ptcb->OSTCBEventPtr       = (OS_EVENT  *)pevent;/* Return event as first multi-pend event ready*/
                   }
               #endif
-1083   1      
-1084   1          return (prio);
-1085   1      }
-1086          #endif
+              
+                  return (prio);
+              }
+              #endif
 1087          /*$PAGE*/
 1088          /*
 1089          *********************************************************************************************************
@@ -1180,23 +1180,23 @@ line level    source
 1100          *********************************************************************************************************
 1101          */
 1102          #if (OS_EVENT_EN)
-1103          void  OS_EventTaskWait (OS_EVENT *pevent) large reentrant
-1104          {
-1105   1          INT8U  y;
-1106   1      
-1107   1      
-1108   1          OSTCBCur->OSTCBEventPtr               = pevent;                 /* Store ptr to ECB in TCB         */
-1109   1      
-1110   1          pevent->OSEventTbl[OSTCBCur->OSTCBY] |= OSTCBCur->OSTCBBitX;    /* Put task in waiting list        */
-1111   1          pevent->OSEventGrp                   |= OSTCBCur->OSTCBBitY;
-1112   1      
-1113   1          y             =  OSTCBCur->OSTCBY;            /* Task no longer ready                              */
-1114   1          OSRdyTbl[y]  &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
-1115   1          if (OSRdyTbl[y] == 0u) {                      /* Clear event grp bit if this was only task pending */
-1116   2              OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
-1117   2          }
-1118   1      }
-1119          #endif
+              void  OS_EventTaskWait (OS_EVENT *pevent) large reentrant
+              {
+                  INT8U  y;
+              
+              
+                  OSTCBCur->OSTCBEventPtr               = pevent;                 /* Store ptr to ECB in TCB         */
+              
+                  pevent->OSEventTbl[OSTCBCur->OSTCBY] |= OSTCBCur->OSTCBBitX;    /* Put task in waiting list        */
+                  pevent->OSEventGrp                   |= OSTCBCur->OSTCBBitY;
+              
+                  y             =  OSTCBCur->OSTCBY;            /* Task no longer ready                              */
+                  OSRdyTbl[y]  &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
+                  if (OSRdyTbl[y] == 0u) {                      /* Clear event grp bit if this was only task pending */
+                      OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+                  }
+              }
+              #endif
 1120          /*$PAGE*/
 1121          /*
 1122          *********************************************************************************************************
@@ -1214,7 +1214,7 @@ line level    source
 1134          *********************************************************************************************************
 1135          */
 1136          #if ((OS_EVENT_EN) && (OS_EVENT_MULTI_EN > 0u))
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 20  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 20  
 
               void  OS_EventTaskWaitMulti (OS_EVENT **pevents_wait) large reentrant
               {
@@ -1259,26 +1259,26 @@ line level    source
 1177          *********************************************************************************************************
 1178          */
 1179          #if (OS_EVENT_EN)
-1180          void  OS_EventTaskRemove (OS_TCB   *ptcb,
-1181                                    OS_EVENT *pevent) large reentrant
-1182          {
-1183   1          INT8U  y;
-1184   1      
-1185   1      
-1186   1          y                       =  ptcb->OSTCBY;
-1187   1          pevent->OSEventTbl[y]  &= (OS_PRIO)~ptcb->OSTCBBitX;    /* Remove task from wait list              */
-1188   1          if (pevent->OSEventTbl[y] == 0u) {
-1189   2              pevent->OSEventGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
-1190   2          }
-1191   1      }
-1192          #endif
+              void  OS_EventTaskRemove (OS_TCB   *ptcb,
+                                        OS_EVENT *pevent) large reentrant
+              {
+                  INT8U  y;
+              
+              
+                  y                       =  ptcb->OSTCBY;
+                  pevent->OSEventTbl[y]  &= (OS_PRIO)~ptcb->OSTCBBitX;    /* Remove task from wait list              */
+                  if (pevent->OSEventTbl[y] == 0u) {
+                      pevent->OSEventGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                  }
+              }
+              #endif
 1193          /*$PAGE*/
 1194          /*
 1195          *********************************************************************************************************
 1196          *                             REMOVE TASK FROM MULTIPLE EVENTS WAIT LISTS
 1197          *
 1198          * Description: Remove a task from multiple events' wait lists.
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 21  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 21  
 
 1199          *
 1200          * Arguments  : ptcb             is a pointer to the task to remove.
@@ -1331,18 +1331,18 @@ line level    source
 1247          *********************************************************************************************************
 1248          */
 1249          #if (OS_EVENT_EN)
-1250          void  OS_EventWaitListInit (OS_EVENT *pevent) large reentrant
-1251          {
-1252   1          INT8U  i;
-1253   1      
-1254   1      
-1255   1          pevent->OSEventGrp = 0u;                     /* No task waiting on event                           */
-1256   1          for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
-1257   2              pevent->OSEventTbl[i] = 0u;
-1258   2          }
-1259   1      }
-1260          #endif
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 22  
+              void  OS_EventWaitListInit (OS_EVENT *pevent) large reentrant
+              {
+                  INT8U  i;
+              
+              
+                  pevent->OSEventGrp = 0u;                     /* No task waiting on event                           */
+                  for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
+                      pevent->OSEventTbl[i] = 0u;
+                  }
+              }
+              #endif
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 22  
 
 1261          /*$PAGE*/
 1262          /*
@@ -1361,32 +1361,32 @@ line level    source
 1275          static  void  OS_InitEventList (void) large reentrant
 1276          {
 1277   1      #if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
-1278   1      #if (OS_MAX_EVENTS > 1u)
-1279   1          INT16U     ix;
-1280   1          INT16U     ix_next;
-1281   1          OS_EVENT  *pevent1;
-1282   1          OS_EVENT  *pevent2;
-1283   1      
-1284   1      
-1285   1          OS_MemClr((INT8U *)&OSEventTbl[0], sizeof(OSEventTbl)); /* Clear the event table                   */
-1286   1          for (ix = 0u; ix < (OS_MAX_EVENTS - 1u); ix++) {        /* Init. list of free EVENT control blocks */
-1287   2              ix_next = ix + 1u;
-1288   2              pevent1 = &OSEventTbl[ix];
-1289   2              pevent2 = &OSEventTbl[ix_next];
-1290   2              pevent1->OSEventType    = OS_EVENT_TYPE_UNUSED;
-1291   2              pevent1->OSEventPtr     = pevent2;
-1292   2      #if OS_EVENT_NAME_EN > 0u
+              #if (OS_MAX_EVENTS > 1u)
+                  INT16U     ix;
+                  INT16U     ix_next;
+                  OS_EVENT  *pevent1;
+                  OS_EVENT  *pevent2;
+              
+              
+                  OS_MemClr((INT8U *)&OSEventTbl[0], sizeof(OSEventTbl)); /* Clear the event table                   */
+                  for (ix = 0u; ix < (OS_MAX_EVENTS - 1u); ix++) {        /* Init. list of free EVENT control blocks */
+                      ix_next = ix + 1u;
+                      pevent1 = &OSEventTbl[ix];
+                      pevent2 = &OSEventTbl[ix_next];
+                      pevent1->OSEventType    = OS_EVENT_TYPE_UNUSED;
+                      pevent1->OSEventPtr     = pevent2;
+              #if OS_EVENT_NAME_EN > 0u
                       pevent1->OSEventName    = (INT8U *)(void *)"?";     /* Unknown name                            */
               #endif
-1295   2          }
-1296   1          pevent1                         = &OSEventTbl[ix];
-1297   1          pevent1->OSEventType            = OS_EVENT_TYPE_UNUSED;
-1298   1          pevent1->OSEventPtr             = (OS_EVENT *)0;
-1299   1      #if OS_EVENT_NAME_EN > 0u
+                  }
+                  pevent1                         = &OSEventTbl[ix];
+                  pevent1->OSEventType            = OS_EVENT_TYPE_UNUSED;
+                  pevent1->OSEventPtr             = (OS_EVENT *)0;
+              #if OS_EVENT_NAME_EN > 0u
                   pevent1->OSEventName            = (INT8U *)(void *)"?"; /* Unknown name                            */
               #endif
-1302   1          OSEventFreeList                 = &OSEventTbl[0];
-1303   1      #else
+                  OSEventFreeList                 = &OSEventTbl[0];
+              #else
                   OSEventFreeList                 = &OSEventTbl[0];       /* Only have ONE event control block       */
                   OSEventFreeList->OSEventType    = OS_EVENT_TYPE_UNUSED;
                   OSEventFreeList->OSEventPtr     = (OS_EVENT *)0;
@@ -1394,7 +1394,7 @@ line level    source
                   OSEventFreeList->OSEventName    = (INT8U *)"?";         /* Unknown name                            */
               #endif
               #endif
-1311   1      #endif
+              #endif
 1312   1      }
 1313          /*$PAGE*/
 1314          /*
@@ -1406,7 +1406,7 @@ line level    source
 1320          *
 1321          * Arguments  : none
 1322          *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 23  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 23  
 
 1323          * Returns    : none
 1324          *********************************************************************************************************
@@ -1470,7 +1470,7 @@ line level    source
 1382   1      }
 1383          
 1384          /*$PAGE*/
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 24  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 24  
 
 1385          /*
 1386          *********************************************************************************************************
@@ -1534,7 +1534,7 @@ line level    source
                                      OS_TASK_IDLE_PRIO);
                   #else
 1434   1          (void)OSTaskCreate(OS_TaskIdle,
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 25  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 25  
 
 1435   1                             (void *)0,
 1436   1                             &OSTaskIdleStk[0],
@@ -1598,7 +1598,7 @@ line level    source
              -/
                                         OS_TASK_STAT_STK_SIZE,
                                         (void *)0,                                   /* No TCB extension               *
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 26  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 26  
 
              -/
                                         OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);  /* Enable stack checking + clear  *
@@ -1662,7 +1662,7 @@ line level    source
                       ptcb1->OSTCBTaskName = (INT8U *)(void *)"?";             /* Unknown name                       */
               #endif
 1540   2          }
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 27  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 27  
 
 1541   1          ptcb1                   = &OSTCBTbl[ix];
 1542   1          ptcb1->OSTCBNext        = (OS_TCB *)0;                       /* Last OS_TCB                        */
@@ -1726,7 +1726,7 @@ line level    source
 1599          *                 of the alignment of the source and destination.
 1600          *********************************************************************************************************
 1601          */
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 28  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 28  
 
 1602          
 1603          void  OS_MemCopy (INT8U  *pdest,
@@ -1790,7 +1790,7 @@ line level    source
 1661          *              that is ready to run.  The global variable 'OSPrioHighRdy' is changed accordingly.
 1662          *
 1663          * Arguments  : none
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 29  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 29  
 
 1664          *
 1665          * Returns    : none
@@ -1854,7 +1854,7 @@ line level    source
                   len = 0u;
                   while (*psrc != OS_ASCII_NUL) {
                       psrc++;
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 30  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 30  
 
                       len++;
                   }
@@ -1918,7 +1918,7 @@ line level    source
 1784          *
 1785          * Notes      : 1) This task runs at a priority level higher than the idle task.  In fact, it runs at the
 1786          *                 next higher priority, OS_TASK_IDLE_PRIO-1.
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 31  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 31  
 
 1787          *              2) You can disable this task by setting the configuration #define OS_TASK_STAT_EN to 0.
 1788          *              3) You MUST have at least a delay of 2/10 seconds to allow for the system to establish the
@@ -1982,7 +1982,7 @@ line level    source
               {
                   OS_TCB      *ptcb;
                   OS_STK_DATA  stk_data;
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 32  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 32  
 
                   INT8U        err;
                   INT8U        prio;
@@ -2046,7 +2046,7 @@ line level    source
 1908          *
 1909          * Returns    : OS_ERR_NONE         if the call was successful
 1910          *              OS_ERR_TASK_NO_MORE_TCB  if there are no more free TCBs to be allocated and thus, the task 
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 33  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 33  
 
              -cannot
 1911          *                                  be created.
@@ -2098,8 +2098,8 @@ line level    source
 1957   2      #endif
 1958   2      
 1959   2      #if OS_TASK_DEL_EN > 0u
-1960   2              ptcb->OSTCBDelReq        = OS_ERR_NONE;
-1961   2      #endif
+                      ptcb->OSTCBDelReq        = OS_ERR_NONE;
+              #endif
 1962   2      
 1963   2      #if OS_LOWEST_PRIO <= 63u                                         /* Pre-compute X, Y                  */
 1964   2              ptcb->OSTCBY             = (INT8U)(prio >> 3u);
@@ -2110,24 +2110,24 @@ line level    source
               #endif
 1970   2                                                                        /* Pre-compute BitX and BitY         */
 1971   2              ptcb->OSTCBBitY          = (OS_PRIO)(1uL << ptcb->OSTCBY);
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 34  
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 34  
 
 1972   2              ptcb->OSTCBBitX          = (OS_PRIO)(1uL << ptcb->OSTCBX);
 1973   2      
 1974   2      #if (OS_EVENT_EN)
-1975   2              ptcb->OSTCBEventPtr      = (OS_EVENT  *)0;         /* Task is not pending on an  event         */
-1976   2      #if (OS_EVENT_MULTI_EN > 0u)
+                      ptcb->OSTCBEventPtr      = (OS_EVENT  *)0;         /* Task is not pending on an  event         */
+              #if (OS_EVENT_MULTI_EN > 0u)
                       ptcb->OSTCBEventMultiPtr = (OS_EVENT **)0;         /* Task is not pending on any events        */
               #endif
-1979   2      #endif
+              #endif
 1980   2      
 1981   2      #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u) && (OS_TASK_DEL_EN > 0u)
                       ptcb->OSTCBFlagNode  = (OS_FLAG_NODE *)0;          /* Task is not pending on an event flag     */
               #endif
 1984   2      
 1985   2      #if (OS_MBOX_EN > 0u) || ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u))
-1986   2              ptcb->OSTCBMsg       = (void *)0;                  /* No message received                      */
-1987   2      #endif
+                      ptcb->OSTCBMsg       = (void *)0;                  /* No message received                      */
+              #endif
 1988   2      
 1989   2      #if OS_TASK_PROFILE_EN > 0u
                       ptcb->OSTCBCtxSwCtr    = 0uL;                      /* Initialize profiling variables           */
@@ -2170,15 +2170,14 @@ line level    source
 2027   1      }
 2028                                                                                                                                                                                                                                                                                                                                                                                                                                                           
              -                                                                                                                                                                                                    
-*** WARNING C294 IN LINE 1767 OF uCOS-II\Src\OS_CORE.C: unreachable code
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-C51 COMPILER V9.60.0.0   OS_CORE                                                           01/22/2020 20:57:56 PAGE 35  
+   CODE SIZE        =   1597    ----
+C51 COMPILER V9.00   OS_CORE                                                               10/09/2020 18:11:58 PAGE 35  
 
-   CODE SIZE        =   3702    ----
    CONSTANT SIZE    =    256    ----
-   XDATA SIZE       =    952    ----
+   XDATA SIZE       =    156    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
@@ -2186,4 +2185,4 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_Q
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_Q
 OBJECT MODULE PLACED IN .\Output\OS_Q.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_Q.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) 
-                    -DEBUG OBJECTEXTEND PRINT(.\Listing\OS_Q.lst) OBJECT(.\Output\OS_Q.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_Q.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) DEB
+                    -UG OBJECTEXTEND PRINT(.\Listing\OS_Q.lst) OBJECT(.\Output\OS_Q.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               *                            if 'pevent' is a NULL pointer or,
               *                            if you passed an invalid event type
               *
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 2   
 
               * Note(s)    : As of V2.60, you can now pass NULL pointers through queues.  Because of this, the argument
               *              'perr' has been added to the API to tell you about the outcome of the call.
@@ -126,7 +126,7 @@ line level    source
               *
               *                            void *MessageStorage[size]
               *
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 3   
 
               *              size          is the number of elements in the storage area
               *
@@ -190,7 +190,7 @@ line level    source
                   }
                   return (pevent);
               }
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 4   
 
               /*$PAGE*/
               /*
@@ -254,7 +254,7 @@ line level    source
                   }
               #endif
               
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 5   
 
               #if OS_ARG_CHK_EN > 0u
                   if (pevent == (OS_EVENT *)0) {                         /* Validate 'pevent'                        */
@@ -318,7 +318,7 @@ line level    source
                                OS_Sched();                               /* Find highest priority task ready to run  */
                            }
                            *perr                  = OS_ERR_NONE;
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 6   
 
                            pevent_return          = (OS_EVENT *)0;       /* Queue has been deleted                   */
                            break;
@@ -382,7 +382,7 @@ line level    source
               #endif
               
               /*$PAGE*/
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 7   
 
               /*
               *********************************************************************************************************
@@ -446,7 +446,7 @@ line level    source
                   }
               #endif
                   if (pevent->OSEventType != OS_EVENT_TYPE_Q) {/* Validate event block type                          */
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 8   
 
                       *perr = OS_ERR_EVENT_TYPE;
                       return ((void *)0);
@@ -510,7 +510,7 @@ line level    source
               /*
               *********************************************************************************************************
               *                                      ABORT WAITING ON A MESSAGE QUEUE
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 9   
 
               *
               * Description: This function aborts & readies any tasks currently waiting on a queue.  This function
@@ -574,7 +574,7 @@ line level    source
                       nbr_tasks = 0u;
                       switch (opt) {
                           case OS_PEND_OPT_BROADCAST:                    /* Do we need to abort ALL waiting tasks?   */
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 10  
 
                                while (pevent->OSEventGrp != 0u) {        /* Yes, ready ALL tasks waiting on queue    */
                                    (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
@@ -638,7 +638,7 @@ line level    source
                   if (pevent->OSEventType != OS_EVENT_TYPE_Q) {      /* Validate event block type                    */
                       return (OS_ERR_EVENT_TYPE);
                   }
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 11  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 11  
 
                   OS_ENTER_CRITICAL();
                   if (pevent->OSEventGrp != 0u) {                    /* See if any task pending on queue             */
@@ -702,7 +702,7 @@ line level    source
               #endif
                   if (pevent->OSEventType != OS_EVENT_TYPE_Q) {     /* Validate event block type                     */
                       return (OS_ERR_EVENT_TYPE);
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 12  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 12  
 
                   }
                   OS_ENTER_CRITICAL();
@@ -766,7 +766,7 @@ line level    source
                   OS_Q      *pq;
               #if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
                   OS_CPU_SR  cpu_sr = 0u;
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 13  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 13  
 
               #endif
               
@@ -830,7 +830,7 @@ line level    source
               *                            queue.
               *
               * Returns    : OS_ERR_NONE         The call was successful and the message was sent
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 14  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 14  
 
               *              OS_ERR_EVENT_TYPE   If you are attempting to obtain data from a non queue.
               *              OS_ERR_PEVENT_NULL  If 'pevent'   is a NULL pointer
@@ -894,7 +894,7 @@ line level    source
               * Arguments   :  none
               *
               * Returns     : none
-C51 COMPILER V9.60.0.0   OS_Q                                                              01/22/2020 20:57:56 PAGE 15  
+C51 COMPILER V9.00   OS_Q                                                                  10/09/2020 18:11:58 PAGE 15  
 
               *
               * Note(s)    : This function is INTERNAL to uC/OS-II and your application should not call it.

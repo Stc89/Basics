@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_TASK
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_TASK
 OBJECT MODULE PLACED IN .\Output\OS_TASK.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_TASK.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\In
-                    -c) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_TASK.lst) OBJECT(.\Output\OS_TASK.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_TASK.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc) 
+                    -DEBUG OBJECTEXTEND PRINT(.\Listing\OS_TASK.lst) OBJECT(.\Output\OS_TASK.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               INT8U  OSTaskChangePrio (INT8U  oldprio,
                                        INT8U  newprio) large reentrant
               {
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 2   
 
               #if (OS_EVENT_EN)
                   OS_EVENT  *pevent;
@@ -126,7 +126,7 @@ line level    source
                   y_old                 =  ptcb->OSTCBY;
                   bity_old              =  ptcb->OSTCBBitY;
                   bitx_old              =  ptcb->OSTCBBitX;
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 3   
 
                   if ((OSRdyTbl[y_old] &   bitx_old) != 0u) {             /* If task is ready make it not            */
                        OSRdyTbl[y_old] &= (OS_PRIO)~bitx_old;
@@ -190,7 +190,7 @@ line level    source
  175          *
  176          *              p_arg    is a pointer to an optional data area which can be used to pass parameters to
  177          *                       the task when the task first executes.  Where the task is concerned it thinks
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 4   
 
  178          *                       it was invoked and passed the argument 'p_arg' as follows:
  179          *
@@ -254,7 +254,7 @@ line level    source
  237   2              OSTCBPrioTbl[prio] = OS_TCB_RESERVED;/* Reserve the priority to prevent others from doing ...  */
  238   2                                                   /* ... the same thing until task is created.              */
  239   2              OS_EXIT_CRITICAL();
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 5   
 
  240   2              psp = OSTaskStkInit(task, p_arg, ptos, 0u);             /* Initialize the task's stack         */
  241   2              err = OS_TCBInit(prio, psp, (OS_STK *)0, 0u, 0u, (void *)0, 0u);
@@ -318,7 +318,7 @@ line level    source
  299          *              stk_size  is the size of the stack in number of elements.  If OS_STK is set to INT8U,
  300          *                        'stk_size' corresponds to the number of bytes available.  If OS_STK is set to
  301          *                        INT16U, 'stk_size' contains the number of 16-bit entries available.  Finally, if
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 6   
 
  302          *                        OS_STK is set to INT32U, 'stk_size' contains the number of 32-bit entries
  303          *                        available on the stack.
@@ -382,7 +382,7 @@ line level    source
                       return (OS_ERR_TASK_CREATE_ISR);
                   }
                   if (OSTCBPrioTbl[prio] == (OS_TCB *)0) { /* Make sure task doesn't already exist at this priority  */
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 7   
 
                       OSTCBPrioTbl[prio] = OS_TCB_RESERVED;/* Reserve the priority to prevent others from doing ...  */
                                                            /* ... the same thing until task is created.              */
@@ -446,109 +446,109 @@ line level    source
  423          *********************************************************************************************************
  424          */
  425          
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 8   
 
  426          #if OS_TASK_DEL_EN > 0u
- 427          INT8U  OSTaskDel (INT8U prio) large reentrant
- 428          {
- 429   1      #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+              INT8U  OSTaskDel (INT8U prio) large reentrant
+              {
+              #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
                   OS_FLAG_NODE *pnode;
               #endif
- 432   1          OS_TCB       *ptcb;
- 433   1      #if OS_CRITICAL_METHOD == 3u                            /* Allocate storage for CPU status register    */
+                  OS_TCB       *ptcb;
+              #if OS_CRITICAL_METHOD == 3u                            /* Allocate storage for CPU status register    */
                   OS_CPU_SR     cpu_sr = 0u;
               #endif
- 436   1      
- 437   1      
- 438   1      
- 439   1          if (OSIntNesting > 0u) {                            /* See if trying to delete from ISR            */
- 440   2              return (OS_ERR_TASK_DEL_ISR);
- 441   2          }
- 442   1          if (prio == OS_TASK_IDLE_PRIO) {                    /* Not allowed to delete idle task             */
- 443   2              return (OS_ERR_TASK_DEL_IDLE);
- 444   2          }
- 445   1      #if OS_ARG_CHK_EN > 0u
+              
+              
+              
+                  if (OSIntNesting > 0u) {                            /* See if trying to delete from ISR            */
+                      return (OS_ERR_TASK_DEL_ISR);
+                  }
+                  if (prio == OS_TASK_IDLE_PRIO) {                    /* Not allowed to delete idle task             */
+                      return (OS_ERR_TASK_DEL_IDLE);
+                  }
+              #if OS_ARG_CHK_EN > 0u
                   if (prio >= OS_LOWEST_PRIO) {                       /* Task priority valid ?                       */
                       if (prio != OS_PRIO_SELF) {
                           return (OS_ERR_PRIO_INVALID);
                       }
                   }
               #endif
- 452   1      
- 453   1      /*$PAGE*/
- 454   1          OS_ENTER_CRITICAL();
- 455   1          if (prio == OS_PRIO_SELF) {                         /* See if requesting to delete self            */
- 456   2              prio = OSTCBCur->OSTCBPrio;                     /* Set priority to delete to current           */
- 457   2          }
- 458   1          ptcb = OSTCBPrioTbl[prio];
- 459   1          if (ptcb == (OS_TCB *)0) {                          /* Task to delete must exist                   */
- 460   2              OS_EXIT_CRITICAL();
- 461   2              return (OS_ERR_TASK_NOT_EXIST);
- 462   2          }
- 463   1          if (ptcb == OS_TCB_RESERVED) {                      /* Must not be assigned to Mutex               */
- 464   2              OS_EXIT_CRITICAL();
- 465   2              return (OS_ERR_TASK_DEL);
- 466   2          }
- 467   1      
- 468   1          OSRdyTbl[ptcb->OSTCBY] &= (OS_PRIO)~ptcb->OSTCBBitX;
- 469   1          if (OSRdyTbl[ptcb->OSTCBY] == 0u) {                 /* Make task not ready                         */
- 470   2              OSRdyGrp           &= (OS_PRIO)~ptcb->OSTCBBitY;
- 471   2          }
- 472   1      
- 473   1      #if (OS_EVENT_EN)
- 474   1          if (ptcb->OSTCBEventPtr != (OS_EVENT *)0) {
- 475   2              OS_EventTaskRemove(ptcb, ptcb->OSTCBEventPtr);  /* Remove this task from any event   wait list */
- 476   2          }
- 477   1      #if (OS_EVENT_MULTI_EN > 0u)
+              
+              /*$PAGE*/
+                  OS_ENTER_CRITICAL();
+                  if (prio == OS_PRIO_SELF) {                         /* See if requesting to delete self            */
+                      prio = OSTCBCur->OSTCBPrio;                     /* Set priority to delete to current           */
+                  }
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                          /* Task to delete must exist                   */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                      /* Must not be assigned to Mutex               */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_DEL);
+                  }
+              
+                  OSRdyTbl[ptcb->OSTCBY] &= (OS_PRIO)~ptcb->OSTCBBitX;
+                  if (OSRdyTbl[ptcb->OSTCBY] == 0u) {                 /* Make task not ready                         */
+                      OSRdyGrp           &= (OS_PRIO)~ptcb->OSTCBBitY;
+                  }
+              
+              #if (OS_EVENT_EN)
+                  if (ptcb->OSTCBEventPtr != (OS_EVENT *)0) {
+                      OS_EventTaskRemove(ptcb, ptcb->OSTCBEventPtr);  /* Remove this task from any event   wait list */
+                  }
+              #if (OS_EVENT_MULTI_EN > 0u)
                   if (ptcb->OSTCBEventMultiPtr != (OS_EVENT **)0) {   /* Remove this task from any events' wait lists*/
                       OS_EventTaskRemoveMulti(ptcb, ptcb->OSTCBEventMultiPtr);
                   }
               #endif
- 482   1      #endif
- 483   1      
- 484   1      #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+              #endif
+              
+              #if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
                   pnode = ptcb->OSTCBFlagNode;
                   if (pnode != (OS_FLAG_NODE *)0) {                   /* If task is waiting on event flag            */
                       OS_FlagUnlink(pnode);                           /* Remove from wait list                       */
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 9   
 
                   }
               #endif
- 490   1      
- 491   1          ptcb->OSTCBDly      = 0u;                           /* Prevent OSTimeTick() from updating          */
- 492   1          ptcb->OSTCBStat     = OS_STAT_RDY;                  /* Prevent task from being resumed             */
- 493   1          ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
- 494   1          if (OSLockNesting < 255u) {                         /* Make sure we don't context switch           */
- 495   2              OSLockNesting++;
- 496   2          }
- 497   1          OS_EXIT_CRITICAL();                                 /* Enabling INT. ignores next instruc.         */
- 498   1          OS_Dummy();                                         /* ... Dummy ensures that INTs will be         */
- 499   1          OS_ENTER_CRITICAL();                                /* ... disabled HERE!                          */
- 500   1          if (OSLockNesting > 0u) {                           /* Remove context switch lock                  */
- 501   2              OSLockNesting--;
- 502   2          }
- 503   1          OSTaskDelHook(ptcb);                                /* Call user defined hook                      */
- 504   1          OSTaskCtr--;                                        /* One less task being managed                 */
- 505   1          OSTCBPrioTbl[prio] = (OS_TCB *)0;                   /* Clear old priority entry                    */
- 506   1          if (ptcb->OSTCBPrev == (OS_TCB *)0) {               /* Remove from TCB chain                       */
- 507   2              ptcb->OSTCBNext->OSTCBPrev = (OS_TCB *)0;
- 508   2              OSTCBList                  = ptcb->OSTCBNext;
- 509   2          } else {
- 510   2              ptcb->OSTCBPrev->OSTCBNext = ptcb->OSTCBNext;
- 511   2              ptcb->OSTCBNext->OSTCBPrev = ptcb->OSTCBPrev;
- 512   2          }
- 513   1          ptcb->OSTCBNext     = OSTCBFreeList;                /* Return TCB to free TCB list                 */
- 514   1          OSTCBFreeList       = ptcb;
- 515   1      #if OS_TASK_NAME_EN > 0u
+              
+                  ptcb->OSTCBDly      = 0u;                           /* Prevent OSTimeTick() from updating          */
+                  ptcb->OSTCBStat     = OS_STAT_RDY;                  /* Prevent task from being resumed             */
+                  ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
+                  if (OSLockNesting < 255u) {                         /* Make sure we don't context switch           */
+                      OSLockNesting++;
+                  }
+                  OS_EXIT_CRITICAL();                                 /* Enabling INT. ignores next instruc.         */
+                  OS_Dummy();                                         /* ... Dummy ensures that INTs will be         */
+                  OS_ENTER_CRITICAL();                                /* ... disabled HERE!                          */
+                  if (OSLockNesting > 0u) {                           /* Remove context switch lock                  */
+                      OSLockNesting--;
+                  }
+                  OSTaskDelHook(ptcb);                                /* Call user defined hook                      */
+                  OSTaskCtr--;                                        /* One less task being managed                 */
+                  OSTCBPrioTbl[prio] = (OS_TCB *)0;                   /* Clear old priority entry                    */
+                  if (ptcb->OSTCBPrev == (OS_TCB *)0) {               /* Remove from TCB chain                       */
+                      ptcb->OSTCBNext->OSTCBPrev = (OS_TCB *)0;
+                      OSTCBList                  = ptcb->OSTCBNext;
+                  } else {
+                      ptcb->OSTCBPrev->OSTCBNext = ptcb->OSTCBNext;
+                      ptcb->OSTCBNext->OSTCBPrev = ptcb->OSTCBPrev;
+                  }
+                  ptcb->OSTCBNext     = OSTCBFreeList;                /* Return TCB to free TCB list                 */
+                  OSTCBFreeList       = ptcb;
+              #if OS_TASK_NAME_EN > 0u
                   ptcb->OSTCBTaskName = (INT8U *)(void *)"?";
               #endif
- 518   1          OS_EXIT_CRITICAL();
- 519   1          if (OSRunning == OS_TRUE) {
- 520   2              OS_Sched();                                     /* Find new highest priority task              */
- 521   2          }
- 522   1          return (OS_ERR_NONE);
- 523   1      }
- 524          #endif
+                  OS_EXIT_CRITICAL();
+                  if (OSRunning == OS_TRUE) {
+                      OS_Sched();                                     /* Find new highest priority task              */
+                  }
+                  return (OS_ERR_NONE);
+              }
+              #endif
  525          /*$PAGE*/
  526          /*
  527          *********************************************************************************************************
@@ -574,7 +574,7 @@ line level    source
  546          *                       .
  547          *                       .
  548          *                       while (1) {
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 10  
 
  549          *                           OSTimeDly(1);
  550          *                           if (OSTaskDelReq(OS_PRIO_SELF) == OS_ERR_TASK_DEL_REQ) {
@@ -601,49 +601,49 @@ line level    source
  570          */
  571          /*$PAGE*/
  572          #if OS_TASK_DEL_EN > 0u
- 573          INT8U  OSTaskDelReq (INT8U prio) large reentrant
- 574          {
- 575   1          INT8U      stat;
- 576   1          OS_TCB    *ptcb;
- 577   1      #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+              INT8U  OSTaskDelReq (INT8U prio) large reentrant
+              {
+                  INT8U      stat;
+                  OS_TCB    *ptcb;
+              #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
                   OS_CPU_SR  cpu_sr = 0u;
               #endif
- 580   1      
- 581   1      
- 582   1      
- 583   1          if (prio == OS_TASK_IDLE_PRIO) {                            /* Not allowed to delete idle task     */
- 584   2              return (OS_ERR_TASK_DEL_IDLE);
- 585   2          }
- 586   1      #if OS_ARG_CHK_EN > 0u
+              
+              
+              
+                  if (prio == OS_TASK_IDLE_PRIO) {                            /* Not allowed to delete idle task     */
+                      return (OS_ERR_TASK_DEL_IDLE);
+                  }
+              #if OS_ARG_CHK_EN > 0u
                   if (prio >= OS_LOWEST_PRIO) {                               /* Task priority valid ?               */
                       if (prio != OS_PRIO_SELF) {
                           return (OS_ERR_PRIO_INVALID);
                       }
                   }
               #endif
- 593   1          if (prio == OS_PRIO_SELF) {                                 /* See if a task is requesting to ...  */
- 594   2              OS_ENTER_CRITICAL();                                    /* ... this task to delete itself      */
- 595   2              stat = OSTCBCur->OSTCBDelReq;                           /* Return request status to caller     */
- 596   2              OS_EXIT_CRITICAL();
- 597   2              return (stat);
- 598   2          }
- 599   1          OS_ENTER_CRITICAL();
- 600   1          ptcb = OSTCBPrioTbl[prio];
- 601   1          if (ptcb == (OS_TCB *)0) {                                  /* Task to delete must exist           */
- 602   2              OS_EXIT_CRITICAL();
- 603   2              return (OS_ERR_TASK_NOT_EXIST);                         /* Task must already be deleted        */
- 604   2          }
- 605   1          if (ptcb == OS_TCB_RESERVED) {                              /* Must NOT be assigned to a Mutex     */
- 606   2              OS_EXIT_CRITICAL();
- 607   2              return (OS_ERR_TASK_DEL);
- 608   2          }
- 609   1          ptcb->OSTCBDelReq = OS_ERR_TASK_DEL_REQ;                    /* Set flag indicating task to be DEL. */
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 11  
+                  if (prio == OS_PRIO_SELF) {                                 /* See if a task is requesting to ...  */
+                      OS_ENTER_CRITICAL();                                    /* ... this task to delete itself      */
+                      stat = OSTCBCur->OSTCBDelReq;                           /* Return request status to caller     */
+                      OS_EXIT_CRITICAL();
+                      return (stat);
+                  }
+                  OS_ENTER_CRITICAL();
+                  ptcb = OSTCBPrioTbl[prio];
+                  if (ptcb == (OS_TCB *)0) {                                  /* Task to delete must exist           */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_NOT_EXIST);                         /* Task must already be deleted        */
+                  }
+                  if (ptcb == OS_TCB_RESERVED) {                              /* Must NOT be assigned to a Mutex     */
+                      OS_EXIT_CRITICAL();
+                      return (OS_ERR_TASK_DEL);
+                  }
+                  ptcb->OSTCBDelReq = OS_ERR_TASK_DEL_REQ;                    /* Set flag indicating task to be DEL. */
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 11  
 
- 610   1          OS_EXIT_CRITICAL();
- 611   1          return (OS_ERR_NONE);
- 612   1      }
- 613          #endif
+                  OS_EXIT_CRITICAL();
+                  return (OS_ERR_NONE);
+              }
+              #endif
  614          /*$PAGE*/
  615          /*
  616          *********************************************************************************************************
@@ -702,7 +702,7 @@ line level    source
                       return (0u);
                   }
               #endif
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 12  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 12  
 
                   if (OSIntNesting > 0u) {                              /* See if trying to call from an ISR          */
                       *perr = OS_ERR_NAME_GET_ISR;
@@ -766,7 +766,7 @@ line level    source
               #endif
               
               
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 13  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 13  
 
               
               #ifdef OS_SAFETY_CRITICAL
@@ -830,7 +830,7 @@ line level    source
  790          *              OS_ERR_TASK_NOT_SUSPENDED  if the task to resume has not been suspended
  791          *********************************************************************************************************
  792          */
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 14  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 14  
 
  793          
  794          #if OS_TASK_SUSPEND_EN > 0u
@@ -894,7 +894,7 @@ line level    source
  852          *
  853          * Returns    : OS_ERR_NONE            upon success
  854          *              OS_ERR_PRIO_INVALID    if the priority you specify is higher that the maximum allowed
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 15  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 15  
 
  855          *                                     (i.e. > OS_LOWEST_PRIO) or, you have not specified OS_PRIO_SELF.
  856          *              OS_ERR_TASK_NOT_EXIST  if the desired task has not been created or is assigned to a Mutex P
@@ -958,7 +958,7 @@ line level    source
               #else
                   while (*pchk-- == (OS_STK)0) {
                       nfree++;
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 16  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 16  
 
                   }
               #endif
@@ -1022,7 +1022,7 @@ line level    source
                   } else {
                       self = OS_FALSE;                                        /* No suspending another task          */
                   }
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 17  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 17  
 
                   ptcb = OSTCBPrioTbl[prio];
                   if (ptcb == (OS_TCB *)0) {                                  /* Task to suspend must exist          */
@@ -1086,7 +1086,7 @@ line level    source
                   if (p_task_data == (OS_TCB *)0) {            /* Validate 'p_task_data'                             */
                       return (OS_ERR_PDATA_NULL);
                   }
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 18  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 18  
 
               #endif
                   OS_ENTER_CRITICAL();
@@ -1150,7 +1150,7 @@ line level    source
               #if OS_ARG_CHK_EN > 0u
                   if (prio >= OS_LOWEST_PRIO) {
                       if (prio != OS_PRIO_SELF) {
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 19  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 19  
 
                           *perr = OS_ERR_PRIO_INVALID;
                           return (0u);
@@ -1214,7 +1214,7 @@ line level    source
               #endif
                   OS_TCB    *ptcb;
               
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 20  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 20  
 
               
               #if OS_ARG_CHK_EN > 0u
@@ -1262,12 +1262,12 @@ line level    source
 1206   1          OSTaskReturnHook(OSTCBCur);                   /* Call hook to let user decide on what to do        */
 1207   1      
 1208   1      #if OS_TASK_DEL_EN > 0u
-1209   1          (void)OSTaskDel(OS_PRIO_SELF);                /* Delete task if it accidentally returns!           */
-1210   1      #else
-                  for (;;) {
-                      OSTimeDly(OS_TICKS_PER_SEC);
-                  }
-              #endif
+                  (void)OSTaskDel(OS_PRIO_SELF);                /* Delete task if it accidentally returns!           */
+              #else
+1211   1          for (;;) {
+1212   2              OSTimeDly(OS_TICKS_PER_SEC);
+1213   2          }
+1214   1      #endif
 1215   1      }
 1216          
 1217          /*$PAGE*/
@@ -1278,7 +1278,7 @@ line level    source
 1222          * Description: This function is used to clear the stack of a task (i.e. write all zeros)
 1223          *
 1224          * Arguments  : pbos     is a pointer to the task's bottom of stack.  If the configuration constant
-C51 COMPILER V9.60.0.0   OS_TASK                                                           01/22/2020 20:57:56 PAGE 21  
+C51 COMPILER V9.00   OS_TASK                                                               10/09/2020 18:11:58 PAGE 21  
 
 1225          *                       OS_STK_GROWTH is set to 1, the stack is assumed to grow downward (i.e. from high
 1226          *                       memory to low memory).  'pbos' will thus point to the lowest (valid) memory
@@ -1323,7 +1323,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1389    ----
+   CODE SIZE        =    293    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

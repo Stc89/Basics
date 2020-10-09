@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 1   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_MUTEX
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_MUTEX
 OBJECT MODULE PLACED IN .\Output\OS_MUTEX.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\Src\OS_MUTEX.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-II\I
-                    -nc) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_MUTEX.lst) OBJECT(.\Output\OS_MUTEX.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\Src\OS_MUTEX.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\Inc)
+                    - DEBUG OBJECTEXTEND PRINT(.\Listing\OS_MUTEX.lst) OBJECT(.\Output\OS_MUTEX.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
               *                                   ACCEPT MUTUAL EXCLUSION SEMAPHORE
               *
               * Description: This  function checks the mutual exclusion semaphore to see if a resource is available.
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 2   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 2   
 
               *              Unlike OSMutexPend(), OSMutexAccept() does not suspend the calling task if the resource is
               *              not available or the event did not occur.
@@ -126,7 +126,7 @@ line level    source
                   OS_ENTER_CRITICAL();                               /* Get value (0 or 1) of Mutex                  */
                   pip = (INT8U)(pevent->OSEventCnt >> 8u);           /* Get PIP from mutex                           */
                   if ((pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8) == OS_MUTEX_AVAILABLE) {
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 3   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 3   
 
                       pevent->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8;   /*      Mask off LSByte (Acquire Mutex)         */
                       pevent->OSEventCnt |= OSTCBCur->OSTCBPrio;     /*      Save current task priority in LSByte    */
@@ -190,7 +190,7 @@ line level    source
               #endif
               
               
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 4   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 4   
 
               
               #ifdef OS_SAFETY_CRITICAL
@@ -254,7 +254,7 @@ line level    source
               *              opt           determines delete options as follows:
               *                            opt == OS_DEL_NO_PEND   Delete mutex ONLY if no task pending
               *                            opt == OS_DEL_ALWAYS    Deletes the mutex even if tasks are waiting.
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 5   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 5   
 
               *                                                    In this case, all the tasks pending will be readied.
               *
@@ -318,7 +318,7 @@ line level    source
                       return (pevent);
                   }
                   if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 6   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 6   
 
                       *perr = OS_ERR_DEL_ISR;                             /* ... can't DELETE from an ISR             */
                       return (pevent);
@@ -382,7 +382,7 @@ line level    source
               
                       default:
                            OS_EXIT_CRITICAL();
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 7   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 7   
 
                            *perr         = OS_ERR_INVALID_OPT;
                            pevent_return = pevent;
@@ -446,7 +446,7 @@ line level    source
                   OS_TCB    *ptcb;
                   OS_EVENT  *pevent2;
                   INT8U      y;
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 8   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 8   
 
               #if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
                   OS_CPU_SR  cpu_sr = 0u;
@@ -510,7 +510,7 @@ line level    source
                               pevent2 = ptcb->OSTCBEventPtr;
                               if (pevent2 != (OS_EVENT *)0) {                   /* Remove from event wait list       */
                                   y = ptcb->OSTCBY;
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 9   
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 9   
 
                                   pevent2->OSEventTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;
                                   if (pevent2->OSEventTbl[y] == 0u) {
@@ -574,7 +574,7 @@ line level    source
                   OS_EXIT_CRITICAL();
               }
               /*$PAGE*/
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 10  
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 10  
 
               /*
               *********************************************************************************************************
@@ -638,7 +638,7 @@ line level    source
                       pevent->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8;  /*      Save priority of mutex's new owner       */
                       pevent->OSEventCnt |= prio;
                       pevent->OSEventPtr  = OSTCBPrioTbl[prio];     /*      Link to new mutex owner's OS_TCB         */
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 11  
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 11  
 
                       if (prio <= pip) {                            /*      PIP 'must' have a SMALLER prio ...       */
                           OS_EXIT_CRITICAL();                       /*      ... than current task!                   */
@@ -702,7 +702,7 @@ line level    source
                   }
                   OS_ENTER_CRITICAL();
                   p_mutex_data->OSMutexPIP  = (INT8U)(pevent->OSEventCnt >> 8u);
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 12  
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 12  
 
                   p_mutex_data->OSOwnerPrio = (INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8);
                   if (p_mutex_data->OSOwnerPrio == 0xFFu) {
@@ -766,7 +766,7 @@ line level    source
               
               
               #endif                                                     /* OS_MUTEX_EN                              */
-C51 COMPILER V9.60.0.0   OS_MUTEX                                                          01/22/2020 20:57:56 PAGE 13  
+C51 COMPILER V9.00   OS_MUTEX                                                              10/09/2020 18:11:58 PAGE 13  
 
  734                                                                                                                                                                                                                                                                                                                                                                                                                                                           
              -                                                                                                                                                                                                    

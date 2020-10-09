@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 1   
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 1   
 
 
-C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OS_CPU_C
+C51 COMPILER V9.00, COMPILATION OF MODULE OS_CPU_C
 OBJECT MODULE PLACED IN .\Output\OS_CPU_C.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE uCOS-II\MCS-51\OS_CPU_C.C LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\uCOS-I
-                    -I\Inc) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_CPU_C.lst) OBJECT(.\Output\OS_CPU_C.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uCOS-II\MCS-51\OS_CPU_C.C LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\uCOS-II\I
+                    -nc) DEBUG OBJECTEXTEND PRINT(.\Listing\OS_CPU_C.lst) OBJECT(.\Output\OS_CPU_C.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52          *                     |              |?C_XBP¸ß|                           |        |
   53          *                     |              ---------- -                         ----------
   54          *                     |              |        | |                         |   .    |
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 2   
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 2   
 
   55          *                     |              ---------- |                         |   .    |
   56          *                     |              |        | |                         |   .    |
@@ -113,190 +113,189 @@ line level    source
  101          /*********************************************** ¹³×Óº¯Êý ***********************************************/
  102          
  103          #if OS_CPU_HOOKS_EN
- 104          /*
- 105          *********************************************************************************************************
- 106          *                                       OS INITIALIZATION HOOK
- 107          *                                            (BEGINNING)
- 108          *
- 109          * Description: This function is called by OSInit() at the beginning of OSInit().
- 110          *
- 111          * Arguments  : none
- 112          *
- 113          * Note(s)    : 1) Interrupts should be disabled during this call.
- 114          *********************************************************************************************************
- 115          */
- 116          #if OS_VERSION > 203
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 3   
+              /*
+              *********************************************************************************************************
+              *                                       OS INITIALIZATION HOOK
+              *                                            (BEGINNING)
+              *
+              * Description: This function is called by OSInit() at the beginning of OSInit().
+              *
+              * Arguments  : none
+              *
+              * Note(s)    : 1) Interrupts should be disabled during this call.
+              *********************************************************************************************************
+              */
+              #if OS_VERSION > 203
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 3   
 
- 117          void OSInitHookBegin (void) large reentrant
- 118          {
- 119   1      }
- 120          #endif
- 121          
- 122          /*
- 123          *********************************************************************************************************
- 124          *                                       OS INITIALIZATION HOOK
- 125          *                                               (END)
- 126          *
- 127          * Description: This function is called by OSInit() at the end of OSInit().
- 128          *
- 129          * Arguments  : none
- 130          *
- 131          * Note(s)    : 1) Interrupts should be disabled during this call.
- 132          *********************************************************************************************************
- 133          */
- 134          #if OS_VERSION > 203
- 135          void OSInitHookEnd (void) large reentrant
- 136          {
- 137   1      }
- 138          #endif
- 139          
- 140          /*
- 141          *********************************************************************************************************
- 142          *                                          TASK CREATION HOOK
- 143          *
- 144          * Description: This function is called when a task is created.
- 145          *
- 146          * Arguments  : ptcb   is a pointer to the task control block of the task being created.
- 147          *
- 148          * Note(s)    : 1) Interrupts are disabled during this call.
- 149          *********************************************************************************************************
- 150          */
- 151          void OSTaskCreateHook (OS_TCB *ptcb) large reentrant
- 152          {
- 153   1          ptcb = ptcb;                       /* Prevent compiler warning                                     */
- 154   1      }
- 155          
- 156          /*
- 157          *********************************************************************************************************
- 158          *                                           TASK DELETION HOOK
- 159          *
- 160          * Description: This function is called when a task is deleted.
- 161          *
- 162          * Arguments  : ptcb   is a pointer to the task control block of the task being deleted.
- 163          *
- 164          * Note(s)    : 1) Interrupts are disabled during this call.
- 165          *********************************************************************************************************
- 166          */
- 167          void OSTaskDelHook (OS_TCB *ptcb) large reentrant
- 168          {
- 169   1          ptcb = ptcb;                       /* Prevent compiler warning                                     */
- 170   1      }
- 171          
- 172          /*
- 173          *********************************************************************************************************
- 174          *                                           TASK SWITCH HOOK
- 175          *
- 176          * Description: This function is called when a task switch is performed.  This allows you to perform other
- 177          *              operations during a context switch.
- 178          *
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 4   
+              void OSInitHookBegin (void) large reentrant
+              {
+              }
+              #endif
+              
+              /*
+              *********************************************************************************************************
+              *                                       OS INITIALIZATION HOOK
+              *                                               (END)
+              *
+              * Description: This function is called by OSInit() at the end of OSInit().
+              *
+              * Arguments  : none
+              *
+              * Note(s)    : 1) Interrupts should be disabled during this call.
+              *********************************************************************************************************
+              */
+              #if OS_VERSION > 203
+              void OSInitHookEnd (void) large reentrant
+              {
+              }
+              #endif
+              
+              /*
+              *********************************************************************************************************
+              *                                          TASK CREATION HOOK
+              *
+              * Description: This function is called when a task is created.
+              *
+              * Arguments  : ptcb   is a pointer to the task control block of the task being created.
+              *
+              * Note(s)    : 1) Interrupts are disabled during this call.
+              *********************************************************************************************************
+              */
+              void OSTaskCreateHook (OS_TCB *ptcb) large reentrant
+              {
+                  ptcb = ptcb;                       /* Prevent compiler warning                                     */
+              }
+              
+              /*
+              *********************************************************************************************************
+              *                                           TASK DELETION HOOK
+              *
+              * Description: This function is called when a task is deleted.
+              *
+              * Arguments  : ptcb   is a pointer to the task control block of the task being deleted.
+              *
+              * Note(s)    : 1) Interrupts are disabled during this call.
+              *********************************************************************************************************
+              */
+              void OSTaskDelHook (OS_TCB *ptcb) large reentrant
+              {
+                  ptcb = ptcb;                       /* Prevent compiler warning                                     */
+              }
+              
+              /*
+              *********************************************************************************************************
+              *                                           TASK SWITCH HOOK
+              *
+              * Description: This function is called when a task switch is performed.  This allows you to perform other
+              *              operations during a context switch.
+              *
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 4   
 
- 179          * Arguments  : none
- 180          *
- 181          * Note(s)    : 1) Interrupts are disabled during this call.
- 182          *              2) It is assumed that the global pointer 'OSTCBHighRdy' points to the TCB of the task that
- 183          *                 will be 'switched in' (i.e. the highest priority task) and, 'OSTCBCur' points to the 
- 184          *                 task being switched out (i.e. the preempted task).
- 185          *********************************************************************************************************
- 186          */
- 187          void OSTaskSwHook (void) large reentrant
- 188          {
- 189   1      }
- 190          
- 191          /*
- 192          *********************************************************************************************************
- 193          *                                           STATISTIC TASK HOOK
- 194          *
- 195          * Description: This function is called every second by uC/OS-II's statistics task.  This allows your 
- 196          *              application to add functionality to the statistics task.
- 197          *
- 198          * Arguments  : none
- 199          *********************************************************************************************************
- 200          */
- 201          void OSTaskStatHook (void) large reentrant
- 202          {
- 203   1      }
- 204          
- 205          /*
- 206          *********************************************************************************************************
- 207          *                                            TASK RETURN HOOK
- 208          *
- 209          * Description: This function is called if a task accidentally returns.  In other words, a task should
- 210          *              either be an infinite loop or delete itself when done.
- 211          *
- 212          * Arguments  : ptcb      is a pointer to the task control block of the task that is returning.
- 213          *
- 214          * Note(s)    : none
- 215          *********************************************************************************************************
- 216          */
- 217          
- 218          #if OS_CPU_HOOKS_EN > 0u
- 219          void  OSTaskReturnHook (OS_TCB  *ptcb) large reentrant
- 220          {
- 221   1      #if OS_APP_HOOKS_EN > 0u
+              * Arguments  : none
+              *
+              * Note(s)    : 1) Interrupts are disabled during this call.
+              *              2) It is assumed that the global pointer 'OSTCBHighRdy' points to the TCB of the task that
+              *                 will be 'switched in' (i.e. the highest priority task) and, 'OSTCBCur' points to the 
+              *                 task being switched out (i.e. the preempted task).
+              *********************************************************************************************************
+              */
+              void OSTaskSwHook (void) large reentrant
+              {
+              }
+              
+              /*
+              *********************************************************************************************************
+              *                                           STATISTIC TASK HOOK
+              *
+              * Description: This function is called every second by uC/OS-II's statistics task.  This allows your 
+              *              application to add functionality to the statistics task.
+              *
+              * Arguments  : none
+              *********************************************************************************************************
+              */
+              void OSTaskStatHook (void) large reentrant
+              {
+              }
+              
+              /*
+              *********************************************************************************************************
+              *                                            TASK RETURN HOOK
+              *
+              * Description: This function is called if a task accidentally returns.  In other words, a task should
+              *              either be an infinite loop or delete itself when done.
+              *
+              * Arguments  : ptcb      is a pointer to the task control block of the task that is returning.
+              *
+              * Note(s)    : none
+              *********************************************************************************************************
+              */
+              
+              #if OS_CPU_HOOKS_EN > 0u
+              void  OSTaskReturnHook (OS_TCB  *ptcb) large reentrant
+              {
+              #if OS_APP_HOOKS_EN > 0u
                   App_TaskReturnHook(ptcb);
               #else
- 224   1          (void)ptcb;
-*** WARNING C275 IN LINE 224 OF uCOS-II\MCS-51\OS_CPU_C.C: expression with possibly no effect
- 225   1      #endif
- 226   1      }
- 227          #endif
- 228          
- 229          /*
- 230          *********************************************************************************************************
- 231          *                                           OSTCBInit() HOOK
- 232          *
- 233          * Description: This function is called by OSTCBInit() after setting up most of the TCB.
- 234          *
- 235          * Arguments  : ptcb    is a pointer to the TCB of the task being created.
- 236          *
- 237          * Note(s)    : 1) Interrupts may or may not be ENABLED during this call.
- 238          *********************************************************************************************************
- 239          */
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 5   
+                  (void)ptcb;
+              #endif
+              }
+              #endif
+              
+              /*
+              *********************************************************************************************************
+              *                                           OSTCBInit() HOOK
+              *
+              * Description: This function is called by OSTCBInit() after setting up most of the TCB.
+              *
+              * Arguments  : ptcb    is a pointer to the TCB of the task being created.
+              *
+              * Note(s)    : 1) Interrupts may or may not be ENABLED during this call.
+              *********************************************************************************************************
+              */
+              #if OS_VERSION > 203
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 5   
 
- 240          #if OS_VERSION > 203
- 241          void OSTCBInitHook (OS_TCB *ptcb) large reentrant
- 242          {
- 243   1          ptcb = ptcb;                                           /* Prevent Compiler warning                 */
- 244   1      }
- 245          #endif
- 246          
- 247          /*
- 248          *********************************************************************************************************
- 249          *                                               TICK HOOK
- 250          *
- 251          * Description: This function is called every tick.
- 252          *
- 253          * Arguments  : none
- 254          *
- 255          * Note(s)    : 1) Interrupts may or may not be ENABLED during this call.
- 256          *********************************************************************************************************
- 257          */
- 258          void OSTimeTickHook (void) large reentrant
- 259          {
- 260   1      }
- 261          
- 262          /*
- 263          *********************************************************************************************************
- 264          *                                             IDLE TASK HOOK
- 265          *
- 266          * Description: This function is called by the idle task.  This hook has been added to allow you to do  
- 267          *              such things as STOP the CPU to conserve power.
- 268          *
- 269          * Arguments  : none
- 270          *
- 271          * Note(s)    : 1) Interrupts are enabled during this call.
- 272          *********************************************************************************************************
- 273          */
- 274          #if OS_VERSION >= 251
- 275          void OSTaskIdleHook (void) large reentrant
- 276          {
- 277   1      }
- 278          #endif
- 279          
- 280          #endif
+              void OSTCBInitHook (OS_TCB *ptcb) large reentrant
+              {
+                  ptcb = ptcb;                                           /* Prevent Compiler warning                 */
+              }
+              #endif
+              
+              /*
+              *********************************************************************************************************
+              *                                               TICK HOOK
+              *
+              * Description: This function is called every tick.
+              *
+              * Arguments  : none
+              *
+              * Note(s)    : 1) Interrupts may or may not be ENABLED during this call.
+              *********************************************************************************************************
+              */
+              void OSTimeTickHook (void) large reentrant
+              {
+              }
+              
+              /*
+              *********************************************************************************************************
+              *                                             IDLE TASK HOOK
+              *
+              * Description: This function is called by the idle task.  This hook has been added to allow you to do  
+              *              such things as STOP the CPU to conserve power.
+              *
+              * Arguments  : none
+              *
+              * Note(s)    : 1) Interrupts are enabled during this call.
+              *********************************************************************************************************
+              */
+              #if OS_VERSION >= 251
+              void OSTaskIdleHook (void) large reentrant
+              {
+              }
+              #endif
+              
+              #endif
  281          
  282          /********************************************************************************************************/
  283          
@@ -315,16 +314,16 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    774    ----
+   CODE SIZE        =    292    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   OS_CPU_C                                                          01/22/2020 20:57:55 PAGE 6   
-
    PDATA SIZE       =   ----    ----
+C51 COMPILER V9.00   OS_CPU_C                                                              10/09/2020 18:11:58 PAGE 6   
+
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
