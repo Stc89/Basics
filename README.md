@@ -24,7 +24,9 @@
 * 学生群体，不管是中学生还是大学生，我觉得都比较适合
 * 算法验证的，如果你写了一段算法代码，可以移植到这上面运行
 
+# 开始看这里
 
+https://github.com/Stc89/Basics/tree/master/article
 
 ![渲染图](https://raw.githubusercontent.com/weiqifa0/pic/master/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20200813202412.jpg)
 
