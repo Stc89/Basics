@@ -1,15 +1,15 @@
-C51 COMPILER V9.53.0.0   TASK_SWITCH                                                       05/15/2018 23:11:34 PAGE 1   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 1   
 
 
-C51 COMPILER V9.53.0.0, COMPILATION OF MODULE TASK_SWITCH
+C51 COMPILER V9.00, COMPILATION OF MODULE TASK_SWITCH
 NO OBJECT MODULE REQUESTED
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE task_switch.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listin
-                    -gs\task_switch.lst) SRC(.\Objects\task_switch.SRC)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE task_switch.c BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\task_switch.lst) S
+                    -RC(.\Objects\task_switch.SRC)
 
 line level    source
 
    1          #include "task_switch.h"
-   2          #include <stc12c5a60s2.h>
+   2          #include "reg51.h"
    3          #include "core.h"
    4          
    5          
@@ -62,7 +62,7 @@ line level    source
   52          
   53          
   54          
-C51 COMPILER V9.53.0.0   TASK_SWITCH                                                       05/15/2018 23:11:34 PAGE 2   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 2   
 
   55          
   56          
@@ -126,7 +126,7 @@ line level    source
  114   2                      EA = 1;
  115   2                      //os_exit_critical();
  116   2                      //__asm RET     //后面是函数返回,即 ret
-C51 COMPILER V9.53.0.0   TASK_SWITCH                                                       05/15/2018 23:11:34 PAGE 3   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 3   
 
  117   2                      //__asm reti
  118   2              }
@@ -190,7 +190,7 @@ line level    source
  176   4                                      if(os_task_rdy_tab & os_map_tab[i])
  177   4                                      {
  178   5                                              if(0 == os_tcb[i].suspend)
-C51 COMPILER V9.53.0.0   TASK_SWITCH                                                       05/15/2018 23:11:34 PAGE 4   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 4   
 
  179   5                                              {
  180   6                                                      break;

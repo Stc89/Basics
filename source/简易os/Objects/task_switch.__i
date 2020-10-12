@@ -1,1 +1,1 @@
-"task_switch.c" OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\task_switch.lst) SRC (.\Objects\task_switch.SRC)
+"task_switch.c" BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\task_switch.lst) SRC (.\Objects\task_switch.SRC)

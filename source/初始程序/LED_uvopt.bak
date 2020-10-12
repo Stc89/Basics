@@ -246,10 +246,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>8</CurrentLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\LED.c</PathWithFileName>
       <FilenameWithoutPath>LED.c</FilenameWithoutPath>
@@ -1627,9 +1627,9 @@
       <Documents>
         <Doc>
           <Name>.\LED.c</Name>
-          <ColumnNumber>14</ColumnNumber>
+          <ColumnNumber>22</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>8</CurrentLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\KEIL\C51\INC\REG51.H</Name>

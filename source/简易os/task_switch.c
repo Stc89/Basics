@@ -1,5 +1,5 @@
 #include "task_switch.h"
-#include <stc12c5a60s2.h>
+#include "reg51.h"
 #include "core.h"
 
 

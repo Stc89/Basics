@@ -1,5 +1,5 @@
 #include "core.h"
-#include <stc12c5a60s2.h>
+#include "reg51.h"
 #include "task_switch.h"
 
 
@@ -24,7 +24,6 @@ void os_init(void)
 {
 	EA = 0;
 	ET0 = 1;			//定时器0开中断
-	AUXR &= 0x7f;		//12T模式
 	TMOD &= 0xf0;
 	TMOD |= 0x01;		//16位计数器
 	TH0 = 0xee;

@@ -1,15 +1,15 @@
-C51 COMPILER V9.53.0.0   CORE                                                              05/15/2018 23:11:34 PAGE 1   
+C51 COMPILER V9.00   CORE                                                                  10/12/2020 21:22:03 PAGE 1   
 
 
-C51 COMPILER V9.53.0.0, COMPILATION OF MODULE CORE
+C51 COMPILER V9.00, COMPILATION OF MODULE CORE
 OBJECT MODULE PLACED IN .\Objects\core.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE core.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\core
-                    -.lst) OBJECT(.\Objects\core.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE core.c BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\core.lst) OBJECT(.\Object
+                    -s\core.obj)
 
 line level    source
 
    1          #include "core.h"
-   2          #include <stc12c5a60s2.h>
+   2          #include "reg51.h"
    3          #include "task_switch.h"
    4          
    5          
@@ -34,101 +34,100 @@ line level    source
   24          {
   25   1              EA = 0;
   26   1              ET0 = 1;                        //定时器0开中断
-  27   1              AUXR &= 0x7f;           //12T模式
-  28   1              TMOD &= 0xf0;
-  29   1              TMOD |= 0x01;           //16位计数器
-  30   1              TH0 = 0xee;
-  31   1              TL0 = 0x00;                     //5ms中断
-  32   1              os_int_count = 0;
-  33   1              os_task_rdy_tab = 0;
-  34   1              os_task_create(MAX_TASK-1,task_idle,(unsigned char)os_tsak_stack[MAX_TASK-1]);
-  35   1      }
+  27   1              TMOD &= 0xf0;
+  28   1              TMOD |= 0x01;           //16位计数器
+  29   1              TH0 = 0xee;
+  30   1              TL0 = 0x00;                     //5ms中断
+  31   1              os_int_count = 0;
+  32   1              os_task_rdy_tab = 0;
+  33   1              os_task_create(MAX_TASK-1,task_idle,(unsigned char)os_tsak_stack[MAX_TASK-1]);
+  34   1      }
+  35          
   36          
-  37          
-  38          /* 空闲任务,必须创建,在系统中其他任务挂起时,系统要有任务运行,一般任务优先级最低,初始化时被创建 */
-  39          static void task_idle(void)
-  40          {
-  41   1              while(1)
-  42   1              {
-  43   2                      //绝对不能有延时,
-  44   2              }
-  45   1      }
+  37          /* 空闲任务,必须创建,在系统中其他任务挂起时,系统要有任务运行,一般任务优先级最低,初始化时被创建 */
+  38          static void task_idle(void)
+  39          {
+  40   1              while(1)
+  41   1              {
+  42   2                      //绝对不能有延时,
+  43   2              }
+  44   1      }
+  45          
   46          
   47          
-  48          
-  49          /* 创建任务 */
-  50          void os_task_create(unsigned char task_id,void (*task)(void),unsigned char stack_point)
-  51          {
-  52   1              char cpu_sr;
-  53   1              
-  54   1              os_enter_critical();
-C51 COMPILER V9.53.0.0   CORE                                                              05/15/2018 23:11:34 PAGE 2   
+  48          /* 创建任务 */
+  49          void os_task_create(unsigned char task_id,void (*task)(void),unsigned char stack_point)
+  50          {
+  51   1              char cpu_sr;
+  52   1              
+  53   1              os_enter_critical();
+  54   1              ((unsigned char idata*)stack_point)[0] = (unsigned int)task;
+C51 COMPILER V9.00   CORE                                                                  10/12/2020 21:22:03 PAGE 2   
 
-  55   1              ((unsigned char idata*)stack_point)[0] = (unsigned int)task;
-  56   1              ((unsigned char idata*)stack_point)[1] = (unsigned int)task >> 8;       //任务地址放在栈底两个字节
-  57   1              os_tcb[task_id].os_task_stcak_bottom = stack_point;                                     //栈底
-  58   1      //      os_tcb[task_id].os_task_stcak_top = stack_point + 14;                           //栈顶(起始这里应该,对任务堆栈初始化后的指针)
-  59   1              //为什么要加1?(因为栈中已经有数据了task)当然初不初始化都可以,用上面的也行(只不过好多人对为什么14有疑惑)
-  60   1              os_tcb[task_id].os_task_stcak_top = os_tesk_stack_init(stack_point + 1);        
-  61   1              os_task_rdy_tab |= os_map_tab[task_id];                                                         //更新任务就绪表
-  62   1              os_tcb[task_id].os_tsak_wait_tick = 0;                                                          //无等待
-  63   1              os_tcb[task_id].suspend = 0;                                                                            //任务以就绪
-  64   1              os_exit_critical();
-  65   1      }
-  66          
-  67          /* 任务开始运行 */
-  68          void os_start(void)
-  69          {
-  70   1              unsigned char i;
-  71   1              
-  72   1              for(i=0; i<MAX_TASK; i++)
-  73   1              {
-  74   2                      if(os_task_rdy_tab & os_map_tab[i])
-  75   2                      {
-  76   3                              break;
-  77   3                      }
-  78   2              }
-  79   1              os_task_running_id = i;         //优先级最高的先运行
-  80   1              EA = 1;
-  81   1              SP = os_tcb[os_task_running_id].os_task_stcak_bottom + 1;       //弹出是任务地址
-  82   1              TR0 = 1;
-  83   1              os_running = os_true;
-  84   1      }
-  85          
-  86          /* 进入中断 */
-  87          void os_int_enter(void)
-  88          {
-  89   1              if(os_true == os_running)
-  90   1              {
-  91   2                      if(os_int_count < 256)  //51单片机中断最多只能进行一次嵌套,os_int_count最大为2,进入本函数前,最多为1
-  92   2                      {
-  93   3                              os_int_count++;
-  94   3                      }
-  95   2              }
-  96   1      }
-  97          
-  98          /* 退出中断 */
-  99          void os_int_exit(void)
- 100          {
- 101   1              if(os_true == os_running)
- 102   1              {
- 103   2                      if(os_int_count >= 1)
- 104   2                      {
- 105   3                              os_int_count--;
- 106   3                      }
- 107   2              }
- 108   1      }
+  55   1              ((unsigned char idata*)stack_point)[1] = (unsigned int)task >> 8;       //任务地址放在栈底两个字节
+  56   1              os_tcb[task_id].os_task_stcak_bottom = stack_point;                                     //栈底
+  57   1      //      os_tcb[task_id].os_task_stcak_top = stack_point + 14;                           //栈顶(起始这里应该,对任务堆栈初始化后的指针)
+  58   1              //为什么要加1?(因为栈中已经有数据了task)当然初不初始化都可以,用上面的也行(只不过好多人对为什么14有疑惑)
+  59   1              os_tcb[task_id].os_task_stcak_top = os_tesk_stack_init(stack_point + 1);        
+  60   1              os_task_rdy_tab |= os_map_tab[task_id];                                                         //更新任务就绪表
+  61   1              os_tcb[task_id].os_tsak_wait_tick = 0;                                                          //无等待
+  62   1              os_tcb[task_id].suspend = 0;                                                                            //任务以就绪
+  63   1              os_exit_critical();
+  64   1      }
+  65          
+  66          /* 任务开始运行 */
+  67          void os_start(void)
+  68          {
+  69   1              unsigned char i;
+  70   1              
+  71   1              for(i=0; i<MAX_TASK; i++)
+  72   1              {
+  73   2                      if(os_task_rdy_tab & os_map_tab[i])
+  74   2                      {
+  75   3                              break;
+  76   3                      }
+  77   2              }
+  78   1              os_task_running_id = i;         //优先级最高的先运行
+  79   1              EA = 1;
+  80   1              SP = os_tcb[os_task_running_id].os_task_stcak_bottom + 1;       //弹出是任务地址
+  81   1              TR0 = 1;
+  82   1              os_running = os_true;
+  83   1      }
+  84          
+  85          /* 进入中断 */
+  86          void os_int_enter(void)
+  87          {
+  88   1              if(os_true == os_running)
+  89   1              {
+  90   2                      if(os_int_count < 256)  //51单片机中断最多只能进行一次嵌套,os_int_count最大为2,进入本函数前,最多为1
+  91   2                      {
+  92   3                              os_int_count++;
+  93   3                      }
+  94   2              }
+  95   1      }
+  96          
+  97          /* 退出中断 */
+  98          void os_int_exit(void)
+  99          {
+ 100   1              if(os_true == os_running)
+ 101   1              {
+ 102   2                      if(os_int_count >= 1)
+ 103   2                      {
+ 104   3                              os_int_count--;
+ 105   3                      }
+ 106   2              }
+ 107   1      }
+ 108          
  109          
- 110          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    200    ----
+   CODE SIZE        =    197    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-C51 COMPILER V9.53.0.0   CORE                                                              05/15/2018 23:11:34 PAGE 3   
-
    PDATA SIZE       =   ----    ----
+C51 COMPILER V9.00   CORE                                                                  10/12/2020 21:22:03 PAGE 3   
+
    DATA SIZE        =     11       6
    IDATA SIZE       =    132    ----
    BIT SIZE         =      1    ----

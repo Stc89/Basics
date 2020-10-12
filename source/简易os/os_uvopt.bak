@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6765992</ColumnNumber>
+      <ColumnNumber>6765895</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>40</TopLine>
-      <CurrentLine>40</CurrentLine>
+      <TopLine>25</TopLine>
+      <CurrentLine>43</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -1583,9 +1583,9 @@
       <Documents>
         <Doc>
           <Name>.\main.c</Name>
-          <ColumnNumber>6765992</ColumnNumber>
-          <TopLine>40</TopLine>
-          <CurrentLine>40</CurrentLine>
+          <ColumnNumber>6765895</ColumnNumber>
+          <TopLine>25</TopLine>
+          <CurrentLine>43</CurrentLine>
         </Doc>
         <Doc>
           <Name>task_switch.h</Name>
