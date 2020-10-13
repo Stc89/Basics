@@ -35,8 +35,7 @@ void delay_us(unsigned int nus)
 void delay_ms(unsigned int nms)
 {
 	unsigned char ms = nms%5;
-	
-	
+
 	if(nms >= 5)
 	{
 		os_delay(nms/5);

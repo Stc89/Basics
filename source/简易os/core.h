@@ -8,21 +8,17 @@
 #define os_enter_critical()	{cpu_sr = os_cpu_sr_save();}
 #define os_exit_critical()	{os_cpu_sr_restore(cpu_sr);}
 
-#define os_true		 	1
-#define os_false 		0
+#define os_true		 	1	//真
+#define os_false 		0	//假
 
 /*任务控制表 */
 typedef struct os_task_control_table
 {
-	unsigned char os_tsak_wait_tick;
-	unsigned char os_task_stcak_top;
-	unsigned char os_task_stcak_bottom;
+	unsigned char os_tsak_wait_tick;	 //任务等待时间
+	unsigned char os_task_stcak_top;	 //栈顶部
+	unsigned char os_task_stcak_bottom;	 //栈底部
 	unsigned char suspend;
 }TCB;
-
-
-
-
 
 extern volatile TCB idata os_tcb[MAX_TASK];
 extern unsigned char idata os_tsak_stack[MAX_TASK][20];

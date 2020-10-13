@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   MAIN                                                                  10/12/2020 21:22:03 PAGE 1   
+C51 COMPILER V9.00   MAIN                                                                  10/13/2020 20:10:15 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
@@ -12,14 +12,14 @@ line level    source
    2          #include "task_switch.h"
    3          #include "reg51.h"
    4          
-   5          sbit led2 = P1^4;
-   6          sbit led3 = P1^5;
-   7          
+   5          /*设置两个LED GPIO口*/
+   6          sbit led1 = P1^4;
+   7          sbit led2 = P1^5;
    8          
    9          /* 系统初始化 */
   10          void system_init(void)
   11          {
-  12   1          P1M1 = 0;   P1M0 = 0;   //设置为准双向口
+  12   1              P1M1 = 0;       P1M0 = 0;       //设置为准双向口
   13   1      }
   14          
   15          void test(void)
@@ -35,50 +35,47 @@ line level    source
   25          {
   26   1              while(1)
   27   1              {
-  28   2                      led2 = 0;
+  28   2                      led1 = 0;
   29   2                      test();
-  30   2                      led2 = 1;
-  31   2                      os_delay(10);
-  32   2              }
-  33   1      }
-  34          
-  35          void task_1(void)
-  36          {
-  37   1              while(1)
-  38   1              {
-  39   2                      led3 = 0;
-  40   2                      os_delay(100);
-  41   2                      led3 = 1;
-  42   2                      os_delay(100);
-  43   2              }
-  44   1      }
-  45          
-  46          char *p = "hello";
-  47          
-  48          int main(void)
-  49          {
-  50   1      
-  51   1      
-  52   1              system_init();
-  53   1              os_init();
-  54   1              os_task_create(1,task_1,(unsigned char)os_tsak_stack[1]);
-C51 COMPILER V9.00   MAIN                                                                  10/12/2020 21:22:03 PAGE 2   
+  30   2                      os_delay(3000);
+  31   2                      led1 = 1;
+  32   2                      os_delay(3000);
+  33   2              }
+  34   1      }
+  35          
+  36          void task_1(void)
+  37          {
+  38   1              while(1)
+  39   1              {
+  40   2                      led2 = 0;
+  41   2                      os_delay(100);
+  42   2                      led2 = 1;
+  43   2                      os_delay(100);
+  44   2              }
+  45   1      }
+  46          
+  47          int main(void)
+  48          {
+  49   1              system_init();
+  50   1              os_init();
+  51   1              os_task_create(1,task_1,(unsigned char)os_tsak_stack[1]);
+  52   1              os_task_create(0,task_0,(unsigned char)os_tsak_stack[0]);
+  53   1              os_start();
+  54   1      
+C51 COMPILER V9.00   MAIN                                                                  10/13/2020 20:10:15 PAGE 2   
 
-  55   1              os_task_create(0,task_0,(unsigned char)os_tsak_stack[0]);
-  56   1              os_start();
-  57   1              
-  58   1              return 0;
-  59   1      }
-  60          
-  61          
+  55   1              return 0;
+  56   1      }
+  57          
+  58          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     90    ----
-   CONSTANT SIZE    =      6    ----
+   CODE SIZE        =     95    ----
+   CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =      3       1
+   DATA SIZE        =   ----       1
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

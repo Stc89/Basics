@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 1   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE TASK_SWITCH
@@ -16,7 +16,7 @@ line level    source
    6          /* ½øÈëÁÙ½ç¶Î */
    7          char os_cpu_sr_save(void)
    8          {
-   9   1              __asm mov r7,IE         //µÃµ½ÖÐ¶Ï¿ØÖÆ¼Ä´æÆ÷Öµ
+   9   1              __asm mov r7,IE         //µÃµ½ ¡¸IE¡¹ÖÐ¶Ï¿ØÖÆ¼Ä´æÆ÷Öµ
   10   1              __asm mov IE,#0
   11   1              __asm ret                       //·µ»ØÖµÊÇÔÚr7ÖÐ
   12   1              return 0;                       //·µ»ØÕâÌõÖ¸ÁîÊµ¼Ê²»»á±»Ö´ÐÐµ½,µ«ÒòÎªÕâ¸öº¯ÊýÈ·ÊµÒª·µ»ØÖµ,ËùÒÔÐ´Ò»ÏÂ(²»È»»áÓÐ¾¯¸æ)
@@ -37,12 +37,12 @@ line level    source
   27          unsigned char os_tesk_stack_init(unsigned char stack_point)
   28          {
   29   1              unsigned char r_sp = SP;
-  30   1              SP = stack_point;
-  31   1              __asm PUSH ACC                          //¼Ä´æÆ÷ÈëÕ»(ÔÚ´ËÖ®Ç°²»ÄÜÓÐÈÎºÎÔËËã²Ù×÷,²»È»»á¸Ä±ä¼Ä´æÆ÷Öµ)
-  32   1              __asm PUSH B
-  33   1              __asm PUSH DPH
-  34   1              __asm PUSH DPL
-  35   1              __asm PUSH PSW
+  30   1              SP = stack_point;       //¼Ä´æÆ÷ÈëÕ»(ÔÚ´ËÖ®Ç°²»ÄÜÓÐÈÎºÎÔËËã²Ù×÷,²»È»»á¸Ä±ä¼Ä´æÆ÷Öµ)
+  31   1              __asm PUSH ACC          //ÀÛ¼ÓÆ÷        
+  32   1              __asm PUSH B            //ÓÃÓÚ³Ë³ýµÄ¼Ä´æÆ÷
+  33   1              __asm PUSH DPH          //Êý¾ÝÖ¸Õë£¬ÓÃÍ¾´ó
+  34   1              __asm PUSH DPL          //Êý¾ÝÖ¸Õë£¬ÓÃÍ¾´ó
+  35   1              __asm PUSH PSW          //±êÖ¾Î»¼Ä´æÆ÷
   36   1              __asm PUSH 0
   37   1              __asm PUSH 1
   38   1              __asm PUSH 2
@@ -51,195 +51,151 @@ line level    source
   41   1              __asm PUSH 5
   42   1              __asm PUSH 6
   43   1              __asm PUSH 7
-  44   1              
+  44   1      
   45   1              stack_point = SP;
   46   1              SP = r_sp;
-  47   1              
+  47   1      
   48   1              return stack_point;
   49   1      }
   50          
   51          
-  52          
-  53          
+  52          /*ÒòÎªÃ»ÓÐ¶ÔPCÖ±½Ó²Ù×÷µÄÖ¸Áî,µ«ÖÐ¶Ï¹ý³ÌºÍ¹ý³Ìµ÷ÓÃ¿ÉÒÔÊ¹PCÈëÕ»,
+  53          ÖÐ¶Ï·µ»Ø,¹ý³Ì·µ»Ø¿ÉÒÔ,Ê¹PC³öÕ»,¿ÉÒÔ¼ä½ÓµÄÀûÓÃ´Ë·½·¨¶ÔPC²Ù×÷*/
   54          
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 2   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 2   
 
-  55          
-  56          
-  57          /*ÒòÎªÃ»ÓÐ¶ÔPCÖ±½Ó²Ù×÷µÄÖ¸Áî,µ«ÖÐ¶Ï¹ý³ÌºÍ¹ý³Ìµ÷ÓÃ¿ÉÒÔÊ¹PCÈëÕ»,
-  58          ÖÐ¶Ï·µ»Ø,¹ý³Ì·µ»Ø¿ÉÒÔ,Ê¹PC³öÕ»,¿ÉÒÔ¼ä½ÓµÄÀûÓÃ´Ë·½·¨¶ÔPC²Ù×÷*/
-  59          
-  60          /* ÏµÍ³ÑÓÊ± */
-  61          void os_delay(unsigned char tisks)
-  62          {
-  63   1              unsigned char i;
-  64   1      //      char cpu_sr;
-  65   1              
-  66   1              if(tisks > 0)
-  67   1              {       
-  68   2                      //os_enter_critical();          
-  69   2                      EA = 0;                                         //Ö±½Ó²Ù×÷,¶ø²»ÓÃÁÙ½ç¶ÎµÄ·½·¨Ö÷ÒªÊÇÎªÁËÈÎÎñÇÐ»»¸ü¿ì
-  70   2                      __asm PUSH ACC                          //¼Ä´æÆ÷ÈëÕ»(ÔÚ´ËÖ®Ç°²»ÄÜÓÐÈÎºÎÔËËã²Ù×÷,²»È»»á¸Ä±ä¼Ä´æÆ÷Öµ)
-  71   2                      __asm PUSH B
-  72   2                      __asm PUSH DPH
-  73   2                      __asm PUSH DPL
-  74   2                      __asm PUSH PSW
-  75   2                      __asm PUSH 0
-  76   2                      __asm PUSH 1
-  77   2                      __asm PUSH 2
-  78   2                      __asm PUSH 3
-  79   2                      __asm PUSH 4
-  80   2                      __asm PUSH 5
-  81   2                      __asm PUSH 6
-  82   2                      __asm PUSH 7
-  83   2                      os_tcb[os_task_running_id].os_task_stcak_top = SP;
-  84   2                      
-  85   2      
-  86   2                      os_tcb[os_task_running_id].os_tsak_wait_tick = tisks;   //ÑÓÊ±Ê±¼ä
-  87   2                      os_tcb[os_task_running_id].suspend = 1;                                 //ÒòÎªÓÐÑÓÊ±,ËùÒÔÏÈ¹ÒÆð±¾ÈÎÎñ
-  88   2                      for(i=0; i<MAX_TASK; i++)                                                               //ÕÒµ½ÒÑ¾­¾ÍÐ÷,Î´±»¹ÒÆð,ÇÒÓÅÏÈ¼¶×î¸ßµÄÈÎÎñ
-  89   2                      {
-  90   3                              if(os_task_rdy_tab & os_map_tab[i])
-  91   3                              {
-  92   4                                      if(0 == os_tcb[i].suspend)
-  93   4                                      {
-  94   5                                              break;
-  95   5                                      }
-  96   4                              }
-  97   3                      }
-  98   2                      os_task_running_id = i;                                                         //¿ÉÖ´ÐÐµÄ×î¸ßÓÅÏÈ¼¶ÈÎÎñ
-  99   2      
- 100   2                      SP = os_tcb[os_task_running_id].os_task_stcak_top;      //×î¸ßÓÅÏÈ¼¶ÈÎÎñµÄÕ»¶¥
- 101   2                      __asm POP 7
- 102   2                      __asm POP 6
- 103   2                      __asm POP 5
- 104   2                      __asm POP 4
- 105   2                      __asm POP 3
- 106   2                      __asm POP 2
- 107   2                      __asm POP 1
- 108   2                      __asm POP 0
- 109   2                      __asm POP PSW
- 110   2                      __asm POP DPL
- 111   2                      __asm POP DPH
- 112   2                      __asm POP B
- 113   2                      __asm POP ACC
- 114   2                      EA = 1;
- 115   2                      //os_exit_critical();
- 116   2                      //__asm RET     //ºóÃæÊÇº¯Êý·µ»Ø,¼´ ret
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 3   
+  55          /* ÏµÍ³ÑÓÊ± */
+  56          void os_delay(unsigned char tisks)
+  57          {
+  58   1              unsigned char i;
+  59   1      
+  60   1              if(tisks > 0)
+  61   1              {
+  62   2                      EA = 0;                                         //Ö±½Ó²Ù×÷,¶ø²»ÓÃÁÙ½ç¶ÎµÄ·½·¨Ö÷ÒªÊÇÎªÁËÈÎÎñÇÐ»»¸ü¿ì
+  63   2                      /*Ñ¹Õ»*/
+  64   2                      __asm PUSH ACC                          //¼Ä´æÆ÷ÈëÕ»(ÔÚ´ËÖ®Ç°²»ÄÜÓÐÈÎºÎÔËËã²Ù×÷,²»È»»á¸Ä±ä¼Ä´æÆ÷Öµ)
+  65   2                      __asm PUSH B
+  66   2                      __asm PUSH DPH
+  67   2                      __asm PUSH DPL
+  68   2                      __asm PUSH PSW
+  69   2                      __asm PUSH 0
+  70   2                      __asm PUSH 1
+  71   2                      __asm PUSH 2
+  72   2                      __asm PUSH 3
+  73   2                      __asm PUSH 4
+  74   2                      __asm PUSH 5
+  75   2                      __asm PUSH 6
+  76   2                      __asm PUSH 7
+  77   2                      os_tcb[os_task_running_id].os_task_stcak_top = SP;
+  78   2                      os_tcb[os_task_running_id].os_tsak_wait_tick = tisks;   //ÑÓÊ±Ê±¼ä
+  79   2                      os_tcb[os_task_running_id].suspend = 1;                                 //ÒòÎªÓÐÑÓÊ±,ËùÒÔÏÈ¹ÒÆð±¾ÈÎÎñ
+  80   2                      for(i=0; i<MAX_TASK; i++)                                                               //ÕÒµ½ÒÑ¾­¾ÍÐ÷,Î´±»¹ÒÆð,ÇÒÓÅÏÈ¼¶×î¸ßµÄÈÎÎñ
+  81   2                      {
+  82   3                              if(os_task_rdy_tab & os_map_tab[i])
+  83   3                              {
+  84   4                                      if(0 == os_tcb[i].suspend)
+  85   4                                      {
+  86   5                                              break;
+  87   5                                      }
+  88   4                              }
+  89   3                      }
+  90   2                      os_task_running_id = i;                                                         //¿ÉÖ´ÐÐµÄ×î¸ßÓÅÏÈ¼¶ÈÎÎñ
+  91   2      
+  92   2                      SP = os_tcb[os_task_running_id].os_task_stcak_top;      //×î¸ßÓÅÏÈ¼¶ÈÎÎñµÄÕ»¶¥
+  93   2                      /*³öÕ»*/
+  94   2                      __asm POP 7
+  95   2                      __asm POP 6
+  96   2                      __asm POP 5
+  97   2                      __asm POP 4
+  98   2                      __asm POP 3
+  99   2                      __asm POP 2
+ 100   2                      __asm POP 1
+ 101   2                      __asm POP 0
+ 102   2                      __asm POP PSW
+ 103   2                      __asm POP DPL
+ 104   2                      __asm POP DPH
+ 105   2                      __asm POP B
+ 106   2                      __asm POP ACC
+ 107   2                      EA = 1;
+ 108   2              }
+ 109   1      }
+ 110          
+ 111          /* ÏµÍ³ÐÄÌø¸üÐÂ */
+ 112          void os_time_tick(void)
+ 113          {
+ 114   1              unsigned char i;
+ 115   1              
+ 116   1              for(i=0; i<MAX_TASK; i++)
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 3   
 
- 117   2                      //__asm reti
- 118   2              }
- 119   1      }
- 120          
- 121          /* ÏµÍ³ÐÄÌø¸üÐÂ */
- 122          void os_time_tick(void)
- 123          {
- 124   1              unsigned char i;
- 125   1              
- 126   1              for(i=0; i<MAX_TASK; i++)
- 127   1              {
- 128   2                      if(os_tcb[i].os_tsak_wait_tick)
- 129   2                      {
- 130   3                              os_tcb[i].os_tsak_wait_tick--;
- 131   3                              if(0 == os_tcb[i].os_tsak_wait_tick)    //Ã»ÓÐµÈ´ýÊ±¼ä,ÔòÈÎÎñ½øÈë¾ÍÐ÷×´Ì¬
- 132   3                              {
- 133   4                                      os_tcb[i].suspend = 0;          //
- 134   4                              }
- 135   3                      }
- 136   2              }
- 137   1              
- 138   1      }
- 139          
- 140          
- 141          /* ÈÎÎñÇÐ»»ÐÄÌø */
- 142          void timer0_isr(void) interrupt 1       //using 0 Ä¬ÈÏÓÃ,ËùÓÐµÄ¼Ä´æÆ÷»á×Ô¶¯ÈëÕ», 
- 143          {                                                       //  ÓÃusing 1 2 3 ÔòÐèÒªÊÖ¶¯¶Ôr0-r7ÈëÕ»,³öÕ»(Çë²é¿´¼Ä´æÆ÷×éÑ¡Ôñ(¿´ÈÎÒâÒ»±¾½²51µÄÊé))
- 144   1              unsigned char i;
- 145   1              char cpu_sr;
- 146   1              
- 147   1              if(os_true == os_running)
- 148   1              {
- 149   2                      os_enter_critical();
- 150   2                      
- 151   2              /*      ¼Ä´æÆ÷ÈëÕ»(×¢ÊÍµÄ²¿·ÖÊÇÔÚ½øÈëÖÐ¶Ïº¯ÊýÇ°ÒÑ¾­Ñ¹ÈëÕ»ÖÐ
- 152   2                      (º¯Êýµ÷ÓÃ»áÈÃPCÑ¹Õ»,ÖÐ¶Ïº¯Êý²»µ«»áÈÃPCÑ¹Õ»,»¹»á¶ÔÏÂÃæÎå¸ö¼Ä´æÆ÷Ñ¹Õ»)
- 153   2                      ,¾ÍÊÇÎÒÐ´µÄÕâ¸öË³Ðò)    */
- 154   2              //      __asm PUSH ACC                  
- 155   2              //      __asm PUSH B
- 156   2              //      __asm PUSH DPH
- 157   2              //      __asm PUSH DPL
- 158   2              //      __asm PUSH PSW
- 159   2      //              __asm PUSH 0
- 160   2      //              __asm PUSH 1
- 161   2      //              __asm PUSH 2
- 162   2      //              __asm PUSH 3
- 163   2      //              __asm PUSH 4
- 164   2      //              __asm PUSH 5
- 165   2      //              __asm PUSH 6
- 166   2      //              __asm PUSH 7
- 167   2                      os_int_enter();
- 168   2                      
- 169   2                      os_time_tick();
- 170   2                      if(1 == os_int_count)           //µ±È»,51µ¥Æ¬»ú×î¶àÖ»ÄÜÓÐÒ»´ÎÖÐ¶ÏÇ¶Ì×,os_int_count×î´óÎª2(+±¾´Î)
- 171   2                      {
- 172   3                              os_tcb[os_task_running_id].os_task_stcak_top = SP;      
- 173   3                              
- 174   3                              for(i=0; i<MAX_TASK; i++)               //ÕÒµ½ÒÑ¾­¾ÍÐ÷,Î´±»¹ÒÆð,ÇÒÓÅÏÈ¼¶×î¸ßµÄÈÎÎñ(ÈÎÎñµ÷¶ÈÆ÷)
- 175   3                              {
- 176   4                                      if(os_task_rdy_tab & os_map_tab[i])
- 177   4                                      {
- 178   5                                              if(0 == os_tcb[i].suspend)
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/12/2020 21:22:03 PAGE 4   
+ 117   1              {
+ 118   2                      if(os_tcb[i].os_tsak_wait_tick)
+ 119   2                      {
+ 120   3                              os_tcb[i].os_tsak_wait_tick--;
+ 121   3                              /*Ã»ÓÐµÈ´ýÊ±¼ä,ÔòÈÎÎñ½øÈë¾ÍÐ÷×´Ì¬*/
+ 122   3                              if(0 == os_tcb[i].os_tsak_wait_tick)
+ 123   3                              {
+ 124   4                                      os_tcb[i].suspend = 0;
+ 125   4                              }
+ 126   3                      }
+ 127   2              }
+ 128   1      }
+ 129          
+ 130          /* 
+ 131          ÈÎÎñÇÐ»»ÐÄÌø 5ms
+ 132          interrupt 1ÊÇ¶¨Ê±Æ÷ÖÐ¶Ï 
+ 133          using 0 Ä¬ÈÏÓÃ,ËùÓÐµÄ¼Ä´æÆ÷»á×Ô¶¯ÈëÕ»
+ 134          ÓÃusing 1 2 3 ÔòÐèÒªÊÖ¶¯¶Ôr0-r7ÈëÕ»,³öÕ»(Çë²é¿´¼Ä´æÆ÷×éÑ¡Ôñ(¿´ÈÎÒâÒ»±¾½²51µÄÊé))
+ 135          */
+ 136          void timer0_isr(void) interrupt 1
+ 137          {
+ 138   1              unsigned char i;
+ 139   1              char cpu_sr;
+ 140   1      
+ 141   1              if(os_true == os_running)
+ 142   1              {
+ 143   2                      os_enter_critical();
+ 144   2                      os_int_enter();
+ 145   2                      
+ 146   2                      os_time_tick();
+ 147   2                      /*µ±È»,51µ¥Æ¬»ú×î¶àÖ»ÄÜÓÐÒ»´ÎÖÐ¶ÏÇ¶Ì×,os_int_count×î´óÎª2(+±¾´Î)*/
+ 148   2                      if(1 == os_int_count)
+ 149   2                      {
+ 150   3                              os_tcb[os_task_running_id].os_task_stcak_top = SP;      
+ 151   3                              /*ÕÒµ½ÒÑ¾­¾ÍÐ÷,Î´±»¹ÒÆð,ÇÒÓÅÏÈ¼¶×î¸ßµÄÈÎÎñ(ÈÎÎñµ÷¶ÈÆ÷)*/
+ 152   3                              for(i=0; i<MAX_TASK; i++)
+ 153   3                              {
+ 154   4                                      if(os_task_rdy_tab & os_map_tab[i])
+ 155   4                                      {
+ 156   5                                              /*ÓÃsuspend ÅÐ¶ÏÐÝÃßÊ±¼äÒÑ¾­µ½£¬¿ÉÒÔÖ´ÐÐÈÎÎñ²¿·Ö*/
+ 157   5                                              if(0 == os_tcb[i].suspend)
+ 158   5                                              {
+ 159   6                                                      break;
+ 160   6                                              }
+ 161   5                                      }
+ 162   4                              }
+ 163   3                              /*ÏÖÔÚÖ´ÐÐµÄÈÎÎñ¾ÍÊÇÓÅÏÈ¼¶×î¸ßµÄ,ËùÒÔ²»ÐèÒªÈÎÎñÇÐ»»*/
+ 164   3                              if(os_task_running_id != i)
+ 165   3                              {
+ 166   4                                      /*¿ÉÖ´ÐÐµÄ×î¸ßÓÅÏÈ¼¶ÈÎÎñ*/
+ 167   4                                      os_task_running_id = i;
+ 168   4                                      /*×î¸ßÓÅÏÈ¼¶ÈÎÎñµÄÕ»¶¥*/
+ 169   4                                      /*SPÊÇ¶ÑÕ»Ö¸Õë£¬Ö¸ÏòÕ»¶¥*/
+ 170   4                                      SP = os_tcb[os_task_running_id].os_task_stcak_top;
+ 171   4                              }
+ 172   3                      }
+ 173   2                      /*Çå³ýÖÐ¶Ï±êÖ¾*/
+ 174   2                      TF0 = 0;
+ 175   2                      /*Ê±¼äÖØ×°ÔØ*/
+ 176   2                      TH0 = 0xee;
+ 177   2                      TL0 = 0x00;
+ 178   2                      os_int_exit();
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 4   
 
- 179   5                                              {
- 180   6                                                      break;
- 181   6                                              }
- 182   5                                      }
- 183   4                              }
- 184   3                              if(os_task_running_id != i)             //ÏÖÔÚÖ´ÐÐµÄÈÎÎñ¾ÍÊÇÓÅÏÈ¼¶×î¸ßµÄ,ËùÒÔ²»ÐèÒªÈÎÎñÇÐ»»
- 185   3                              {
- 186   4                                      os_task_running_id = i;                 //¿ÉÖ´ÐÐµÄ×î¸ßÓÅÏÈ¼¶ÈÎÎñ
- 187   4                                      SP = os_tcb[os_task_running_id].os_task_stcak_top;      //×î¸ßÓÅÏÈ¼¶ÈÎÎñµÄÕ»¶¥
- 188   4                              }
- 189   3                      }
- 190   2                      
- 191   2                      TF0 = 0;                        //Çå³ýÖÐ¶Ï±êÖ¾
- 192   2                      TH0 = 0xee;                     //Ê±¼äÖØ×°ÔØ
- 193   2                      TL0 = 0x00;
- 194   2                      os_int_exit();
- 195   2                      
- 196   2                      
- 197   2      //              __asm POP 7
- 198   2      //              __asm POP 6
- 199   2      //              __asm POP 5
- 200   2      //              __asm POP 4
- 201   2      //              __asm POP 3
- 202   2      //              __asm POP 2
- 203   2      //              __asm POP 1
- 204   2      //              __asm POP 0
- 205   2                      
- 206   2                      os_exit_critical();
- 207   2                      /*ºÍÇ°ÃæµÄµÀÀíÏàÍ¬(¼ÈÈ»Ñ¹Õ»ÁË,µ±È»Ò²Òª³öÕ»)(ËµÃ÷,ºóÃæÊÖ¶¯¼ÓµÄ__asm RETI,ÔòÏÂÃæµÄÕâ¼¸ÌøPOPÊÇ±ØÐëÒªµÄ,
- 208   2                              ÕâÊÇÎªÊ²Ã´ÄØ?    ¹þ¹þ,ÒòÎªÄ¬ÈÏÇé¿öÏÂ,RETIÖ¸ÁîÊÇÒªÔÚ,POPµÄºóÃæ,²»È»¾Í²»ÄÜÖ´ÐÐPOP,Õâ¼¸¸ö¼Ä´æÆ÷Öµ¾Í»Ö¸´²»Á
-             -Ë
- 209   2                              ,×îÖØÒªµÄÊÇSPÒ²¾ÍÂÒÌ×ÁË ,,,,,,,)*/
- 210   2              //      __asm POP PSW                   
- 211   2              //      __asm POP DPL
- 212   2              //      __asm POP DPH
- 213   2              //      __asm POP B
- 214   2              //      __asm POP ACC
- 215   2                      /*Ð´²»Ð´¶¼Ò»Ñù(Ð´ÁË,ÕâÌõÓï¾äÖ´ÐÐÍê»á½øÐÐÉÏÃæ¼Ä´æÆ÷ºÍPC³öÕ»,
- 216   2                      ²»Ð´µÄ»°,CÓïÑÔÐ´µÄÖÐ¶Ïº¯Êý,±àÒëÆ÷»ã±à¹ýºó,»áÔÚºóÃæ¼ÓÒ»ÌõretiÖ¸Áî,ºÍÉÏÃæÖ´ÐÐÏàÍ¬µÄ¹¦ÄÜ)
- 217   2                      ¡¾Ð´µ½ÕâÀï,Í¬Ñ§ÎÒÍ»È»ÓÐÕâÃ´Ò»¸öÏë·¨,ÄÜ²»ÄÜÓÃret(reti¶ÔÖÐ¶Ï±êÖ¾Î»ÓÐÇåÁã×÷ÓÃ,ÕâÀïÎÒÃÇÊÖ¶¯Çå³ý±êÖ¾Î»¾Í¿ÉÒÔÁ
-             -Ë)
- 218   2                      ,º¯Êý·µ»ØÖ¸ÁîÀ´·µ»ØÖÐ¶Ïº¯Êý,µ±È»ÕâÐ©POPÖ®ÀàµÄÖ¸Áî¾ÍÐèÒªÊÕµ½Ð´ÁË,³ÌÐòÊÇÍæ³öÀ´µÄ,´ó¼Ò¿ÉÒÔ¾¡ÇéµÄ³¢ÊÔ¹þ^_^¡¿
-             -*/
- 219   2              //      __asm RETI      
- 220   2              //      __asm   ret   //ºÃÏñ²»¿ÉÒÔ,ÎªÊ²Ã´ÄØ?
- 221   2              }
- 222   1              
- 223   1      }
+ 179   2                      os_exit_critical();
+ 180   2              }
+ 181   1              
+ 182   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
