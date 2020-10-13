@@ -1,5 +1,6 @@
 ".\Objects\main.obj",
 ".\Objects\core.obj",
-".\Objects\task_switch.obj" 
+".\Objects\task_switch.obj",
+".\Objects\uart.obj" 
 TO ".\Objects\os" 
 PRINT(".\Listings\os.m51") RAMSIZE(256) 

@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 1   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:35:49 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE TASK_SWITCH
@@ -62,7 +62,7 @@ line level    source
   52          /*因为没有对PC直接操作的指令,但中断过程和过程调用可以使PC入栈,
   53          中断返回,过程返回可以,使PC出栈,可以间接的利用此方法对PC操作*/
   54          
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 2   
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:35:49 PAGE 2   
 
   55          /* 系统延时 */
   56          void os_delay(unsigned char tisks)
@@ -99,103 +99,104 @@ line level    source
   87   5                                      }
   88   4                              }
   89   3                      }
-  90   2                      os_task_running_id = i;                                                         //可执行的最高优先级任务
-  91   2      
-  92   2                      SP = os_tcb[os_task_running_id].os_task_stcak_top;      //最高优先级任务的栈顶
-  93   2                      /*出栈*/
-  94   2                      __asm POP 7
-  95   2                      __asm POP 6
-  96   2                      __asm POP 5
-  97   2                      __asm POP 4
-  98   2                      __asm POP 3
-  99   2                      __asm POP 2
- 100   2                      __asm POP 1
- 101   2                      __asm POP 0
- 102   2                      __asm POP PSW
- 103   2                      __asm POP DPL
- 104   2                      __asm POP DPH
- 105   2                      __asm POP B
- 106   2                      __asm POP ACC
- 107   2                      EA = 1;
- 108   2              }
- 109   1      }
- 110          
- 111          /* 系统心跳更新 */
- 112          void os_time_tick(void)
- 113          {
- 114   1              unsigned char i;
- 115   1              
- 116   1              for(i=0; i<MAX_TASK; i++)
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 3   
+  90   2                      /*可执行的最高优先级任务*/
+  91   2                      os_task_running_id = i;
+  92   2      
+  93   2                      SP = os_tcb[os_task_running_id].os_task_stcak_top;      //最高优先级任务的栈顶
+  94   2                      /*出栈*/
+  95   2                      __asm POP 7
+  96   2                      __asm POP 6
+  97   2                      __asm POP 5
+  98   2                      __asm POP 4
+  99   2                      __asm POP 3
+ 100   2                      __asm POP 2
+ 101   2                      __asm POP 1
+ 102   2                      __asm POP 0
+ 103   2                      __asm POP PSW
+ 104   2                      __asm POP DPL
+ 105   2                      __asm POP DPH
+ 106   2                      __asm POP B
+ 107   2                      __asm POP ACC
+ 108   2                      EA = 1;
+ 109   2              }
+ 110   1      }
+ 111          
+ 112          /* 系统心跳更新 */
+ 113          void os_time_tick(void)
+ 114          {
+ 115   1              unsigned char i;
+ 116   1              
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:35:49 PAGE 3   
 
- 117   1              {
- 118   2                      if(os_tcb[i].os_tsak_wait_tick)
- 119   2                      {
- 120   3                              os_tcb[i].os_tsak_wait_tick--;
- 121   3                              /*没有等待时间,则任务进入就绪状态*/
- 122   3                              if(0 == os_tcb[i].os_tsak_wait_tick)
- 123   3                              {
- 124   4                                      os_tcb[i].suspend = 0;
- 125   4                              }
- 126   3                      }
- 127   2              }
- 128   1      }
- 129          
- 130          /* 
- 131          任务切换心跳 5ms
- 132          interrupt 1是定时器中断 
- 133          using 0 默认用,所有的寄存器会自动入栈
- 134          用using 1 2 3 则需要手动对r0-r7入栈,出栈(请查看寄存器组选择(看任意一本讲51的书))
- 135          */
- 136          void timer0_isr(void) interrupt 1
- 137          {
- 138   1              unsigned char i;
- 139   1              char cpu_sr;
- 140   1      
- 141   1              if(os_true == os_running)
- 142   1              {
- 143   2                      os_enter_critical();
- 144   2                      os_int_enter();
- 145   2                      
- 146   2                      os_time_tick();
- 147   2                      /*当然,51单片机最多只能有一次中断嵌套,os_int_count最大为2(+本次)*/
- 148   2                      if(1 == os_int_count)
- 149   2                      {
- 150   3                              os_tcb[os_task_running_id].os_task_stcak_top = SP;      
- 151   3                              /*找到已经就绪,未被挂起,且优先级最高的任务(任务调度器)*/
- 152   3                              for(i=0; i<MAX_TASK; i++)
- 153   3                              {
- 154   4                                      if(os_task_rdy_tab & os_map_tab[i])
- 155   4                                      {
- 156   5                                              /*用suspend 判断休眠时间已经到，可以执行任务部分*/
- 157   5                                              if(0 == os_tcb[i].suspend)
- 158   5                                              {
- 159   6                                                      break;
- 160   6                                              }
- 161   5                                      }
- 162   4                              }
- 163   3                              /*现在执行的任务就是优先级最高的,所以不需要任务切换*/
- 164   3                              if(os_task_running_id != i)
- 165   3                              {
- 166   4                                      /*可执行的最高优先级任务*/
- 167   4                                      os_task_running_id = i;
- 168   4                                      /*最高优先级任务的栈顶*/
- 169   4                                      /*SP是堆栈指针，指向栈顶*/
- 170   4                                      SP = os_tcb[os_task_running_id].os_task_stcak_top;
- 171   4                              }
- 172   3                      }
- 173   2                      /*清除中断标志*/
- 174   2                      TF0 = 0;
- 175   2                      /*时间重装载*/
- 176   2                      TH0 = 0xee;
- 177   2                      TL0 = 0x00;
- 178   2                      os_int_exit();
-C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:10:15 PAGE 4   
+ 117   1              for(i=0; i<MAX_TASK; i++)
+ 118   1              {
+ 119   2                      if(os_tcb[i].os_tsak_wait_tick)
+ 120   2                      {
+ 121   3                              os_tcb[i].os_tsak_wait_tick--;
+ 122   3                              /*没有等待时间,则任务进入就绪状态*/
+ 123   3                              if(0 == os_tcb[i].os_tsak_wait_tick)
+ 124   3                              {
+ 125   4                                      os_tcb[i].suspend = 0;
+ 126   4                              }
+ 127   3                      }
+ 128   2              }
+ 129   1      }
+ 130          
+ 131          /* 
+ 132          任务切换心跳 5ms
+ 133          interrupt 1是定时器中断 
+ 134          using 0 默认用,所有的寄存器会自动入栈
+ 135          用using 1 2 3 则需要手动对r0-r7入栈,出栈(请查看寄存器组选择(看任意一本讲51的书))
+ 136          */
+ 137          void timer0_isr(void) interrupt 1
+ 138          {
+ 139   1              unsigned char i;
+ 140   1              char cpu_sr;
+ 141   1      
+ 142   1              if(os_true == os_running)
+ 143   1              {
+ 144   2                      os_enter_critical();
+ 145   2                      os_int_enter();
+ 146   2                      
+ 147   2                      os_time_tick();
+ 148   2                      /*当然,51单片机最多只能有一次中断嵌套,os_int_count最大为2(+本次)*/
+ 149   2                      if(1 == os_int_count)
+ 150   2                      {
+ 151   3                              os_tcb[os_task_running_id].os_task_stcak_top = SP;      
+ 152   3                              /*找到已经就绪,未被挂起,且优先级最高的任务(任务调度器)*/
+ 153   3                              for(i=0; i<MAX_TASK; i++)
+ 154   3                              {
+ 155   4                                      if(os_task_rdy_tab & os_map_tab[i])
+ 156   4                                      {
+ 157   5                                              /*用suspend 判断休眠时间已经到，可以执行任务部分*/
+ 158   5                                              if(0 == os_tcb[i].suspend)
+ 159   5                                              {
+ 160   6                                                      break;
+ 161   6                                              }
+ 162   5                                      }
+ 163   4                              }
+ 164   3                              /*现在执行的任务就是优先级最高的,所以不需要任务切换*/
+ 165   3                              if(os_task_running_id != i)
+ 166   3                              {
+ 167   4                                      /*可执行的最高优先级任务*/
+ 168   4                                      os_task_running_id = i;
+ 169   4                                      /*最高优先级任务的栈顶*/
+ 170   4                                      /*SP是堆栈指针，指向栈顶*/
+ 171   4                                      SP = os_tcb[os_task_running_id].os_task_stcak_top;
+ 172   4                              }
+ 173   3                      }
+ 174   2                      /*清除中断标志*/
+ 175   2                      TF0 = 0;
+ 176   2                      /*时间重装载*/
+ 177   2                      TH0 = 0xee;
+ 178   2                      TL0 = 0x00;
+C51 COMPILER V9.00   TASK_SWITCH                                                           10/13/2020 20:35:49 PAGE 4   
 
- 179   2                      os_exit_critical();
- 180   2              }
- 181   1              
- 182   1      }
+ 179   2                      os_int_exit();
+ 180   2                      os_exit_critical();
+ 181   2              }
+ 182   1              
+ 183   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE

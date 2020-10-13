@@ -139,6 +139,7 @@ TH0	DATA	08CH
 EX0	BIT	0A8H.0
 TH1	DATA	08DH
 IT0	BIT	088H.0
+TH2	DATA	0D6H
 T2H	DATA	0D6H
 EX1	BIT	0A8H.2
 TB8	BIT	098H.3
@@ -150,6 +151,7 @@ SM0	BIT	098H.7
 TL0	DATA	08AH
 SM1	BIT	098H.6
 TL1	DATA	08BH
+TL2	DATA	0D7H
 T2L	DATA	0D7H
 SM2	BIT	098H.5
 T3L	DATA	0D5H
@@ -185,6 +187,7 @@ SADDR	DATA	0A9H
 IAP_TRIG	DATA	0C6H
 F0	BIT	0D0H.5
 IRCBAND	DATA	09DH
+INT_CLKO	DATA	08FH
 PSW	DATA	0D0H
 SPDAT	DATA	0CFH
 P0M0	DATA	094H
@@ -461,12 +464,13 @@ _os_delay:
 	INC  	R7
 	CJNE 	R7,#03H,?C0005
 ?C0006:
-; 		os_task_running_id = i;								//可执行的最高优先级任务
-			; SOURCE LINE # 90
+; 		/*可执行的最高优先级任务*/
+; 		os_task_running_id = i;
+			; SOURCE LINE # 91
 	MOV  	os_task_running_id,R7
 ; 
 ; 		SP = os_tcb[os_task_running_id].os_task_stcak_top;	//最高优先级任务的栈顶
-			; SOURCE LINE # 92
+			; SOURCE LINE # 93
 	MOV  	R7,os_task_running_id
 	MOV  	A,R7
 	ADD  	A,ACC
@@ -503,12 +507,12 @@ _os_delay:
 ; 		__asm POP ACC
 	 POP ACC
 ; 		EA = 1;
-			; SOURCE LINE # 107
+			; SOURCE LINE # 108
 	SETB 	EA
 ; 	}
-			; SOURCE LINE # 108
-; }
 			; SOURCE LINE # 109
+; }
+			; SOURCE LINE # 110
 ?C0010:
 	RET  	
 ; END OF _os_delay
@@ -520,21 +524,21 @@ _os_delay:
 	RSEG  ?PR?os_time_tick?TASK_SWITCH
 os_time_tick:
 	USING	0
-			; SOURCE LINE # 112
-; {
 			; SOURCE LINE # 113
+; {
+			; SOURCE LINE # 114
 ; 	unsigned char i;
 ; 	
 ; 	for(i=0; i<MAX_TASK; i++)
-			; SOURCE LINE # 116
+			; SOURCE LINE # 117
 ;---- Variable 'i?445' assigned to Register 'R7' ----
 	CLR  	A
 	MOV  	R7,A
 ?C0011:
 ; 	{
-			; SOURCE LINE # 117
-; 		if(os_tcb[i].os_tsak_wait_tick)
 			; SOURCE LINE # 118
+; 		if(os_tcb[i].os_tsak_wait_tick)
+			; SOURCE LINE # 119
 	MOV  	A,R7
 	ADD  	A,ACC
 	ADD  	A,ACC
@@ -543,9 +547,9 @@ os_time_tick:
 	MOV  	A,@R0
 	JZ   	?C0013
 ; 		{
-			; SOURCE LINE # 119
-; 			os_tcb[i].os_tsak_wait_tick--;
 			; SOURCE LINE # 120
+; 			os_tcb[i].os_tsak_wait_tick--;
+			; SOURCE LINE # 121
 	MOV  	A,R7
 	ADD  	A,ACC
 	ADD  	A,ACC
@@ -554,7 +558,7 @@ os_time_tick:
 	DEC  	@R0
 ; 			/*没有等待时间,则任务进入就绪状态*/
 ; 			if(0 == os_tcb[i].os_tsak_wait_tick)
-			; SOURCE LINE # 122
+			; SOURCE LINE # 123
 	MOV  	A,R7
 	ADD  	A,ACC
 	ADD  	A,ACC
@@ -563,9 +567,9 @@ os_time_tick:
 	MOV  	A,@R0
 	JNZ  	?C0013
 ; 			{
-			; SOURCE LINE # 123
-; 				os_tcb[i].suspend = 0;
 			; SOURCE LINE # 124
+; 				os_tcb[i].suspend = 0;
+			; SOURCE LINE # 125
 	MOV  	A,R7
 	ADD  	A,ACC
 	ADD  	A,ACC
@@ -574,16 +578,16 @@ os_time_tick:
 	CLR  	A
 	MOV  	@R0,A
 ; 			}
-			; SOURCE LINE # 125
-; 		}
 			; SOURCE LINE # 126
-; 	}
+; 		}
 			; SOURCE LINE # 127
+; 	}
+			; SOURCE LINE # 128
 ?C0013:
 	INC  	R7
 	CJNE 	R7,#03H,?C0011
 ; }
-			; SOURCE LINE # 128
+			; SOURCE LINE # 129
 ?C0016:
 	RET  	
 ; END OF os_time_tick
@@ -618,37 +622,37 @@ timer0_isr:
 	PUSH 	AR6
 	PUSH 	AR7
 	USING	0
-			; SOURCE LINE # 136
+			; SOURCE LINE # 137
 ; {
 ; 	unsigned char i;
 ; 	char cpu_sr;
 ; 
 ; 	if(os_true == os_running)
-			; SOURCE LINE # 141
+			; SOURCE LINE # 142
 	JNB  	os_running,?C0025
 ; 	{
-			; SOURCE LINE # 142
-; 		os_enter_critical();
 			; SOURCE LINE # 143
+; 		os_enter_critical();
+			; SOURCE LINE # 144
 	LCALL	os_cpu_sr_save
 	MOV  	cpu_sr?547,R7
 ; 		os_int_enter();
-			; SOURCE LINE # 144
+			; SOURCE LINE # 145
 	LCALL	os_int_enter
 ; 		
 ; 		os_time_tick();
-			; SOURCE LINE # 146
+			; SOURCE LINE # 147
 	LCALL	os_time_tick
 ; 		/*当然,51单片机最多只能有一次中断嵌套,os_int_count最大为2(+本次)*/
 ; 		if(1 == os_int_count)
-			; SOURCE LINE # 148
+			; SOURCE LINE # 149
 	MOV  	A,os_int_count
 	XRL  	A,#01H
 	JNZ  	?C0018
 ; 		{
-			; SOURCE LINE # 149
-; 			os_tcb[os_task_running_id].os_task_stcak_top = SP;	
 			; SOURCE LINE # 150
+; 			os_tcb[os_task_running_id].os_task_stcak_top = SP;	
+			; SOURCE LINE # 151
 	MOV  	R7,os_task_running_id
 	MOV  	A,R7
 	ADD  	A,ACC
@@ -658,15 +662,15 @@ timer0_isr:
 	MOV  	@R0,SP
 ; 			/*找到已经就绪,未被挂起,且优先级最高的任务(任务调度器)*/
 ; 			for(i=0; i<MAX_TASK; i++)
-			; SOURCE LINE # 152
+			; SOURCE LINE # 153
 ;---- Variable 'i?546' assigned to Register 'R7' ----
 	CLR  	A
 	MOV  	R7,A
 ?C0019:
 ; 			{
-			; SOURCE LINE # 153
-; 				if(os_task_rdy_tab & os_map_tab[i])
 			; SOURCE LINE # 154
+; 				if(os_task_rdy_tab & os_map_tab[i])
+			; SOURCE LINE # 155
 	MOV  	A,#LOW (os_map_tab)
 	ADD  	A,R7
 	MOV  	R0,A
@@ -674,10 +678,10 @@ timer0_isr:
 	ANL  	A,os_task_rdy_tab
 	JZ   	?C0021
 ; 				{
-			; SOURCE LINE # 155
+			; SOURCE LINE # 156
 ; 					/*用suspend 判断休眠时间已经到，可以执行任务部分*/
 ; 					if(0 == os_tcb[i].suspend)
-			; SOURCE LINE # 157
+			; SOURCE LINE # 158
 	MOV  	A,R7
 	ADD  	A,ACC
 	ADD  	A,ACC
@@ -686,36 +690,36 @@ timer0_isr:
 	MOV  	A,@R0
 	JZ   	?C0020
 ; 					{
-			; SOURCE LINE # 158
-; 						break;
 			; SOURCE LINE # 159
-; 					}
+; 						break;
 			; SOURCE LINE # 160
+; 					}
+			; SOURCE LINE # 161
 ?C0023:
 ; 				}
-			; SOURCE LINE # 161
-; 			}
 			; SOURCE LINE # 162
+; 			}
+			; SOURCE LINE # 163
 ?C0021:
 	INC  	R7
 	CJNE 	R7,#03H,?C0019
 ?C0020:
 ; 			/*现在执行的任务就是优先级最高的,所以不需要任务切换*/
 ; 			if(os_task_running_id != i)
-			; SOURCE LINE # 164
+			; SOURCE LINE # 165
 	MOV  	A,os_task_running_id
 	XRL  	A,R7
 	JZ   	?C0018
 ; 			{
-			; SOURCE LINE # 165
+			; SOURCE LINE # 166
 ; 				/*可执行的最高优先级任务*/
 ; 				os_task_running_id = i;
-			; SOURCE LINE # 167
+			; SOURCE LINE # 168
 	MOV  	os_task_running_id,R7
 ; 				/*最高优先级任务的栈顶*/
 ; 				/*SP是堆栈指针，指向栈顶*/
 ; 				SP = os_tcb[os_task_running_id].os_task_stcak_top;
-			; SOURCE LINE # 170
+			; SOURCE LINE # 171
 	MOV  	R7,os_task_running_id
 	MOV  	A,R7
 	ADD  	A,ACC
@@ -725,33 +729,33 @@ timer0_isr:
 	MOV  	A,@R0
 	MOV  	SP,A
 ; 			}
-			; SOURCE LINE # 171
-; 		}
 			; SOURCE LINE # 172
+; 		}
+			; SOURCE LINE # 173
 ?C0018:
 ; 		/*清除中断标志*/
 ; 		TF0 = 0;
-			; SOURCE LINE # 174
+			; SOURCE LINE # 175
 	CLR  	TF0
 ; 		/*时间重装载*/
 ; 		TH0 = 0xee;
-			; SOURCE LINE # 176
+			; SOURCE LINE # 177
 	MOV  	TH0,#0EEH
 ; 		TL0 = 0x00;
-			; SOURCE LINE # 177
+			; SOURCE LINE # 178
 	MOV  	TL0,#00H
 ; 		os_int_exit();
-			; SOURCE LINE # 178
+			; SOURCE LINE # 179
 	LCALL	os_int_exit
 ; 		os_exit_critical();
-			; SOURCE LINE # 179
+			; SOURCE LINE # 180
 	MOV  	R7,cpu_sr?547
 	LCALL	_os_cpu_sr_restore
 ; 	}
-			; SOURCE LINE # 180
+			; SOURCE LINE # 181
 ; 	
 ; }
-			; SOURCE LINE # 182
+			; SOURCE LINE # 183
 ?C0025:
 	POP  	AR7
 	POP  	AR6

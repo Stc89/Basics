@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:10:15 PAGE 1   
+C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:35:49 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE CORE
@@ -62,7 +62,7 @@ line level    source
   52          
   53          /* 空闲任务,必须创建,在系统中其他任务挂起时,系统要有任务运行,一般任务优先级最低,初始化时被创建 */
   54          static void task_idle(void)
-C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:10:15 PAGE 2   
+C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:35:49 PAGE 2   
 
   55          {
   56   1              while(1)
@@ -126,7 +126,7 @@ line level    source
  114   2              }
  115   1      }
  116          
-C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:10:15 PAGE 3   
+C51 COMPILER V9.00   CORE                                                                  10/13/2020 20:35:49 PAGE 3   
 
  117          /* 退出中断 */
  118          void os_int_exit(void)
