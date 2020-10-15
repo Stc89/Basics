@@ -30,6 +30,13 @@ https://github.com/Stc89/Basics/tree/master/article
 
 ![渲染图](https://raw.githubusercontent.com/weiqifa0/pic/master/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20200813202412.jpg)
 
+# 所以流产是从这个时候开始的
+
+没有资本的注入，没有火爆的卖场，我觉得我不想坚持了。
+`不过我还是会继续研究的`毕竟以后楠哥是真的需要这个github链接的。
+
+![我就用它来学习好了](https://raw.githubusercontent.com/weiqifa0/pic/master/image-20201015214618297.png)
+
 # 防止失联微信公众号
 
 下面是我的微信技术公众号，大家如果在学习中遇到什么问题，欢迎来公众号一起讨论技术。
