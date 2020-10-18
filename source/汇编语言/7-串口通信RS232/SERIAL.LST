@@ -1,0 +1,236 @@
+                                                                    页     1
+                                                                    10-16-20
+                                                                    20:55:50
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            ;打开任意串口调试软件
+            ;打开对应的串口，可以在设备管理器中看到
+            ;设置波特率为9600，8个数据位，1个停止位，无奇偶校验
+            ;在发送栏输入任意数字或者字符串，点击发送，接收区能接收到相同的信息
+            ;发送格式与接收格式必须相同，如都是字符或者都是十六进制格式
+                    ORG 0000H
+0000 0130           AJMP MAIN
+                    ORG 0023H
+0023 0141           AJMP RECEIVE          ;跳转到接收中断入口
+                    ORG 0030H
+            
+0030 758920 MAIN:   MOV TMOD,#20H         ;T1工作方式2
+0033 758DFD         MOV TH1,#0FDH         ;波特率9600
+0036 759850         MOV SCON,#50H         ;传口工作方式1，允许中断接受
+0039 D2AF           SETB EA               ;打开总中断
+003B D2AC           SETB ES               ;打开串口中断
+003D D28E           SETB TR1              ;打开定时器1
+003F 013F           AJMP $
+            
+            
+            RECEIVE:
+0041 C298           CLR RI
+0043 E599           MOV A,SBUF            ;串口接收数据
+0045 F8             MOV R0,A
+0046 F599           MOV SBUF,A            ;将接收的数据再传送给计算机
+0048 3099FD         JNB TI,$
+004B C299           CLR TI
+004D E8             MOV A,R0
+            
+                    ;送LED显示
+004E F590           MOV P1,A
+0050 32             RETI
+            
+            
+0051 C0F9A4 
+0054 B09992 
+0057 82F880 
+005A 90     TAB:    DB 0C0H,0F9H,0A4H,0B0H,99H,92H,82H,0F8H,80H,90H    ;共阳字码表
+            
+                    END
+
+
+
+
+
+
+
+
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\7-串口通信RS232\SERIAL.ASM     
+ 
+                                                                    页     2
+                                                                    10-16-20
+                                                                    20:55:50
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+
+
+            符号                       值     类型
+
+            AC                       = 00D6H CONST 常量 
+            ACC                      = 00E0H CONST 常量 
+            B                        = 00F0H CONST 常量 
+            CCF0                     = 00DFH CONST 常量 
+            CCF1                     = 00DEH CONST 常量 
+            CCF2                     = 00DDH CONST 常量 
+            CCF3                     = 00DCH CONST 常量 
+            CCF4                     = 00DBH CONST 常量 
+            CF                       = 00D8H CONST 常量 
+            CP_RL2                   = 00C8H CONST 常量 
+            CP_RL2                   = 00C8H CONST 常量 
+            CR                       = 00D9H CONST 常量 
+            CY                       = 00D7H CONST 常量 
+            C_T2                     = 00C9H CONST 常量 
+            C_T2                     = 00C9H CONST 常量 
+            DPH                      = 0083H CONST 常量 
+            DPL                      = 0082H CONST 常量 
+            EA                       = 00AFH CONST 常量 
+            ES                       = 00ACH CONST 常量 
+            ET0                      = 00A9H CONST 常量 
+            ET1                      = 00ABH CONST 常量 
+            ET2                      = 00ADH CONST 常量 
+            EX0                      = 00A8H CONST 常量 
+            EX1                      = 00AAH CONST 常量 
+            EXEN2                    = 00CBH CONST 常量 
+            EXEN2                    = 00CBH CONST 常量 
+            EXF2                     = 00CEH CONST 常量 
+            EXF2                     = 00CEH CONST 常量 
+            F0                       = 00D5H CONST 常量 
+            IE                       = 00A8H CONST 常量 
+            IE0                      = 0089H CONST 常量 
+            IE1                      = 008BH CONST 常量 
+            INT0                     = 00B2H CONST 常量 
+            INT1                     = 00B3H CONST 常量 
+            IP                       = 00B8H CONST 常量 
+            IT0                      = 0088H CONST 常量 
+            IT1                      = 008AH CONST 常量 
+            MAIN                     = 0030H CODE  标号 
+            OV                       = 00D2H CONST 常量 
+            P                        = 00D0H CONST 常量 
+            P0                       = 0080H CONST 常量 
+            P1                       = 0090H CONST 常量 
+            P2                       = 00A0H CONST 常量 
+            P3                       = 00B0H CONST 常量 
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\7-串口通信RS232\SERIAL.ASM     
+ 
+                                                                    页     3
+                                                                    10-16-20
+                                                                    20:55:50
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            PCON                     = 0087H CONST 常量 
+            PS                       = 00BCH CONST 常量 
+            PSW                      = 00D0H CONST 常量 
+            PT0                      = 00B9H CONST 常量 
+            PT1                      = 00BBH CONST 常量 
+            PX0                      = 00B8H CONST 常量 
+            PX1                      = 00BAH CONST 常量 
+            RB8                      = 009AH CONST 常量 
+            RCAP2H                   = 00CBH CONST 常量 
+            RCAP2L                   = 00CAH CONST 常量 
+            RCLK                     = 00CDH CONST 常量 
+            RCLK                     = 00CDH CONST 常量 
+            RD                       = 00B7H CONST 常量 
+            RECEIVE                  = 0041H CODE  标号 
+            REN                      = 009CH CONST 常量 
+            RI                       = 0098H CONST 常量 
+            RS0                      = 00D3H CONST 常量 
+            RS1                      = 00D4H CONST 常量 
+            RXD                      = 00B0H CONST 常量 
+            SBUF                     = 0099H CONST 常量 
+            SCON                     = 0098H CONST 常量 
+            SM0                      = 009FH CONST 常量 
+            SM1                      = 009EH CONST 常量 
+            SM2                      = 009DH CONST 常量 
+            SP                       = 0081H CONST 常量 
+            T0                       = 00B4H CONST 常量 
+            T1                       = 00B5H CONST 常量 
+            T2CON                    = 00C8H CONST 常量 
+            TAB                      = 0051H CODE  标号 
+            TB8                      = 009BH CONST 常量 
+            TCLK                     = 00CCH CONST 常量 
+            TCLK                     = 00CCH CONST 常量 
+            TCON                     = 0088H CONST 常量 
+            TF0                      = 008DH CONST 常量 
+            TF1                      = 008FH CONST 常量 
+            TF2                      = 00CFH CONST 常量 
+            TF2                      = 00CFH CONST 常量 
+            TH0                      = 008CH CONST 常量 
+            TH1                      = 008DH CONST 常量 
+            TH2                      = 00CDH CONST 常量 
+            TI                       = 0099H CONST 常量 
+            TL0                      = 008AH CONST 常量 
+            TL1                      = 008BH CONST 常量 
+            TL2                      = 00CCH CONST 常量 
+            TMOD                     = 0089H CONST 常量 
+            TR0                      = 008CH CONST 常量 
+            TR1                      = 008EH CONST 常量 
+            TR2                      = 00CAH CONST 常量 
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\7-串口通信RS232\SERIAL.ASM     
+ 
+                                                                    页     4
+                                                                    10-16-20
+                                                                    20:55:50
+伟福汇编器 V5.00                             Copyright (c) 1989, 2001 by CHY
+
+地址  机器码 源程序
+
+            TR2                      = 00CAH CONST 常量 
+            TXD                      = 00B1H CONST 常量 
+            WR                       = 00B6H CONST 常量 
+
+
+            公有符号:   95
+            私有符号:    0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+D:\SOURCE\BASICS\SOURCE\汇编语言\7-串口通信RS232\SERIAL.ASM     
+ 
