@@ -9,7 +9,7 @@
 
 希望前辈给予一些指导
 
-![问题图片](C:/Users/32941/AppData/Roaming/Typora/typora-user-images/image-20201015140623082.png)
+![问题图片](https://raw.githubusercontent.com/weiqifa0/pic/master/image-20201015140623082.png)
 
 # #回答
 
