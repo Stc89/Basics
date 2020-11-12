@@ -11,6 +11,7 @@
 /*---------------------------------------------------------------------*/
 
 #include    "reg51.h"
+#include    <string.h>
 
 #define     MAIN_Fosc       24000000L   //定义主时钟
 
@@ -108,11 +109,35 @@ u8 code ledNum[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 void  delay_ms(u8 ms);
 
+#define KEY_0  P57 /*按键*/
+#define UP_500W P56 /*上层管*/
+#define DOWN_200W P55 /*下层管*/
+#define FUNJI P54 /*风机*/ 
+#define true (1)
+#define false (0)
 
-/******************** 主函数 **************************/
-void main(void)
+enum STATE{
+
+	STATE_UP_ON, /*启动上层管700W*/
+	STATE_DOWN_ON, /*启动下层管200W*/
+	STATE_FUN_ON, /*启动风机*/
+	STATE_TIME1_5MIN, /*定时器1 5分钟*/
+	STATE_TIME2_10MIN, /*定时器2 10分钟*/
+	STATE_TIME3_5MIN, /*定时器3 5分钟*/
+	
+	STATE_idle,	  /*空闲*/
+};
+
+struct strg_data{
+	int time_cout;
+};
+
+enum STATE sys_state;
+struct strg_data stu_data;
+
+void gpio_init(void)
 {
-    P0M1 = 0;   P0M0 = 0;   //设置为准双向口
+	P0M1 = 0;   P0M0 = 0;   //设置为准双向口
     P1M1 = 0;   P1M0 = 0;   //设置为准双向口
     P2M1 = 0;   P2M0 = 0;   //设置为准双向口
     P3M1 = 0;   P3M0 = 0;   //设置为准双向口
@@ -120,19 +145,83 @@ void main(void)
     P5M1 = 0;   P5M0 = 0;   //设置为准双向口
     P6M1 = 0;   P6M0 = 0;   //设置为准双向口
     P7M1 = 0;   P7M0 = 0;   //设置为准双向口
+}
 
-    P40 = 0;		//LED Power On
-		ledIndex = 0;
+unsigned char get_key_value(void)
+{
+	if(KEY_0 == 1){
+		delay_ms(200);
+		if(KEY_0 == 1){
+			return (true);
+		}
+	}
+	return (false);
+}
+
+/******************** 主函数 **************************/
+void main(void)
+{
+
+	gpio_init();
+
+	sys_state =  STATE_idle;
+
+	memset(&stu_data,0,sizeof(stu_data));
     while(1)
     {
-        P1 = ~ledNum[ledIndex];	//输出低驱动
-				ledIndex++;
-				if(ledIndex > 7)
-				{
-						ledIndex = 0;
-				}
-        delay_ms(250);
-        delay_ms(250);
+		if(get_key_value() && sys_state == STATE_idle){
+			sys_state = STATE_UP_ON;
+		}
+
+		switch(sys_state)
+		{
+			case STATE_UP_ON:
+			{
+				 DOWN_200W = 1; /*启动下层管*/
+				 sys_state = STATE_TIME2_10MIN;	
+			}
+			break; 
+			case STATE_TIME1_5MIN:
+			{
+				 stu_data.time_cout ++;
+				 delay_ms(1000);
+				 if(stu_data.time_cout >= 5*60){
+				 	stu_data.time_cout = 0;
+					sys_state = STATE_DOWN_ON;
+				 }
+			}
+			break; 
+			case STATE_TIME2_10MIN:
+			{
+				 stu_data.time_cout ++;
+				 delay_ms(1000);
+				 if(stu_data.time_cout >= 10*60){
+				 	stu_data.time_cout = 0;
+					sys_state = STATE_TIME3_5MIN;
+
+					DOWN_200W = 0; /*关闭下层管*/
+					FUNJI = 1; /*启动风机*/
+				 }
+			}
+			break;
+			case STATE_TIME3_5MIN:
+			{
+				 stu_data.time_cout ++;
+				 delay_ms(1000);
+				 if(stu_data.time_cout >= 5*60){
+				 	stu_data.time_cout = 0;
+					sys_state = STATE_idle;
+
+					UP_500W = 0; /*关闭上层管*/
+					FUNJI = 0; /*关闭风机*/
+				 }
+			}
+			break;
+
+			default:
+
+			break;
+		}
     }
 }
 

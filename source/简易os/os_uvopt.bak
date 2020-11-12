@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6765895</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>25</TopLine>
-      <CurrentLine>43</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -188,10 +188,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6766163</ColumnNumber>
+      <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>111</TopLine>
-      <CurrentLine>111</CurrentLine>
+      <TopLine>64</TopLine>
+      <CurrentLine>64</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\core.c</PathWithFileName>
       <FilenameWithoutPath>core.c</FilenameWithoutPath>
@@ -202,10 +202,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6766163</ColumnNumber>
+      <ColumnNumber>9</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>52443664</TopLine>
-      <CurrentLine>16587236</CurrentLine>
+      <TopLine>202</TopLine>
+      <CurrentLine>202</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\task_switch.c</PathWithFileName>
       <FilenameWithoutPath>task_switch.c</FilenameWithoutPath>
@@ -215,7 +215,33 @@
   <AlienFiles>
     <PathWithFilename>D:\source\Basics\source\简易os\task_switch.h</PathWithFilename>
     <TopLine>1</TopLine>
-    <CurrentLine>6</CurrentLine>
+    <CurrentLine>12</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\KEIL\C51\INC\REG51.H</PathWithFilename>
+    <TopLine>324</TopLine>
+    <CurrentLine>335</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1583,15 +1609,33 @@
       <Documents>
         <Doc>
           <Name>.\main.c</Name>
-          <ColumnNumber>6765895</ColumnNumber>
-          <TopLine>25</TopLine>
-          <CurrentLine>43</CurrentLine>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
-          <Name>task_switch.h</Name>
-          <ColumnNumber>4</ColumnNumber>
+          <Name>TASK_SWITCH.H</Name>
+          <ColumnNumber>82</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>6</CurrentLine>
+          <CurrentLine>12</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\core.c</Name>
+          <ColumnNumber>27</ColumnNumber>
+          <TopLine>64</TopLine>
+          <CurrentLine>64</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\task_switch.c</Name>
+          <ColumnNumber>9</ColumnNumber>
+          <TopLine>202</TopLine>
+          <CurrentLine>202</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>C:\KEIL\C51\INC\REG51.H</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>324</TopLine>
+          <CurrentLine>335</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>
